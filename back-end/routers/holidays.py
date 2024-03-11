@@ -38,7 +38,7 @@ def get_holiday_info(holidays, date):
 
     return holiday_info
 
-@router.get("/api/holidays/")
+@router.get("/api/holidays/{date}")
 async def get_holidays(date: Optional[str] = None):
     try:
         if date is None:
@@ -48,8 +48,8 @@ async def get_holidays(date: Optional[str] = None):
             date_obj = datetime.fromisoformat(date)
             print("date passed from frontend:", date_obj)
 
-        start_date = date_obj - timedelta(weeks=6)
-        end_date = date_obj + timedelta(weeks=6)
+        start_date = date_obj - timedelta(weeks=8)
+        end_date = date_obj + timedelta(weeks=8)
 
         formatted_start_date = start_date.strftime("%Y-%m-%d")
         formatted_end_date = end_date.strftime("%Y-%m-%d")
