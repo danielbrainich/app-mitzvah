@@ -150,9 +150,8 @@ export default function Holidays() {
                     </View>
                 </Swiper>
             ) : (
-                <AppLoading />
+                null
             )}
-            <StatusBar style="auto" />
         </SafeAreaView>
     );
 }
