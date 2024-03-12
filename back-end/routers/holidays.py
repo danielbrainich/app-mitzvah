@@ -40,8 +40,12 @@ def get_holiday_info(holidays, date):
 
 @router.get("/api/holidays/{date}")
 async def get_holidays(date: Optional[str] = None):
+    test_date = None # For testing purposes. Date format should be "YYYY-MM-DD"
+
     try:
-        if date is None:
+        if test_date is not None:
+            date_obj = datetime.fromisoformat(test_date)
+        elif date is None:
             date_obj = datetime.now()
             print("date generated on backend:", date_obj)
         else:
@@ -75,10 +79,8 @@ async def get_holidays(date: Optional[str] = None):
         response.raise_for_status()
         data = response.json()
 
-        # Extract holiday information using the get_holiday_info function
         holiday_info = get_holiday_info(data.get("items", []), date_obj.isoformat())
 
-        # Return the holiday data along with the extracted holiday information
         return {
             "holiday_info": holiday_info
         }
