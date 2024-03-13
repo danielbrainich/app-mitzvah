@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, SafeAreaView, View } from "react-native";
 import { useFonts } from "expo-font";
 import Swiper from "react-native-swiper";
@@ -167,29 +166,29 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     headerText: {
-        color: "#82CBFF",
-        fontSize: 32,
+        color: "white",
+        fontSize: 26,
         marginBottom: 22,
     },
     bigBoldText: {
-        color: "white",
+        color: "#82CBFF",
         fontFamily: "Nayuki",
-        fontSize: 84,
+        fontSize: 72,
         marginBottom: 2,
     },
     hebrewText: {
-        color: "#82CBFF",
-        fontSize: 44,
+        color: "white",
+        fontSize: 38,
         marginBottom: 18,
     },
     dateText: {
-        color: "#82CBFF",
-        fontSize: 24,
+        color: "white",
+        fontSize: 22,
         marginBottom: 24,
     },
     paragraphText: {
         color: "white",
-        fontSize: 26,
+        fontSize: 24,
     },
     dot: {
         backgroundColor: "white",

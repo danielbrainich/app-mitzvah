@@ -14,6 +14,7 @@ export default function Settings() {
     const toggleHolidayNotifications = () => {
         setHolidayNotifications(!holidayNotifications);
     };
+
     const toggleShabbatNotifications = () => {
         setShabbatNotifications(!shabbatNotifications);
     };
@@ -63,9 +64,7 @@ export default function Settings() {
                             }
                             onPress={() => setDateDisplay("gregorian")}
                         />
-                        <Text style={styles.radioText}>
-                            Gregorian
-                        </Text>
+                        <Text style={styles.radioText}>Gregorian</Text>
                     </View>
                     <View style={styles.radioContainer}>
                         <RadioButton
@@ -78,10 +77,20 @@ export default function Settings() {
                             }
                             onPress={() => setDateDisplay("hebrew")}
                         />
-                        <Text style={styles.radioText}>
-                            Hebrew
-                        </Text>
+                        <Text style={styles.radioText}>Hebrew</Text>
                     </View>
+                    <Text style={styles.headerText}>About</Text>
+                    <Text style={styles.smallText}>
+                        YomTov is a simple app that provides information about
+                        Jewish holidays and Shabbat times. It is designed to be
+                        intuitive and accessible.
+                    </Text>
+                    <Text style={styles.smallText}>
+                        YomTov was coded by Daniel Brainich and designed by
+                        Andrea Portillo. It was inspired by
+                        istodayajewishholiday.com and is powered by the
+                        hebcal.com API.
+                    </Text>
                 </View>
             ) : null}
         </SafeAreaView>
@@ -110,7 +119,7 @@ const styles = StyleSheet.create({
     },
     headerText: {
         color: "#82CBFF",
-        fontSize: 32,
+        fontSize: 30,
         marginBottom: 22,
     },
     smallText: {
