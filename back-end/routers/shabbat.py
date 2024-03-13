@@ -37,12 +37,13 @@ def get_shabbat_info(data):
 
     return shabbat_info
 
-@router.get("/api/shabbat/{date}/{coordinates}")
-async def get_shabbat(coordinates: str, date: Optional[str] = None):
+@router.get("/api/shabbat/{coordinates}/{date}")
+async def get_shabbat(coordinates: str, date: str):
 
     if date is None:
         date_obj = datetime.now()
         print("date generated on backend:", date_obj)
+
     else:
         date_obj = datetime.fromisoformat(date)
         print("date passed from frontend:", date_obj)

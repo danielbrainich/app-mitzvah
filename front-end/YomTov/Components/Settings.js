@@ -52,7 +52,7 @@ export default function Settings() {
                             value={shabbatNotifications}
                         />
                     </View>
-                    <Text style={styles.smallText}>Date format</Text>
+                    <Text style={styles.smallText}>Holiday date format</Text>
                     <View style={styles.radioContainer}>
                         <RadioButton
                             color="#82CBFF"

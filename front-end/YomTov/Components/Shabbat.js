@@ -33,10 +33,10 @@ export default function Shabbat() {
                 return;
             }
             const date = new Date().toISOString().split("T")[0];
-            console.log(date);
+            console.log("date", date);
             try {
                 const response = await fetch(
-                    `http://localhost:8000/api/shabbat/${date}/${coordinates}`
+                    `http://localhost:8000/api/shabbat/${coordinates}/${date}`
                 );
                 if (!response.ok) {
                     throw new Error(
@@ -101,6 +101,11 @@ export default function Shabbat() {
                             {shabbatInfo.end_date && (
                                 <Text style={styles.headerText}>
                                     Shabbat End: {shabbatInfo.end_date}
+                                </Text>
+                            )}
+                            {shabbatInfo.time_zone && (
+                                <Text style={styles.headerText}>
+                                    Timezone: {shabbatInfo.time_zone}
                                 </Text>
                             )}
                         </View>
