@@ -76,37 +76,6 @@ export default function Holidays() {
                                 </View>
                             )}
                         </View>
-
-                        <View style={styles.card}>
-                            {holidays?.holiday_info?.previous ? (
-                                <View>
-                                    <Text style={styles.cardHeaderText}>
-                                        Previous holiday
-                                    </Text>
-                                    <Text style={styles.cardBigBoldText}>
-                                        {holidays.holiday_info.previous.title}
-                                    </Text>
-                                    <Text style={styles.cardHebrewText}>
-                                        {holidays.holiday_info.previous.hebrew}
-                                    </Text>
-                                    <Text style={styles.cardDateText}>
-                                        {formatDate(
-                                            holidays.holiday_info.previous.date
-                                        )}
-                                    </Text>
-                                </View>
-                            ) : (
-                                <View>
-                                    <Text style={styles.cardHeaderText}>
-                                        Error loading
-                                    </Text>
-                                    <Text style={styles.cardBigBoldText}>
-                                        previous Jewish holiday
-                                    </Text>
-                                </View>
-                            )}
-                        </View>
-
                         <View style={styles.card}>
                             {holidays?.holiday_info?.next ? (
                                 <View>
@@ -136,6 +105,35 @@ export default function Holidays() {
                                 </View>
                             )}
                         </View>
+                        <View style={styles.card}>
+                            {holidays?.holiday_info?.previous ? (
+                                <View>
+                                    <Text style={styles.cardHeaderText}>
+                                        Previous holiday
+                                    </Text>
+                                    <Text style={styles.cardBigBoldText}>
+                                        {holidays.holiday_info.previous.title}
+                                    </Text>
+                                    <Text style={styles.cardHebrewText}>
+                                        {holidays.holiday_info.previous.hebrew}
+                                    </Text>
+                                    <Text style={styles.cardDateText}>
+                                        {formatDate(
+                                            holidays.holiday_info.previous.date
+                                        )}
+                                    </Text>
+                                </View>
+                            ) : (
+                                <View>
+                                    <Text style={styles.cardHeaderText}>
+                                        Error loading
+                                    </Text>
+                                    <Text style={styles.cardBigBoldText}>
+                                        previous Jewish holiday
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
                     </>
                 ) : null}
             </ScrollView>
@@ -150,6 +148,10 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         backgroundColor: "black",
     },
+    scrollViewContent: {
+        flex: 1,
+        alignSelf: "stretch",
+    },
     frame: {
         padding: 20,
     },
@@ -161,28 +163,29 @@ const styles = StyleSheet.create({
     },
     cardHeaderText: {
         color: "black",
-        fontSize: 26,
+        fontSize: 20,
+        marginBottom: 10,
     },
     cardBigBoldText: {
         color: "black",
         fontFamily: "Nayuki",
-        fontSize: 72,
+        fontSize: 44,
         marginBottom: 2,
     },
     cardHebrewText: {
         color: "black",
-        fontSize: 38,
-        marginBottom: 18,
+        fontSize: 24,
+        marginBottom: 10,
     },
     cardDateText: {
         color: "black",
-        fontSize: 22,
-        marginBottom: 24,
+        fontSize: 18,
+        marginBottom: 0,
     },
     headerText: {
         color: "white",
         fontSize: 26,
-        marginBottom: 22,
+        marginBottom: 16,
     },
     bigBoldText: {
         color: "#82CBFF",
