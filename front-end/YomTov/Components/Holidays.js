@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, Text, SafeAreaView, View } from "react-native";
+import { StyleSheet, Text, SafeAreaView, View, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
-import Swiper from "react-native-swiper";
 
 export default function Holidays() {
     const [holidays, setHolidays] = useState([]);
@@ -46,111 +45,100 @@ export default function Holidays() {
 
     return (
         <SafeAreaView style={styles.container}>
-            {fontsLoaded ? (
-                <Swiper
-                    style={styles.wrapper}
-                    showsButtons={false}
-                    loop={false}
-                    dot={<View style={styles.dot} />}
-                    activeDot={<View style={styles.activeDot} />}
-                    index={1}
-                >
-                    <View style={styles.frame}>
-                        {holidays?.holiday_info?.previous ? (
-                            <View>
-                                <Text style={styles.headerText}>
-                                    Previous holiday
-                                </Text>
-                                <Text style={styles.bigBoldText}>
-                                    {holidays.holiday_info.previous.title}
-                                </Text>
-                                <Text style={styles.hebrewText}>
-                                    {holidays.holiday_info.previous.hebrew}
-                                </Text>
-                                <Text style={styles.dateText}>
-                                    {formatDate(
-                                        holidays.holiday_info.previous.date
-                                    )}
-                                </Text>
-                                <Text style={styles.paragraphText}>
-                                    {holidays.holiday_info.previous.memo}
-                                </Text>
-                            </View>
-                        ) : (
-                            <View>
-                                <Text style={styles.headerText}>
-                                    Error loading
-                                </Text>
-                                <Text style={styles.bigBoldText}>
-                                    previous Jewish holiday
-                                </Text>
-                            </View>
-                        )}
-                    </View>
-                    <View style={styles.frame}>
-                        {holidays?.holiday_info?.today ? (
-                            <View>
-                                <Text style={styles.headerText}>Today is</Text>
-                                <Text style={styles.bigBoldText}>
-                                    {holidays.holiday_info.today.title}
-                                </Text>
-                                <Text style={styles.hebrewText}>
-                                    {holidays.holiday_info.today.hebrew}
-                                </Text>
-                                <Text style={styles.dateText}>
-                                    {formatDate(
-                                        holidays.holiday_info.today.date
-                                    )}
-                                </Text>
-                                <Text style={styles.paragraphText}>
-                                    {holidays.holiday_info.today.memo}
-                                </Text>
-                            </View>
-                        ) : (
-                            <View>
-                                <Text style={styles.headerText}>Today is</Text>
-                                <Text style={styles.bigBoldText}>
-                                    not a Jewish holiday
-                                </Text>
-                            </View>
-                        )}
-                    </View>
-                    <View style={styles.frame}>
-                        {holidays?.holiday_info?.next ? (
-                            <View>
-                                <Text style={styles.headerText}>
-                                    Upcoming holiday
-                                </Text>
-                                <Text style={styles.bigBoldText}>
-                                    {holidays.holiday_info.next.title}
-                                </Text>
-                                <Text style={styles.hebrewText}>
-                                    {holidays.holiday_info.next.hebrew}
-                                </Text>
-                                <Text style={styles.dateText}>
-                                    {formatDate(
-                                        holidays.holiday_info.next.date
-                                    )}
-                                </Text>
-                                <Text style={styles.paragraphText}>
-                                    {holidays.holiday_info.next.memo}
-                                </Text>
-                            </View>
-                        ) : (
-                            <View>
-                                <Text style={styles.headerText}>
-                                    Error loading
-                                </Text>
-                                <Text style={styles.bigBoldText}>
-                                    next Jewish holiday
-                                </Text>
-                            </View>
-                        )}
-                    </View>
-                </Swiper>
-            ) : (
-                null
-            )}
+            <ScrollView style={styles.scrollViewContent}>
+                {fontsLoaded ? (
+                    <>
+                        <View style={styles.frame}>
+                            {holidays?.holiday_info?.today ? (
+                                <View>
+                                    <Text style={styles.headerText}>Today is</Text>
+                                    <Text style={styles.bigBoldText}>
+                                        {holidays.holiday_info.today.title}
+                                    </Text>
+                                    <Text style={styles.hebrewText}>
+                                        {holidays.holiday_info.today.hebrew}
+                                    </Text>
+                                    <Text style={styles.dateText}>
+                                        {formatDate(
+                                            holidays.holiday_info.today.date
+                                        )}
+                                    </Text>
+                                    <Text style={styles.paragraphText}>
+                                        {holidays.holiday_info.today.memo}
+                                    </Text>
+                                </View>
+                            ) : (
+                                <View>
+                                    <Text style={styles.headerText}>Today is</Text>
+                                    <Text style={styles.bigBoldText}>
+                                        not a Jewish holiday
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
+
+                        <View style={styles.card}>
+                            {holidays?.holiday_info?.previous ? (
+                                <View>
+                                    <Text style={styles.cardHeaderText}>
+                                        Previous holiday
+                                    </Text>
+                                    <Text style={styles.cardBigBoldText}>
+                                        {holidays.holiday_info.previous.title}
+                                    </Text>
+                                    <Text style={styles.cardHebrewText}>
+                                        {holidays.holiday_info.previous.hebrew}
+                                    </Text>
+                                    <Text style={styles.cardDateText}>
+                                        {formatDate(
+                                            holidays.holiday_info.previous.date
+                                        )}
+                                    </Text>
+                                </View>
+                            ) : (
+                                <View>
+                                    <Text style={styles.cardHeaderText}>
+                                        Error loading
+                                    </Text>
+                                    <Text style={styles.cardBigBoldText}>
+                                        previous Jewish holiday
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
+
+                        <View style={styles.card}>
+                            {holidays?.holiday_info?.next ? (
+                                <View>
+                                    <Text style={styles.cardHeaderText}>
+                                        Upcoming holiday
+                                    </Text>
+                                    <Text style={styles.cardBigBoldText}>
+                                        {holidays.holiday_info.next.title}
+                                    </Text>
+                                    <Text style={styles.cardHebrewText}>
+                                        {holidays.holiday_info.next.hebrew}
+                                    </Text>
+                                    <Text style={styles.cardDateText}>
+                                        {formatDate(
+                                            holidays.holiday_info.next.date
+                                        )}
+                                    </Text>
+                                </View>
+                            ) : (
+                                <View>
+                                    <Text style={styles.cardHeaderText}>
+                                        Error loading
+                                    </Text>
+                                    <Text style={styles.cardBigBoldText}>
+                                        next Jewish holiday
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
+                    </>
+                ) : null}
+            </ScrollView>
         </SafeAreaView>
     );
 }
@@ -164,6 +152,32 @@ const styles = StyleSheet.create({
     },
     frame: {
         padding: 20,
+    },
+    card: {
+        padding: 20,
+        backgroundColor: "#82CBFF",
+        margin: 20,
+        borderRadius: 8,
+    },
+    cardHeaderText: {
+        color: "black",
+        fontSize: 26,
+    },
+    cardBigBoldText: {
+        color: "black",
+        fontFamily: "Nayuki",
+        fontSize: 72,
+        marginBottom: 2,
+    },
+    cardHebrewText: {
+        color: "black",
+        fontSize: 38,
+        marginBottom: 18,
+    },
+    cardDateText: {
+        color: "black",
+        fontSize: 22,
+        marginBottom: 24,
     },
     headerText: {
         color: "white",
@@ -189,19 +203,5 @@ const styles = StyleSheet.create({
     paragraphText: {
         color: "white",
         fontSize: 24,
-    },
-    dot: {
-        backgroundColor: "white",
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        margin: 3,
-    },
-    activeDot: {
-        backgroundColor: "#82CBFF",
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        margin: 3,
     },
 });
