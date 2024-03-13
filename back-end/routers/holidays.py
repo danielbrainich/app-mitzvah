@@ -40,7 +40,7 @@ def get_holiday_info(holidays, date):
 
 @router.get("/api/holidays/{date}")
 async def get_holidays(date: Optional[str] = None):
-    test_date = None # For testing purposes. Date format should be "YYYY-MM-DD"
+    test_date = None # For testing purposes. Date format should be "YYYY-MM-DD to test"
 
     try:
         if test_date is not None:
@@ -84,7 +84,5 @@ async def get_holidays(date: Optional[str] = None):
         return {
             "holiday_info": holiday_info
         }
-    except (json.JSONDecodeError, ValueError) as e:
-        raise HTTPException(status_code=400, detail=str(e))
     except requests.RequestException as e:
         raise HTTPException(status_code=400, detail=str(e))

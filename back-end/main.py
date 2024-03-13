@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from dependencies import setup_dependencies
-from routers import holidays, candles
+from routers import holidays, shabbat
 from dependencies import setup_dependencies
 
 load_dotenv()
@@ -28,4 +28,4 @@ app.add_middleware(
 setup_dependencies(app)
 
 app.include_router(holidays.router)
-app.include_router(candles.router)
+app.include_router(shabbat.router)

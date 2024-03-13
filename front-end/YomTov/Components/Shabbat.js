@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, StyleSheet, SafeAreaView, ScrollView} from "react-native";
+import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import * as Location from "expo-location";
 
@@ -8,36 +8,101 @@ export default function Shabbat() {
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
     });
     const [location, setLocation] = useState({});
+    const [shabbatInfo, setShabbatInfo] = useState({});
+    const [coordinates, setCoordinates] = useState("");
 
     useEffect(() => {
         (async () => {
-            let {status} = await Location.requestForegroundPermissionsAsync();
-            if (status = 'granted') {
-                console.log('Permission granted');
-            } else {
-                console.log('Permission denied');
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                console.log("Permission denied");
+                return;
             }
-
             const loc = await Location.getCurrentPositionAsync();
             console.log(loc);
             setLocation(loc);
-
+            const coords = `${loc.coords.latitude},${loc.coords.longitude}`;
+            console.log(coords);
+            setCoordinates(coords);
         })();
-    }, [])
+    }, []);
 
+    useEffect(() => {
+        const fetchShabbatInfo = async () => {
+            if (coordinates === "") {
+                return;
+            }
+            const date = new Date().toISOString().split("T")[0];
+            console.log(date);
+            try {
+                const response = await fetch(
+                    `http://localhost:8000/api/shabbat/${date}/${coordinates}`
+                );
+                if (!response.ok) {
+                    throw new Error(
+                        "Something went wrong fetching Shabbat info!"
+                    );
+                }
+                const data = await response.json();
+                console.log(data);
+                setShabbatInfo(data.shabbat_info);
+            } catch (error) {
+                console.error(
+                    "Something went wrong fetching Shabbat info!",
+                    error
+                );
+            }
+        };
+        fetchShabbatInfo(coordinates);
+    }, [coordinates]);
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollViewContent}>
                 {fontsLoaded ? (
                     <>
+                        {console.log(shabbatInfo)}
                         <View style={styles.frame}>
-                            <Text style={styles.headerText}>Shabbat</Text>
-                            <Text style={styles.headerText}>The Date</Text>
-                            <Text style={styles.headerText}>Candle Lighting</Text>
-                            <Text style={styles.headerText}>7:00 PM</Text>
-                            <Text style={styles.headerText}>Havdalah</Text>
-                            <Text style={styles.headerText}>8:00 PM</Text>
+                            {shabbatInfo.candle_time && (
+                                <Text style={styles.headerText}>
+                                    Candle Lighting: {shabbatInfo.candle_time.split(": ")[1]}
+                                </Text>
+                            )}
+
+                            {shabbatInfo.parasha_eng && (
+                                <Text style={styles.headerText}>
+                                    Parasha (English): {shabbatInfo.parasha_eng}
+                                </Text>
+                            )}
+
+                            {shabbatInfo.parasha_heb && (
+                                <Text style={styles.headerText}>
+                                    Parasha (Hebrew): {shabbatInfo.parasha_heb}
+                                </Text>
+                            )}
+
+                            {shabbatInfo.parasha_date && (
+                                <Text style={styles.headerText}>
+                                    Parasha Date: {shabbatInfo.parasha_date}
+                                </Text>
+                            )}
+
+                            {shabbatInfo.havdalah_time && (
+                                <Text style={styles.headerText}>
+                                    Havdalah: {shabbatInfo.havdalah_time.split(": ")[1]}
+                                </Text>
+                            )}
+
+                            {shabbatInfo.start_date && (
+                                <Text style={styles.headerText}>
+                                    Shabbat Start: {shabbatInfo.start_date}
+                                </Text>
+                            )}
+                            {shabbatInfo.end_date && (
+                                <Text style={styles.headerText}>
+                                    Shabbat End: {shabbatInfo.end_date}
+                                </Text>
+                            )}
                         </View>
                     </>
                 ) : null}
