@@ -60,7 +60,7 @@ async def get_shabbat(coordinates: str, date: str):
         "geo": "pos",                               # Location sepecified by latitude and longitude
         "latitude": coordinates.split(",")[0],      # Latitude
         "longitude": coordinates.split(",")[1],     # Longitude
-        "ue": "off",                                # Use elevation for location
+        "ue": "on",                                 # Use elevation for location
         "gy": YYYY,                                 # Year
         "gm": MM,                                   # Month
         "gd": DD,                                   # Day
