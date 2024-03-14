@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useFonts } from "expo-font";
 import { StyleSheet, Text, SafeAreaView, View, Switch } from "react-native";
 import { RadioButton } from "react-native-paper";
+import { useSelector, useDispatch } from "react-redux";
+import { setDateDisplay } from "../store/actions";
 
 export default function Settings() {
     const [fontsLoaded] = useFonts({
@@ -9,7 +11,20 @@ export default function Settings() {
     });
     const [holidayNotifications, setHolidayNotifications] = useState(false);
     const [shabbatNotifications, setShabbatNotifications] = useState(false);
-    const [dateDisplay, setDateDisplay] = useState("gregorian");
+    const [displayMode, setDisplayMode] = useState(false);
+    const dateDisplay = useSelector((state) => state.dateDisplay);
+
+
+
+    const dispatch = useDispatch();
+
+    const toggleDisplayMode = () => {
+        dispatch(setDisplayMode(!displayMode));
+    };
+
+    const handleDateDisplayChange = (newValue) => {
+        dispatch(setDateDisplay(newValue));
+    };
 
     const toggleHolidayNotifications = () => {
         setHolidayNotifications(!holidayNotifications);
@@ -17,6 +32,7 @@ export default function Settings() {
 
     const toggleShabbatNotifications = () => {
         setShabbatNotifications(!shabbatNotifications);
+
     };
 
     return (
@@ -25,23 +41,33 @@ export default function Settings() {
                 <View style={styles.frame}>
                     <Text style={styles.headerText}>Settings</Text>
                     <View style={styles.optionContainer}>
-                        <Text style={styles.smallText}>
-                            Holiday push notification
-                        </Text>
+                        <View>
+                            <Text style={styles.smallText}>
+                                Display mode
+                            </Text>
+                            <Text style={styles.tinyText}>
+                                Dark and light themes
+                            </Text>
+                        </View>
                         <Switch
                             trackColor={{ false: "#767577", true: "#82CBFF" }}
                             thumbColor={
-                                holidayNotifications ? "white" : "#f4f3f4"
+                                displayMode ? "white" : "#f4f3f4"
                             }
                             ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleHolidayNotifications}
-                            value={holidayNotifications}
+                            onValueChange={toggleDisplayMode}
+                            value={displayMode}
                         />
                     </View>
                     <View style={styles.optionContainer}>
-                        <Text style={styles.smallText}>
-                            Shabbat push notification
-                        </Text>
+                        <View>
+                            <Text style={styles.smallText}>
+                                Shabbat notifications
+                            </Text>
+                            <Text style={styles.tinyText}>
+                                Each Erev Shabbat morning
+                            </Text>
+                        </View>
                         <Switch
                             trackColor={{ false: "#767577", true: "#82CBFF" }}
                             thumbColor={
@@ -50,6 +76,25 @@ export default function Settings() {
                             ios_backgroundColor="#3e3e3e"
                             onValueChange={toggleShabbatNotifications}
                             value={shabbatNotifications}
+                        />
+                    </View>
+                    <View style={styles.optionContainer}>
+                        <View>
+                            <Text style={styles.smallText}>
+                                Holiday notifications
+                            </Text>
+                            <Text style={styles.tinyText}>
+                                Each holiday morning
+                            </Text>
+                        </View>
+                        <Switch
+                            trackColor={{ false: "#767577", true: "#82CBFF" }}
+                            thumbColor={
+                                holidayNotifications ? "white" : "#f4f3f4"
+                            }
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={toggleHolidayNotifications}
+                            value={holidayNotifications}
                         />
                     </View>
                     <Text style={styles.smallText}>Holiday date format</Text>
@@ -62,7 +107,7 @@ export default function Settings() {
                                     ? "checked"
                                     : "unchecked"
                             }
-                            onPress={() => setDateDisplay("gregorian")}
+                            onPress={() => handleDateDisplayChange("gregorian")}
                         />
                         <Text style={styles.radioText}>Gregorian</Text>
                     </View>
@@ -75,22 +120,10 @@ export default function Settings() {
                                     ? "checked"
                                     : "unchecked"
                             }
-                            onPress={() => setDateDisplay("hebrew")}
+                            onPress={() => handleDateDisplayChange("hebrew")}
                         />
                         <Text style={styles.radioText}>Hebrew</Text>
                     </View>
-                    <Text style={styles.headerText}>About</Text>
-                    <Text style={styles.smallText}>
-                        YomTov is a simple app that provides information about
-                        Jewish holidays and Shabbat times. It is designed to be
-                        intuitive and accessible.
-                    </Text>
-                    <Text style={styles.smallText}>
-                        YomTov was coded by Daniel Brainich and designed by
-                        Andrea Portillo. It was inspired by
-                        istodayajewishholiday.com and is powered by the
-                        hebcal.com API.
-                    </Text>
                 </View>
             ) : null}
         </SafeAreaView>
@@ -103,6 +136,12 @@ const styles = StyleSheet.create({
         backgroundColor: "black",
         alignItems: "flex-start",
         justifyContent: "flex-start",
+    },
+    topOptionContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "100%",
+
     },
     optionContainer: {
         flexDirection: "row",
@@ -125,6 +164,11 @@ const styles = StyleSheet.create({
     smallText: {
         color: "white",
         fontSize: 20,
+        marginBottom: 6,
+    },
+    tinyText: {
+        color: "#82CBFF",
+        fontSize: 16,
         marginBottom: 28,
     },
     radioText: {
@@ -132,6 +176,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginLeft: 6,
         marginTop: 6,
-        marginBottom: 20,
+        marginBottom: 8,
     },
 });

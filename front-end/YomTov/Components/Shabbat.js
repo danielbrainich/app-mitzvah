@@ -22,7 +22,6 @@ export default function Shabbat() {
             console.log(loc);
             setLocation(loc);
             const coords = `${loc.coords.latitude},${loc.coords.longitude}`;
-            console.log(coords);
             setCoordinates(coords);
         })();
     }, []);

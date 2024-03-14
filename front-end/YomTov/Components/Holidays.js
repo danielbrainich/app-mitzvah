@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { StyleSheet, Text, SafeAreaView, View, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
+import { useSelector } from "react-redux";
 
 export default function Holidays() {
     const [holidays, setHolidays] = useState([]);
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
     });
+    const dateDisplay = useSelector((state) => state.dateDisplay);
 
     function formatDate(inputDate) {
         const date = new Date(inputDate);
@@ -51,7 +53,9 @@ export default function Holidays() {
                         <View style={styles.frame}>
                             {holidays?.holiday_info?.today ? (
                                 <View>
-                                    <Text style={styles.headerText}>Today is</Text>
+                                    <Text style={styles.headerText}>
+                                        Today is
+                                    </Text>
                                     <Text style={styles.bigBoldText}>
                                         {holidays.holiday_info.today.title}
                                     </Text>
@@ -59,9 +63,12 @@ export default function Holidays() {
                                         {holidays.holiday_info.today.hebrew}
                                     </Text>
                                     <Text style={styles.dateText}>
-                                        {formatDate(
-                                            holidays.holiday_info.today.date
-                                        )}
+                                        {dateDisplay === "gregorian"
+                                            ? formatDate(
+                                                  holidays.holiday_info.today
+                                                      .date
+                                              )
+                                            : holidays.holiday_info.today.hdate}
                                     </Text>
                                     <Text style={styles.paragraphText}>
                                         {holidays.holiday_info.today.memo}
@@ -69,7 +76,9 @@ export default function Holidays() {
                                 </View>
                             ) : (
                                 <View>
-                                    <Text style={styles.headerText}>Today is</Text>
+                                    <Text style={styles.headerText}>
+                                        Today is
+                                    </Text>
                                     <Text style={styles.bigBoldText}>
                                         not a Jewish holiday
                                     </Text>
@@ -89,9 +98,12 @@ export default function Holidays() {
                                         {holidays.holiday_info.next.hebrew}
                                     </Text>
                                     <Text style={styles.cardDateText}>
-                                        {formatDate(
-                                            holidays.holiday_info.next.date
-                                        )}
+                                        {dateDisplay === "gregorian"
+                                            ? formatDate(
+                                                  holidays.holiday_info.next
+                                                      .date
+                                              )
+                                            : holidays.holiday_info.next.hdate}
                                     </Text>
                                 </View>
                             ) : (
@@ -118,9 +130,13 @@ export default function Holidays() {
                                         {holidays.holiday_info.previous.hebrew}
                                     </Text>
                                     <Text style={styles.cardDateText}>
-                                        {formatDate(
-                                            holidays.holiday_info.previous.date
-                                        )}
+                                        {dateDisplay === "gregorian"
+                                            ? formatDate(
+                                                  holidays.holiday_info.previous
+                                                      .date
+                                              )
+                                            : holidays.holiday_info.previous
+                                                  .hdate}
                                     </Text>
                                 </View>
                             ) : (

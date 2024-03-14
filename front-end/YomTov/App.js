@@ -3,46 +3,78 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { StatusBar } from "expo-status-bar";
 import Settings from "./components/Settings";
+import Information from "./components/Information";
 import { StyleSheet } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import TabBarTabs from "./components/TabBarTabs";
-
+import { Provider } from "react-redux";
+import store from "./store";
 
 export default function App() {
     const Stack = createNativeStackNavigator();
     const Tab = createMaterialTopTabNavigator();
 
     return (
-        <NavigationContainer>
-            <StatusBar style="auto" />
-            <Stack.Navigator
-                initialRouteName="Tabs"
-                screenOptions={{
-                    headerStyle: {
-                        backgroundColor: "black",
-                    },
-                    headerTintColor: "white",
-                    title: "",
-                }}
-            >
-                <Stack.Screen
-                    name="Tabs"
-                    component={TabBarTabs}
-                    options={({ navigation }) => ({
-                        headerRight: () => (
-                            <MaterialCommunityIcons
-                                name="cog"
-                                size={30}
-                                onPress={() => navigation.navigate("Settings")}
-                                color="white"
-                            />
-                        ),
+        <Provider store={store}>
+            <NavigationContainer>
+                <StatusBar style="auto" />
+                <Stack.Navigator
+                    initialRouteName="Tabs"
+                    screenOptions={{
+                        headerStyle: {
+                            backgroundColor: "black",
+                        },
+                        headerTintColor: "white",
                         title: "",
-                    })}
-                />
-                <Stack.Screen name="Settings" component={Settings} />
-            </Stack.Navigator>
-        </NavigationContainer>
+                    }}
+                >
+                    <Stack.Screen
+                        name="Tabs"
+                        component={TabBarTabs}
+                        options={({ navigation }) => ({
+                            headerRight: () => (
+                                <>
+                                    <MaterialCommunityIcons
+                                        name="information"
+                                        size={30}
+                                        onPress={() =>
+                                            navigation.navigate("Information")
+                                        }
+                                        color="white"
+                                        marginRight={10}
+                                    />
+                                    <MaterialCommunityIcons
+                                        name="cog"
+                                        size={30}
+                                        onPress={() =>
+                                            navigation.navigate("Settings")
+                                        }
+                                        color="white"
+                                    />
+                                </>
+                            ),
+                            title: "",
+
+                            headerTitleStyle: {
+                                color: "#82CBFF",
+                                fontSize: 20,
+                                fontFamily: "Nayuki",
+                            },
+                        })}
+                    />
+                    <Stack.Screen
+                        name="Settings"
+                        component={Settings}
+                        options={{ headerBackTitleVisible: false }}
+                    />
+                    <Stack.Screen
+                        name="Information"
+                        component={Information}
+                        options={{ headerBackTitleVisible: false }}
+                    />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
     );
 }
 
@@ -56,6 +88,5 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginLeft: 12,
         marginRight: 12,
-
     },
 });
