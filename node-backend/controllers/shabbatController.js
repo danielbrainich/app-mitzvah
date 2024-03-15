@@ -4,9 +4,13 @@ const { HebrewCalendar, CandleLightingEvent, ParshaEvent, HavdalahEvent, Locatio
 async function getShabbat(req, res) {
     console.log("hello");
     try {
-        const startDate = new Date(req.params.date);
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + 7);
+        const providedDate = new Date(req.params.date);
+
+        const nearestSaturday = new Date(providedDate);
+        nearestSaturday.setDate(providedDate.getDate() + (6 - providedDate.getDay() + 7) % 7);
+
+        const startDate = new Date();
+        const endDate = new Date(nearestSaturday);
 
         const locationData = req.query;
 
@@ -20,8 +24,6 @@ async function getShabbat(req, res) {
 
         const location = new Location(latitude, longitude, il, tzid, cityName, countryCode, elevation);
 
-        console.log("location", location);
-
         const options = {
             start: startDate,
             end: endDate,
@@ -31,8 +33,6 @@ async function getShabbat(req, res) {
             omer: true,
             locale: "he",
         };
-
-        console.log("options", options);
 
         const events = await HebrewCalendar.calendar(options);
         console.log("events", events)
@@ -49,34 +49,39 @@ async function getShabbat(req, res) {
 
 function getShabbatInfo(events) {
     const shabbatInfo = {
+        candleDesc: null,
         candleTime: null,
         candleMemo: null,
-        parashaEng: null,
-        parashaHeb: null,
-        parashaDate: null,
-        parashaMemo: null,
+        candleDateTime: null,
+        candleHDate: null,
+        parshaDesc: null,
+        parshaDate: null,
+        havdalahDesc: null,
         havdalahTime: null,
-        havdalahMemo: null,
+        havdalahDateTime: null,
+        havdalahHDate: null,
     };
 
     for (const event of events) {
         if (event instanceof CandleLightingEvent) {
-            shabbatInfo.candleTime = event.fmtTime;
-            shabbatInfo.candleMemo = event.memo;
-            console.log("candleinfo",
-            event.options, event.linkedEvent, event.date, event.eventTime, event.mask)
+            shabbatInfo.candleDesc = event.desc || null;
+            shabbatInfo.candleTime = event.fmtTime || null;
+            shabbatInfo.candleMemo = event.memo || null;
+            shabbatInfo.candleDateTime = event.eventTime ? event.eventTime.toString() : null;
+            shabbatInfo.candleHDate = event.date ? event.date.toString() : null;
         } else if (event instanceof ParshaEvent) {
-            shabbatInfo.parashaEng = event.desc;
-            shabbatInfo.parashaHeb = event.desc;
-            shabbatInfo.parashaDate = event.date.toString();
-            shabbatInfo.parashaMemo = event.memo;
+            shabbatInfo.parshaDesc = event.desc || null;
+            shabbatInfo.parshaDate = event.date ? event.date.toString() : null;
         } else if (event instanceof HavdalahEvent) {
-            shabbatInfo.havdalahTime = event.fmtTime;
-            shabbatInfo.havdalahMemo = event.memo;
+            shabbatInfo.havdalahDesc = event.desc || null;
+            shabbatInfo.havdalahTime = event.fmtTime || null;
+            shabbatInfo.havdalahDateTime = event.eventTime ? event.eventTime.toString() : null;
+            shabbatInfo.havdalahHDate = event.date ? event.date.toString() : null;
         }
     }
 
     return shabbatInfo;
 }
+
 
 module.exports = { getShabbat };

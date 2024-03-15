@@ -50,13 +50,13 @@ export default function Shabbat() {
                     timezone: locationData.timezone.toString(),
                 });
                 const url = `http://localhost:8000/api/shabbat/${date}?${queryParams}`;
-                console.log("url", url);
                 const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error("Something went wrong fetching Shabbat info!");
                 }
                 const data = await response.json();
-                setShabbatInfo(data.shabbat_info);
+                console.log("data", data);
+                setShabbatInfo(data.shabbatInfo);
             } catch (error) {
                 console.error("Something went wrong fetching Shabbat info!", error);
             }
@@ -69,12 +69,11 @@ export default function Shabbat() {
             <ScrollView style={styles.scrollViewContent}>
                 {fontsLoaded ? (
                     <>
-                        {console.log(shabbatInfo)}
                         <View style={styles.frame}>
-                            {shabbatInfo.candle_time && (
+                            {shabbatInfo.candleTime && (
                                 <Text style={styles.headerText}>
                                     Candle Lighting:{" "}
-                                    {shabbatInfo.candle_time.split(": ")[1]}
+                                    {shabbatInfo.candleTime.split(": ")[1]}
                                 </Text>
                             )}
 
