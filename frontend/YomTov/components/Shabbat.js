@@ -9,51 +9,60 @@ export default function Shabbat() {
     });
     const [location, setLocation] = useState({});
     const [shabbatInfo, setShabbatInfo] = useState({});
-    const [coordinates, setCoordinates] = useState("");
+    const [locationData, setLocationData] = useState("");
+    const [timezone, setTimezone] = useState("");
 
     useEffect(() => {
-        (async () => {
+        const fetchLocationData = async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
                 console.log("Permission denied");
                 return;
             }
-            const loc = await Location.getCurrentPositionAsync();
-            console.log(loc);
-            setLocation(loc);
-            const coords = `${loc.coords.latitude},${loc.coords.longitude}`;
-            setCoordinates(coords);
-        })();
+            const locationObject = await Location.getCurrentPositionAsync();
+            const { latitude, longitude, altitude } = locationObject.coords;
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            setLocation(locationObject);
+            const locationData = {
+                latitude,
+                longitude,
+                altitude,
+                timezone,
+            };
+            console.log("locationData_", locationData);
+            setLocationData(locationData)
+        };
+
+        fetchLocationData();
     }, []);
 
     useEffect(() => {
         const fetchShabbatInfo = async () => {
-            if (coordinates === "") {
+            if (!locationData) {
                 return;
             }
             const date = new Date().toISOString().split("T")[0];
-            console.log("date", date);
             try {
-                const response = await fetch(
-                    `http://localhost:8000/api/shabbat/${coordinates}/${date}`
-                );
+                const queryParams = new URLSearchParams({
+                    latitude: locationData.latitude.toString(),
+                    longitude: locationData.longitude.toString(),
+                    altitude: locationData.altitude.toString(),
+                    timezone: locationData.timezone.toString(),
+                });
+                const url = `http://localhost:8000/api/shabbat/${date}?${queryParams}`;
+                console.log("url", url);
+                const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(
-                        "Something went wrong fetching Shabbat info!"
-                    );
+                    throw new Error("Something went wrong fetching Shabbat info!");
                 }
                 const data = await response.json();
-                console.log(data);
                 setShabbatInfo(data.shabbat_info);
             } catch (error) {
-                console.error(
-                    "Something went wrong fetching Shabbat info!",
-                    error
-                );
+                console.error("Something went wrong fetching Shabbat info!", error);
             }
         };
-        fetchShabbatInfo(coordinates);
-    }, [coordinates]);
+        fetchShabbatInfo();
+    }, [locationData]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -64,7 +73,8 @@ export default function Shabbat() {
                         <View style={styles.frame}>
                             {shabbatInfo.candle_time && (
                                 <Text style={styles.headerText}>
-                                    Candle Lighting: {shabbatInfo.candle_time.split(": ")[1]}
+                                    Candle Lighting:{" "}
+                                    {shabbatInfo.candle_time.split(": ")[1]}
                                 </Text>
                             )}
 
@@ -88,7 +98,8 @@ export default function Shabbat() {
 
                             {shabbatInfo.havdalah_time && (
                                 <Text style={styles.headerText}>
-                                    Havdalah: {shabbatInfo.havdalah_time.split(": ")[1]}
+                                    Havdalah:{" "}
+                                    {shabbatInfo.havdalah_time.split(": ")[1]}
                                 </Text>
                             )}
 

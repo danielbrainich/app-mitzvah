@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -9,10 +10,23 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import TabBarTabs from "./components/TabBarTabs";
 import { Provider } from "react-redux";
 import store from "./store";
+import * as Font from "expo-font";
+
 
 export default function App() {
     const Stack = createNativeStackNavigator();
     const Tab = createMaterialTopTabNavigator();
+    const [fontLoaded, setFontLoaded] = useState(false);
+
+    useEffect(() => {
+        Font.loadAsync({
+            Nayuki: require("./assets/fonts/NayukiRegular.otf"),
+        }).then(() => {
+            setFontLoaded(true);
+        });
+    }, []);
+
+    if (!fontLoaded) return null;
 
     return (
         <Provider store={store}>

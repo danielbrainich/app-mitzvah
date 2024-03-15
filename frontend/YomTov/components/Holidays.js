@@ -10,24 +10,44 @@ export default function Holidays() {
     });
     const dateDisplay = useSelector((state) => state.dateDisplay);
     const [isTodayHoliday, setIsTodayHoliday] = useState(null);
+    // const today = new Date().toISOString().split("T")[0];
+    const today = "2024-06-12";
 
     function formatDate(inputDate) {
         const date = new Date(inputDate);
-        return date.toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-        });
+        const day = date.getUTCDate();
+        const month = getMonthName(date.getUTCMonth());
+        const year = date.getUTCFullYear();
+
+        return `${day} ${month} ${year}`;
+    }
+
+    function getMonthName(monthIndex) {
+        const monthNames = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ];
+
+        return monthNames[monthIndex];
     }
 
     function checkIfTodayIsHoliday(holidays) {
-        const today = new Date().toISOString().split("T")[0];
         const todayHoliday = holidays.find((holiday) => holiday.date === today);
         setIsTodayHoliday(todayHoliday || null);
     }
 
     function removeParentheses(text) {
-        return text.replace(/\s*\([^)]*\)/g, '');
+        return text.replace(/\s*\([^)]*\)/g, "");
     }
 
     useEffect(() => {
@@ -35,7 +55,7 @@ export default function Holidays() {
             const date = new Date().toISOString().split("T")[0];
             try {
                 const response = await fetch(
-                    `http://localhost:8000/api/holidays/2024-03-25`
+                    `http://localhost:8000/api/holidays/${today}`
                 );
                 if (!response.ok) {
                     throw new Error(
@@ -43,7 +63,6 @@ export default function Holidays() {
                     );
                 }
                 const data = await response.json();
-                console.log(data);
                 setHolidays(data);
                 checkIfTodayIsHoliday(data);
             } catch (error) {
@@ -55,7 +74,6 @@ export default function Holidays() {
         };
         fetchHolidays();
     }, []);
-
 
     return (
         <SafeAreaView style={styles.container}>
@@ -69,36 +87,41 @@ export default function Holidays() {
                                     {removeParentheses(isTodayHoliday.title)}
                                 </Text>
                                 <Text style={styles.hebrewText}>
-                                    {isTodayHoliday.hebrewDate}
+                                    {isTodayHoliday.hebrewTitle}
                                 </Text>
                                 <Text style={styles.dateText}>
-                                    {formatDate(isTodayHoliday.date)}
+                                    {dateDisplay === "gregorian"
+                                        ? formatDate(isTodayHoliday.date)
+                                        : isTodayHoliday.hebrewDate}
                                 </Text>
                             </View>
                         ) : (
                             <View style={styles.frame}>
-                                <Text style={styles.headerText}>
-                                    Today is
-                                </Text>
+                                <Text style={styles.headerText}>Today is</Text>
                                 <Text style={styles.bigBoldText}>
                                     not a Jewish holiday
                                 </Text>
                             </View>
                         )}
                         <View style={styles.frame}>
-                        <Text style={styles.headerText}>Coming up</Text>
-                        {holidays.map((holiday, index) => (
-                            <View key={index} style={styles.card}>
-                                <Text style={styles.cardBigBoldText}>
-                                {removeParentheses(holiday.title)}
-                                </Text>
-                                <Text style={styles.cardDateText}>
-                                    {dateDisplay === "gregorian"
-                                        ? formatDate(holiday.date)
-                                        : holiday.hebrewDate}
-                                </Text>
-                            </View>
-                        ))}
+                            <Text style={styles.headerText}>Coming up</Text>
+                            {holidays
+                                .filter((holiday) => holiday.date > today)
+                                .map((holiday, index) => (
+                                    <View key={index} style={styles.card}>
+                                        <Text style={styles.cardBigBoldText}>
+                                            {removeParentheses(holiday.title)}
+                                        </Text>
+                                        <Text style={styles.cardHebrewText}>
+                                            {holiday.hebrewTitle}
+                                        </Text>
+                                        <Text style={styles.cardDateText}>
+                                            {dateDisplay === "gregorian"
+                                                ? formatDate(holiday.date)
+                                                : holiday.hebrewDate}
+                                        </Text>
+                                    </View>
+                                ))}
                         </View>
                     </>
                 ) : null}
@@ -127,8 +150,8 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginTop: 20,
         marginBottom: 20,
-        height: 175,
-        justifyContent: "space-between",
+        height: 195,
+        justifyContent: "center",
     },
     cardHeaderText: {
         color: "black",
@@ -138,7 +161,7 @@ const styles = StyleSheet.create({
     cardBigBoldText: {
         color: "black",
         fontFamily: "Nayuki",
-        fontSize: 44,
+        fontSize: 38,
         marginBottom: 2,
     },
     cardHebrewText: {
