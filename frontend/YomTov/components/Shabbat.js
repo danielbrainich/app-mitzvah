@@ -30,7 +30,7 @@ export default function Shabbat() {
                 timezone,
             };
             console.log("locationData_", locationData);
-            setLocationData(locationData)
+            setLocationData(locationData);
         };
 
         fetchLocationData();
@@ -52,13 +52,18 @@ export default function Shabbat() {
                 const url = `http://localhost:8000/api/shabbat/${date}?${queryParams}`;
                 const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error("Something went wrong fetching Shabbat info!");
+                    throw new Error(
+                        "Something went wrong fetching Shabbat info!"
+                    );
                 }
                 const data = await response.json();
-                console.log("data", data);
-                setShabbatInfo(data.shabbatInfo);
+                console.log("shabbatinfo", data);
+                setShabbatInfo(data);
             } catch (error) {
-                console.error("Something went wrong fetching Shabbat info!", error);
+                console.error(
+                    "Something went wrong fetching Shabbat info!",
+                    error
+                );
             }
         };
         fetchShabbatInfo();
@@ -68,57 +73,70 @@ export default function Shabbat() {
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollViewContent}>
                 {fontsLoaded ? (
-                    <>
-                        <View style={styles.frame}>
-                            {shabbatInfo.candleTime && (
-                                <Text style={styles.headerText}>
-                                    Candle Lighting:{" "}
-                                    {shabbatInfo.candleTime.split(": ")[1]}
-                                </Text>
-                            )}
+                    <View style={styles.frame}>
+                        {shabbatInfo ? (
+                            <>
+                                {shabbatInfo?.candleTime !== null &&
+                                    shabbatInfo?.candleTime !== undefined && (
+                                        <Text style={styles.headerText}>
+                                            Candle Lighting:{" "}
+                                            {
+                                                shabbatInfo.candleTime.split(
+                                                    ": "
+                                                )[1]
+                                            }
+                                        </Text>
+                                    )}
+                                    <Text style={styles.bigBoldText}>
+                                        Parsha
+                                    </Text>
+                                {shabbatInfo.parshaDesc && (
+                                    <Text style={styles.headerText}>
+                                        Parasha Name:{" "}
+                                        {shabbatInfo.parshaDesc}
+                                    </Text>
+                                )}
 
-                            {shabbatInfo.parasha_eng && (
-                                <Text style={styles.headerText}>
-                                    Parasha (English): {shabbatInfo.parasha_eng}
-                                </Text>
-                            )}
+                                {shabbatInfo.parasha_heb && (
+                                    <Text style={styles.headerText}>
+                                        Parasha (Hebrew):{" "}
+                                        {shabbatInfo.parasha_heb}
+                                    </Text>
+                                )}
 
-                            {shabbatInfo.parasha_heb && (
-                                <Text style={styles.headerText}>
-                                    Parasha (Hebrew): {shabbatInfo.parasha_heb}
-                                </Text>
-                            )}
+                                {shabbatInfo.parshaDate && (
+                                    <Text style={styles.headerText}>
+                                        Parsha Date: {shabbatInfo.parshaDate}
+                                    </Text>
+                                )}
 
-                            {shabbatInfo.parasha_date && (
-                                <Text style={styles.headerText}>
-                                    Parasha Date: {shabbatInfo.parasha_date}
-                                </Text>
-                            )}
+                                {shabbatInfo.havdalahTime && (
+                                    <Text style={styles.headerText}>
+                                        Havdalah Time:{" "}
+                                        {shabbatInfo.havdalahTime}
+                                    </Text>
+                                )}
 
-                            {shabbatInfo.havdalah_time && (
-                                <Text style={styles.headerText}>
-                                    Havdalah:{" "}
-                                    {shabbatInfo.havdalah_time.split(": ")[1]}
-                                </Text>
-                            )}
-
-                            {shabbatInfo.start_date && (
-                                <Text style={styles.headerText}>
-                                    Shabbat Start: {shabbatInfo.start_date}
-                                </Text>
-                            )}
-                            {shabbatInfo.end_date && (
-                                <Text style={styles.headerText}>
-                                    Shabbat End: {shabbatInfo.end_date}
-                                </Text>
-                            )}
-                            {shabbatInfo.time_zone && (
-                                <Text style={styles.headerText}>
-                                    Timezone: {shabbatInfo.time_zone}
-                                </Text>
-                            )}
-                        </View>
-                    </>
+                                {shabbatInfo.start_date && (
+                                    <Text style={styles.headerText}>
+                                        Shabbat Start: {shabbatInfo.start_date}
+                                    </Text>
+                                )}
+                                    <Text style={styles.bigBoldText}>
+                                        Havdalah
+                                    </Text>
+                                {shabbatInfo.havdalahDateTime && (
+                                    <Text style={styles.headerText}>
+                                        Havdalah DateTime: {shabbatInfo.havdalahDateTime}
+                                    </Text>
+                                )}
+                            </>
+                        ) : (
+                            <Text style={styles.headerText}>
+                                Loading Shabbat info...
+                            </Text>
+                        )}
+                    </View>
                 ) : null}
             </ScrollView>
         </SafeAreaView>
