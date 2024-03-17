@@ -145,24 +145,31 @@ export default function Holidays() {
                                 .filter((holiday) => holiday.date > today)
                                 .slice(0, displayCount)
                                 .map((holiday, index) => (
-                                    <>
-                                    <View key={index} style={styles.list}>
-                                        <Text style={styles.listText}>
-                                            {removeParentheses(holiday.title)}
-                                        </Text>
-                                        <Text style={styles.listText}>
-                                            {dateDisplay === "gregorian"
-                                                ? formatShortDate(holiday.date)
-                                                : holiday.hebrewDate}
-                                        </Text>
+                                    <View key={`holiday-${index}`}>
+                                        <View key={index} style={styles.list}>
+                                            <Text style={styles.listText}>
+                                                {removeParentheses(
+                                                    holiday.title
+                                                )}
+                                            </Text>
+                                            <Text style={styles.listText}>
+                                                {dateDisplay === "gregorian"
+                                                    ? formatShortDate(
+                                                          holiday.date
+                                                      )
+                                                    : holiday.hebrewDate}
+                                            </Text>
+                                        </View>
+                                        <View
+                                            key={`line-${index}`}
+                                            style={styles.blueLine}
+                                        ></View>
                                     </View>
-                                    <View key={`line-${index}`} style={styles.blueLine}></View>
-                                    </>
                                 ))}
                             {displayCount < holidays.length && (
                                 <Text
-                                style={styles.showMoreText}
-                                onPress={handleShowMore}
+                                    style={styles.showMoreText}
+                                    onPress={handleShowMore}
                                 >
                                     Show More
                                 </Text>
@@ -199,7 +206,7 @@ const styles = StyleSheet.create({
     },
     frame: {
         padding: 20,
-        paddingTop: 40
+        paddingTop: 40,
     },
     headerText: {
         color: "white",
