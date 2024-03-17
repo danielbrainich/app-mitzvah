@@ -87,10 +87,10 @@ export default function Holidays() {
 
     useEffect(() => {
         const fetchHolidays = () => {
-            const providedDate = new Date();
-            const startDate = new HDate(providedDate).next().onOrAfter(6); // Get next Shabbat
-            let endDate = new Date(startDate.greg());
-            endDate.setMonth(endDate.getMonth() + 15); // Next 15 months
+            const startDate = new Date(today);
+            startDate.setDate(startDate.getDate() + 1);
+            let endDate = new Date(today);
+            endDate.setMonth(endDate.getMonth() + 15);
 
             const options = {
                 start: startDate,
@@ -144,15 +144,6 @@ export default function Holidays() {
         setDisplayCount((prevCount) => prevCount + 4);
     }
 
-    useEffect(() => {
-        console.log("Current display count: ", displayCount);
-        console.log(
-            "Number of items currently rendered: ",
-            holidays.slice(0, displayCount).length
-        );
-    }, [displayCount, holidays]);
-    
-
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollViewContent}>
@@ -186,7 +177,10 @@ export default function Holidays() {
                                 Coming up
                             </Text>
                             {holidays
-                                .filter((holiday) => holiday.date > today)
+                                .filter((holiday) => {
+                                    console.log(holiday.date, today);
+                                    return holiday.date > today;
+                                })
                                 .slice(0, displayCount)
                                 .map((holiday, index) => (
                                     <View key={`holiday-${index}`}>
