@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import * as Location from "expo-location";
+import { useSelector } from "react-redux";
 
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
@@ -10,7 +11,10 @@ export default function Shabbat() {
     const [location, setLocation] = useState({});
     const [shabbatInfo, setShabbatInfo] = useState({});
     const [locationData, setLocationData] = useState("");
-    const [timezone, setTimezone] = useState("");
+    const dateDisplay = useSelector((state) => state.dateDisplay);
+    const today = new Date().toISOString().split("T")[0];
+    // const today = "2024-12-29";
+
 
     useEffect(() => {
         const fetchLocationData = async () => {
@@ -29,7 +33,6 @@ export default function Shabbat() {
                 altitude,
                 timezone,
             };
-            console.log("locationData_", locationData);
             setLocationData(locationData);
         };
 
@@ -41,7 +44,6 @@ export default function Shabbat() {
             if (!locationData) {
                 return;
             }
-            const date = new Date().toISOString().split("T")[0];
             try {
                 const queryParams = new URLSearchParams({
                     latitude: locationData.latitude.toString(),
@@ -49,7 +51,7 @@ export default function Shabbat() {
                     altitude: locationData.altitude.toString(),
                     timezone: locationData.timezone.toString(),
                 });
-                const url = `http://localhost:8000/api/shabbat/${date}?${queryParams}`;
+                const url = `http://localhost:8000/api/shabbat/${today}?${queryParams}`;
                 const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error(
@@ -57,7 +59,7 @@ export default function Shabbat() {
                     );
                 }
                 const data = await response.json();
-                console.log("shabbatinfo", data);
+                console.log("shabinfo", data);
                 setShabbatInfo(data);
             } catch (error) {
                 console.error(
@@ -76,63 +78,88 @@ export default function Shabbat() {
                     <View style={styles.frame}>
                         {shabbatInfo ? (
                             <>
-                                {shabbatInfo?.candleTime !== null &&
-                                    shabbatInfo?.candleTime !== undefined && (
-                                        <Text style={styles.headerText}>
-                                            Candle Lighting:{" "}
-                                            {
-                                                shabbatInfo.candleTime.split(
-                                                    ": "
-                                                )[1]
-                                            }
+                                <Text style={styles.mediumBoldText}>
+                                    Erev Shabbat
+                                </Text>
+                                <View style={styles.list}>
+                                    <Text style={styles.paragraphText}>
+                                        Date
+                                    </Text>
+                                    {shabbatInfo.candleDate && (
+                                        <Text style={styles.paragraphText}>
+                                            {dateDisplay === "gregorian"
+                                                ? shabbatInfo.candleDate
+                                                : shabbatInfo.candleHDate}
                                         </Text>
                                     )}
-                                    <Text style={styles.bigBoldText}>
-                                        Parsha
-                                    </Text>
-                                {shabbatInfo.parshaDesc && (
-                                    <Text style={styles.headerText}>
-                                        Parasha Name:{" "}
-                                        {shabbatInfo.parshaDesc}
-                                    </Text>
-                                )}
+                                </View>
 
-                                {shabbatInfo.parasha_heb && (
-                                    <Text style={styles.headerText}>
-                                        Parasha (Hebrew):{" "}
-                                        {shabbatInfo.parasha_heb}
+                                <View style={styles.list}>
+                                    <Text style={styles.paragraphText}>
+                                        Candle Lighting
                                     </Text>
-                                )}
+                                    {shabbatInfo.candleTime && (
+                                        <Text style={styles.paragraphText}>
+                                            {shabbatInfo.candleTime}
+                                        </Text>
+                                    )}
+                                </View>
 
-                                {shabbatInfo.parshaDate && (
-                                    <Text style={styles.headerText}>
-                                        Parsha Date: {shabbatInfo.parshaDate}
+                                <View style={styles.list}>
+                                    <Text style={styles.paragraphText}>
+                                        Sundown
                                     </Text>
-                                )}
+                                    {shabbatInfo.sundown && (
+                                        <Text style={styles.paragraphText}>
+                                            {shabbatInfo.sundown}
+                                        </Text>
+                                    )}
+                                </View>
+                                <View style={styles.spacer} />
+                                <Text style={styles.mediumBoldText}>
+                                    Yom Shabbat
+                                </Text>
 
-                                {shabbatInfo.havdalahTime && (
-                                    <Text style={styles.headerText}>
-                                        Havdalah Time:{" "}
-                                        {shabbatInfo.havdalahTime}
+                                <View style={styles.list}>
+                                    <Text style={styles.paragraphText}>
+                                        Date
                                     </Text>
-                                )}
-
-                                {shabbatInfo.start_date && (
-                                    <Text style={styles.headerText}>
-                                        Shabbat Start: {shabbatInfo.start_date}
-                                    </Text>
-                                )}
-                                    <Text style={styles.bigBoldText}>
+                                    {shabbatInfo.havdalahDate && (
+                                        <Text style={styles.paragraphText}>
+                                            {dateDisplay === "gregorian"
+                                                ? shabbatInfo.havdalahDate
+                                                : shabbatInfo.havdalahHDate}
+                                        </Text>
+                                    )}
+                                </View>
+                                <View style={styles.list}>
+                                    <Text style={styles.paragraphText}>
                                         Havdalah
                                     </Text>
-                                {shabbatInfo.havdalahDateTime && (
-                                    <Text style={styles.headerText}>
-                                        Havdalah DateTime: {shabbatInfo.havdalahDateTime}
+                                    {shabbatInfo.havdalahTime && (
+                                        <Text style={styles.paragraphText}>
+                                            {shabbatInfo.havdalahTime}
+                                        </Text>
+                                    )}
+                                </View>
+                                <View style={styles.spacer} />
+
+                                <Text style={styles.mediumBoldText}>
+                                    Parasha
+                                </Text>
+                                {shabbatInfo.parshaEnglish && (
+                                    <Text style={styles.paragraphText}>
+                                        {shabbatInfo.parshaEnglish}
+                                    </Text>
+                                )}
+                                {shabbatInfo.parshaHebrew && (
+                                    <Text style={styles.paragraphText}>
+                                        {shabbatInfo.parshaHebrew}
                                     </Text>
                                 )}
                             </>
                         ) : (
-                            <Text style={styles.headerText}>
+                            <Text style={styles.paragraphText}>
                                 Loading Shabbat info...
                             </Text>
                         )}
@@ -156,57 +183,25 @@ const styles = StyleSheet.create({
     },
     frame: {
         padding: 20,
+        paddingTop: 40,
     },
-    card: {
-        padding: 20,
-        backgroundColor: "#82CBFF",
-        margin: 20,
-        borderRadius: 8,
-    },
-    cardHeaderText: {
-        color: "black",
-        fontSize: 20,
-        marginBottom: 10,
-    },
-    cardBigBoldText: {
-        color: "black",
-        fontFamily: "Nayuki",
-        fontSize: 44,
-        marginBottom: 2,
-    },
-    cardHebrewText: {
-        color: "black",
-        fontSize: 24,
-        marginBottom: 10,
-    },
-    cardDateText: {
-        color: "black",
-        fontSize: 18,
-        marginBottom: 0,
-    },
-    headerText: {
-        color: "white",
-        fontSize: 26,
-        marginBottom: 16,
-    },
-    bigBoldText: {
-        color: "#82CBFF",
-        fontFamily: "Nayuki",
-        fontSize: 72,
-        marginBottom: 2,
-    },
-    hebrewText: {
-        color: "white",
-        fontSize: 38,
+    spacer: {
         marginBottom: 18,
     },
-    dateText: {
-        color: "white",
-        fontSize: 22,
-        marginBottom: 24,
+    mediumBoldText: {
+        color: "#82CBFF",
+        fontFamily: "Nayuki",
+        fontSize: 42,
+        marginBottom: 16,
+    },
+    list: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 16,
     },
     paragraphText: {
         color: "white",
-        fontSize: 24,
+        fontSize: 20,
+        marginBottom: 8,
     },
 });

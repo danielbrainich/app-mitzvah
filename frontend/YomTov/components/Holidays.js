@@ -11,12 +11,22 @@ export default function Holidays() {
     const dateDisplay = useSelector((state) => state.dateDisplay);
     const [isTodayHoliday, setIsTodayHoliday] = useState(null);
     // const today = new Date().toISOString().split("T")[0];
-    const today = "2024-06-12";
+    const today = "2024-12-29";
+    const [displayCount, setDisplayCount] = useState(4);
 
     function formatDate(inputDate) {
         const date = new Date(inputDate);
         const day = date.getUTCDate();
         const month = getMonthName(date.getUTCMonth());
+        const year = date.getUTCFullYear();
+
+        return `${day} ${month} ${year}`;
+    }
+
+    function formatShortDate(inputDate) {
+        const date = new Date(inputDate);
+        const day = date.getUTCDate();
+        const month = getShortMonthName(date.getUTCMonth());
         const year = date.getUTCFullYear();
 
         return `${day} ${month} ${year}`;
@@ -36,6 +46,25 @@ export default function Holidays() {
             "October",
             "November",
             "December",
+        ];
+
+        return monthNames[monthIndex];
+    }
+
+    function getShortMonthName(monthIndex) {
+        const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
         ];
 
         return monthNames[monthIndex];
@@ -75,6 +104,10 @@ export default function Holidays() {
         fetchHolidays();
     }, []);
 
+    function handleShowMore() {
+        setDisplayCount((prevCount) => prevCount + 4);
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollViewContent}>
@@ -104,24 +137,36 @@ export default function Holidays() {
                             </View>
                         )}
                         <View style={styles.frame}>
-                            <Text style={styles.headerText}>Coming up</Text>
+                            <Text style={styles.secondHeaderText}>
+                                Coming up
+                            </Text>
                             {holidays
+
                                 .filter((holiday) => holiday.date > today)
+                                .slice(0, displayCount)
                                 .map((holiday, index) => (
-                                    <View key={index} style={styles.card}>
-                                        <Text style={styles.cardBigBoldText}>
+                                    <>
+                                    <View key={index} style={styles.list}>
+                                        <Text style={styles.listText}>
                                             {removeParentheses(holiday.title)}
                                         </Text>
-                                        <Text style={styles.cardHebrewText}>
-                                            {holiday.hebrewTitle}
-                                        </Text>
-                                        <Text style={styles.cardDateText}>
+                                        <Text style={styles.listText}>
                                             {dateDisplay === "gregorian"
-                                                ? formatDate(holiday.date)
+                                                ? formatShortDate(holiday.date)
                                                 : holiday.hebrewDate}
                                         </Text>
                                     </View>
+                                    <View key={`line-${index}`} style={styles.blueLine}></View>
+                                    </>
                                 ))}
+                            {displayCount < holidays.length && (
+                                <Text
+                                style={styles.showMoreText}
+                                onPress={handleShowMore}
+                                >
+                                    Show More
+                                </Text>
+                            )}
                         </View>
                     </>
                 ) : null}
@@ -137,66 +182,62 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         backgroundColor: "black",
     },
+    list: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 16,
+    },
+    blueLine: {
+        height: 1,
+        backgroundColor: "#82CBFF",
+        marginTop: 2,
+        marginBottom: 18,
+    },
     scrollViewContent: {
         flex: 1,
         alignSelf: "stretch",
     },
     frame: {
         padding: 20,
-    },
-    card: {
-        padding: 20,
-        backgroundColor: "#82CBFF",
-        borderRadius: 8,
-        marginTop: 20,
-        marginBottom: 20,
-        height: 195,
-        justifyContent: "center",
-    },
-    cardHeaderText: {
-        color: "black",
-        fontSize: 20,
-        marginBottom: 10,
-    },
-    cardBigBoldText: {
-        color: "black",
-        fontFamily: "Nayuki",
-        fontSize: 38,
-        marginBottom: 2,
-    },
-    cardHebrewText: {
-        color: "black",
-        fontSize: 24,
-        marginBottom: 10,
-    },
-    cardDateText: {
-        color: "black",
-        fontSize: 18,
-        marginBottom: 0,
+        paddingTop: 40
     },
     headerText: {
         color: "white",
-        fontSize: 26,
+        fontSize: 30,
         marginBottom: 16,
+    },
+    secondHeaderText: {
+        color: "#82CBFF",
+        fontSize: 24,
+        marginBottom: 30,
     },
     bigBoldText: {
         color: "#82CBFF",
         fontFamily: "Nayuki",
         fontSize: 72,
-        marginBottom: 2,
     },
     hebrewText: {
-        color: "white",
+        color: "#82CBFF",
         fontSize: 38,
-        marginBottom: 18,
+        marginBottom: 12,
     },
     dateText: {
         color: "white",
         fontSize: 22,
-        marginBottom: 24,
+        marginBottom: 16,
     },
     paragraphText: {
         color: "white",
         fontSize: 24,
+    },
+    listText: {
+        color: "white",
+        fontSize: 16,
+    },
+    showMoreText: {
+        color: "#82CBFF",
+        fontSize: 16,
+        marginTop: 6,
+        fontWeight: "bold",
     },
 });
