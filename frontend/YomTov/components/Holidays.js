@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import { StyleSheet, Text, SafeAreaView, View, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
+import {
+    HebrewCalendar,
+    Location as HebcalLocation,
+    HDate,
+    Event,
+} from "@hebcal/core";
 
 export default function Holidays() {
     const [holidays, setHolidays] = useState([]);
@@ -80,33 +86,72 @@ export default function Holidays() {
     }
 
     useEffect(() => {
-        const fetchHolidays = async () => {
-            const date = new Date().toISOString().split("T")[0];
-            try {
-                const response = await fetch(
-                    `http://localhost:8000/api/holidays/${today}`
-                );
-                if (!response.ok) {
-                    throw new Error(
-                        "Something went wrong fetching holiday info!"
-                    );
-                }
-                const data = await response.json();
-                setHolidays(data);
-                checkIfTodayIsHoliday(data);
-            } catch (error) {
-                console.error(
-                    "Something went wrong fetching holiday info!",
-                    error
-                );
-            }
+        const fetchHolidays = () => {
+            const providedDate = new Date();
+            const startDate = new HDate(providedDate).next().onOrAfter(6); // Get next Shabbat
+            let endDate = new Date(startDate.greg());
+            endDate.setMonth(endDate.getMonth() + 15); // Next 15 months
+
+            const options = {
+                start: startDate,
+                end: endDate,
+                isHebrewYear: false,
+                candlelighting: false,
+                noMinorFast: true,
+                noSpecialShabbat: true,
+                noModern: false,
+                noRoshChodesh: true,
+                sedrot: false,
+                omer: false,
+                shabbatMevarchim: false,
+                molad: false,
+                yomKippurKatan: false,
+                locale: "he",
+            };
+
+            const events = HebrewCalendar.calendar(options);
+            const uniqueHolidays = collectUniqueHolidays(events);
+
+            const formattedEvents = uniqueHolidays.map((ev) => ({
+                title: ev.getDesc(),
+                hebrewTitle: ev.renderBrief("he-x-NoNikud"),
+                date: ev.getDate().greg().toISOString().split("T")[0],
+                hebrewDate: ev.getDate().toString(),
+                categories: ev.getCategories(),
+            }));
+
+            setHolidays(formattedEvents);
+            checkIfTodayIsHoliday(formattedEvents);
         };
+
         fetchHolidays();
     }, []);
+
+    function collectUniqueHolidays(events) {
+        const seenHolidays = new Set();
+        const collectedHolidays = [];
+
+        for (const event of events) {
+            if (event instanceof Event && !seenHolidays.has(event.getDesc())) {
+                seenHolidays.add(event.getDesc());
+                collectedHolidays.push(event);
+            }
+        }
+        return collectedHolidays;
+    }
 
     function handleShowMore() {
         setDisplayCount((prevCount) => prevCount + 4);
     }
+
+    useEffect(() => {
+        console.log("Current display count: ", displayCount);
+        console.log(
+            "Number of items currently rendered: ",
+            holidays.slice(0, displayCount).length
+        );
+    }, [displayCount, holidays]);
+    
 
     return (
         <SafeAreaView style={styles.container}>
@@ -141,12 +186,11 @@ export default function Holidays() {
                                 Coming up
                             </Text>
                             {holidays
-
                                 .filter((holiday) => holiday.date > today)
                                 .slice(0, displayCount)
                                 .map((holiday, index) => (
                                     <View key={`holiday-${index}`}>
-                                        <View key={index} style={styles.list}>
+                                        <View style={styles.list}>
                                             <Text style={styles.listText}>
                                                 {removeParentheses(
                                                     holiday.title
@@ -160,10 +204,7 @@ export default function Holidays() {
                                                     : holiday.hebrewDate}
                                             </Text>
                                         </View>
-                                        <View
-                                            key={`line-${index}`}
-                                            style={styles.blueLine}
-                                        ></View>
+                                        <View style={styles.blueLine}></View>
                                     </View>
                                 ))}
                             {displayCount < holidays.length && (
