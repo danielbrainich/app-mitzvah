@@ -178,7 +178,6 @@ export default function Holidays() {
                             </Text>
                             {holidays
                                 .filter((holiday) => {
-                                    console.log(holiday.date, today);
                                     return holiday.date > today;
                                 })
                                 .slice(0, displayCount)

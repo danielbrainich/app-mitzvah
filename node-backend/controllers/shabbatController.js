@@ -66,9 +66,8 @@ async function getShabbat(req, res) {
         };
 
         const events = await HebrewCalendar.calendar(options);
-        console.log("events", events);
         const shabbatInfo = getShabbatInfo(events);
-        console.log("shabgfIdnfo", shabbatInfo);
+        console.log("shabgIdnfo", shabbatInfo);
 
         res.json(shabbatInfo);
     } catch (error) {

@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import {
+    HebrewCalendar,
+    Location,
+    CandleLightingEvent,
+    ParshaEvent,
+    HavdalahEvent,
+} from "@hebcal/core";
 import { useFonts } from "expo-font";
-import * as Location from "expo-location";
+import * as ExpoLocation from "expo-location";
 import { useSelector } from "react-redux";
 
 export default function Shabbat() {
@@ -12,28 +19,19 @@ export default function Shabbat() {
     const [shabbatInfo, setShabbatInfo] = useState({});
     const [locationData, setLocationData] = useState("");
     const dateDisplay = useSelector((state) => state.dateDisplay);
-    const today = new Date().toISOString().split("T")[0];
-    // const today = "2024-12-29";
-
+    // const today = new Date().toISOString().split("T")[0];
+    const today = "2024-12-29";
 
     useEffect(() => {
         const fetchLocationData = async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
+            let { status } =
+                await ExpoLocation.requestForegroundPermissionsAsync();
             if (status !== "granted") {
-                console.log("Permission denied");
+                console.log("Permission to access location was denied");
                 return;
             }
-            const locationObject = await Location.getCurrentPositionAsync();
-            const { latitude, longitude, altitude } = locationObject.coords;
-            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            setLocation(locationObject);
-            const locationData = {
-                latitude,
-                longitude,
-                altitude,
-                timezone,
-            };
-            setLocationData(locationData);
+            const location = await ExpoLocation.getCurrentPositionAsync({});
+            setLocation(location);
         };
 
         fetchLocationData();
@@ -41,35 +39,113 @@ export default function Shabbat() {
 
     useEffect(() => {
         const fetchShabbatInfo = async () => {
-            if (!locationData) {
-                return;
-            }
-            try {
-                const queryParams = new URLSearchParams({
-                    latitude: locationData.latitude.toString(),
-                    longitude: locationData.longitude.toString(),
-                    altitude: locationData.altitude.toString(),
-                    timezone: locationData.timezone.toString(),
-                });
-                const url = `http://localhost:8000/api/shabbat/${today}?${queryParams}`;
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(
-                        "Something went wrong fetching Shabbat info!"
-                    );
-                }
-                const data = await response.json();
-                console.log("shabinfo", data);
-                setShabbatInfo(data);
-            } catch (error) {
-                console.error(
-                    "Something went wrong fetching Shabbat info!",
-                    error
-                );
-            }
+            const latitude = location.coords.latitude;
+            const longitude = location.coords.longitude;
+            const il = false;
+            const tzid = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const cityName = undefined;
+            const countryCode = "US";
+            const geoId = undefined;
+            const elevation = location.coords.altitude;
+            const hebcalLocation = new Location(
+                latitude,
+                longitude,
+                il,
+                tzid,
+                cityName,
+                countryCode,
+                geoId,
+                elevation
+            );
+
+            const friday = new Date(today);
+            const saturday = new Date(today);
+            friday.setDate(friday.getDate() + 5 - friday.getDay());
+            saturday.setDate(saturday.getDate() + 6 - saturday.getDay());
+            const events = HebrewCalendar.calendar({
+                start: friday,
+                end: saturday,
+                location: hebcalLocation,
+                candlelighting: true,
+                sedrot: true,
+                omer: true,
+                // havdalahMins: 50,
+            });
+            const shabbatInfo = getShabbatInfo(events);
+            setShabbatInfo(shabbatInfo);
         };
         fetchShabbatInfo();
-    }, [locationData]);
+    }, []);
+
+
+    const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+
+    const timeFormatter = new Intl.DateTimeFormat("en-GB", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+    });
+
+    function formatTime(date) {
+        return timeFormatter.formatToParts(date)
+            .map(({type, value}) => {
+                if (type === 'dayPeriod') {
+                    return value.toLowerCase();
+                }
+                return value;
+            })
+            .join('');
+    }
+
+
+    function getShabbatInfo(events) {
+        const shabbatInfo = {
+            candleDesc: null,
+            candleTime: null,
+            sundown: null,
+            candleDate: null,
+            candleHDate: null,
+
+            parshaHebrew: null,
+            parshaEnglish: null,
+            parshaHDate: null,
+
+            havdalahDesc: null,
+            havdalahTime: null,
+            havdalahDate: null,
+            havdalahHDate: null,
+        };
+
+        for (const event of events) {
+            if (event instanceof CandleLightingEvent) {
+                shabbatInfo.candleDesc = event.renderBrief('he-x-NoNikud');
+                shabbatInfo.candleTime = event.fmtTime || null;
+                shabbatInfo.candleDate = event.eventTime ? dateFormatter.format(new Date(event.eventTime)) : null;
+                shabbatInfo.candleHDate = event.date ? event.date.toString() : null;
+
+                const candleDateTime = new Date(event.eventTime);
+                candleDateTime.setMinutes(candleDateTime.getMinutes() + 18);
+                shabbatInfo.sundown = formatTime(candleDateTime);
+
+            } else if (event instanceof ParshaEvent) {
+                shabbatInfo.parshaEnglish = event.render('en');
+                shabbatInfo.parshaHebrew = event.renderBrief('he-x-NoNikud');
+                shabbatInfo.parshaHDate = event.date ? event.date.toString() : null;
+            } else if (event instanceof HavdalahEvent) {
+                shabbatInfo.havdalahDesc = event.renderBrief('he-x-NoNikud');
+                shabbatInfo.havdalahTime = event.fmtTime || null;
+                shabbatInfo.havdalahDate = event.eventTime ? dateFormatter.format(new Date(event.eventTime)) : null;
+                shabbatInfo.havdalahHDate = event.date ? event.date.toString() : null;
+            }
+        }
+
+        return shabbatInfo;
+    }
+
 
     return (
         <SafeAreaView style={styles.container}>
