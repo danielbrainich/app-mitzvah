@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, Text, SafeAreaView, View, ScrollView } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    SafeAreaView,
+    View,
+    ScrollView,
+    RefreshControl,
+} from "react-native";
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
-import {
-    HebrewCalendar,
-    Location as HebcalLocation,
-    HDate,
-    Event,
-} from "@hebcal/core";
+import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 
 export default function Holidays() {
     const [holidays, setHolidays] = useState([]);
@@ -16,9 +18,10 @@ export default function Holidays() {
     });
     const dateDisplay = useSelector((state) => state.dateDisplay);
     const [isTodayHoliday, setIsTodayHoliday] = useState(null);
-    // const today = new Date().toISOString().split("T")[0];
-    const today = "2024-12-29";
+    const today = new Date().toISOString().split("T")[0];
+    // const today = "2024-12-29";
     const [displayCount, setDisplayCount] = useState(4);
+    const [refreshing, setRefreshing] = useState(false);
 
     function formatDate(inputDate) {
         const date = new Date(inputDate);
@@ -125,7 +128,7 @@ export default function Holidays() {
         };
 
         fetchHolidays();
-    }, []);
+    }, [refreshing]);
 
     function collectUniqueHolidays(events) {
         const seenHolidays = new Set();
@@ -144,9 +147,25 @@ export default function Holidays() {
         setDisplayCount((prevCount) => prevCount + 4);
     }
 
+    const handleRefresh = () => {
+        setRefreshing(true);
+        setDisplayCount(4);
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1000);
+    };
+
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView style={styles.scrollViewContent}>
+            <ScrollView
+                style={styles.scrollViewContent}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                    />
+                }
+            >
                 {fontsLoaded ? (
                     <>
                         {isTodayHoliday ? (
@@ -169,6 +188,11 @@ export default function Holidays() {
                                 <Text style={styles.headerText}>Today is</Text>
                                 <Text style={styles.bigBoldText}>
                                     not a Jewish holiday
+                                </Text>
+                                <Text style={styles.dateText}>
+                                    {dateDisplay === "gregorian"
+                                        ? formatDate(today)
+                                        : new HDate().toString()}
                                 </Text>
                             </View>
                         )}

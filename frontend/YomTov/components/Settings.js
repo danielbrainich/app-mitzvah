@@ -41,23 +41,6 @@ export default function Settings() {
                 <View style={styles.frame}>
                     <Text style={styles.headerText}>Settings</Text>
                     <View style={styles.optionContainer}>
-                        <View>
-                            <Text style={styles.smallText}>
-                                Display mode
-                            </Text>
-                            <Text style={styles.tinyText}>
-                                Dark and light themes
-                            </Text>
-                        </View>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={
-                                displayMode ? "white" : "#f4f3f4"
-                            }
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleDisplayMode}
-                            value={displayMode}
-                        />
                     </View>
                     <View style={styles.optionContainer}>
                         <View>

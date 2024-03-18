@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    SafeAreaView,
+    ScrollView,
+    RefreshControl,
+} from "react-native";
 import {
     HebrewCalendar,
     Location,
@@ -10,17 +17,24 @@ import {
 import { useFonts } from "expo-font";
 import * as ExpoLocation from "expo-location";
 import { useSelector } from "react-redux";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
     });
-    const [location, setLocation] = useState({});
+    const [location, setLocation] = useState(null);
+    const [latitude, setLatitude] = useState(null);
+    const [longitude, setLongitude] = useState(null);
+    const [elevation, setElevation] = useState(null);
+    const [timezone, setTimezone] = useState(
+        Intl.DateTimeFormat().resolvedOptions().timeZone
+    );
+    const [refreshing, setRefreshing] = useState(false);
     const [shabbatInfo, setShabbatInfo] = useState({});
-    const [locationData, setLocationData] = useState("");
     const dateDisplay = useSelector((state) => state.dateDisplay);
-    // const today = new Date().toISOString().split("T")[0];
-    const today = "2024-12-29";
+    const today = new Date().toISOString().split("T")[0];
+    // const today = "2024-12-29";
 
     useEffect(() => {
         const fetchLocationData = async () => {
@@ -33,20 +47,25 @@ export default function Shabbat() {
             const location = await ExpoLocation.getCurrentPositionAsync({});
             setLocation(location);
         };
-
         fetchLocationData();
-    }, []);
+    }, [refreshing]);
 
     useEffect(() => {
         const fetchShabbatInfo = async () => {
+            if (!location) {
+                return;
+            }
             const latitude = location.coords.latitude;
+            setLatitude(latitude);
             const longitude = location.coords.longitude;
+            setLongitude(longitude);
             const il = false;
             const tzid = Intl.DateTimeFormat().resolvedOptions().timeZone;
             const cityName = undefined;
             const countryCode = "US";
             const geoId = undefined;
             const elevation = location.coords.altitude;
+            setElevation(elevation);
             const hebcalLocation = new Location(
                 latitude,
                 longitude,
@@ -75,8 +94,7 @@ export default function Shabbat() {
             setShabbatInfo(shabbatInfo);
         };
         fetchShabbatInfo();
-    }, []);
-
+    }, [location, refreshing]);
 
     const dateFormatter = new Intl.DateTimeFormat("en-GB", {
         day: "numeric",
@@ -91,16 +109,16 @@ export default function Shabbat() {
     });
 
     function formatTime(date) {
-        return timeFormatter.formatToParts(date)
-            .map(({type, value}) => {
-                if (type === 'dayPeriod') {
+        return timeFormatter
+            .formatToParts(date)
+            .map(({ type, value }) => {
+                if (type === "dayPeriod") {
                     return value.toLowerCase();
                 }
                 return value;
             })
-            .join('');
+            .join("");
     }
-
 
     function getShabbatInfo(events) {
         const shabbatInfo = {
@@ -122,34 +140,56 @@ export default function Shabbat() {
 
         for (const event of events) {
             if (event instanceof CandleLightingEvent) {
-                shabbatInfo.candleDesc = event.renderBrief('he-x-NoNikud');
+                shabbatInfo.candleDesc = event.renderBrief("he-x-NoNikud");
                 shabbatInfo.candleTime = event.fmtTime || null;
-                shabbatInfo.candleDate = event.eventTime ? dateFormatter.format(new Date(event.eventTime)) : null;
-                shabbatInfo.candleHDate = event.date ? event.date.toString() : null;
+                shabbatInfo.candleDate = event.eventTime
+                    ? dateFormatter.format(new Date(event.eventTime))
+                    : null;
+                shabbatInfo.candleHDate = event.date
+                    ? event.date.toString()
+                    : null;
 
                 const candleDateTime = new Date(event.eventTime);
                 candleDateTime.setMinutes(candleDateTime.getMinutes() + 18);
                 shabbatInfo.sundown = formatTime(candleDateTime);
-
             } else if (event instanceof ParshaEvent) {
-                shabbatInfo.parshaEnglish = event.render('en');
-                shabbatInfo.parshaHebrew = event.renderBrief('he-x-NoNikud');
-                shabbatInfo.parshaHDate = event.date ? event.date.toString() : null;
+                shabbatInfo.parshaEnglish = event.render("en");
+                shabbatInfo.parshaHebrew = event.renderBrief("he-x-NoNikud");
+                shabbatInfo.parshaHDate = event.date
+                    ? event.date.toString()
+                    : null;
             } else if (event instanceof HavdalahEvent) {
-                shabbatInfo.havdalahDesc = event.renderBrief('he-x-NoNikud');
+                shabbatInfo.havdalahDesc = event.renderBrief("he-x-NoNikud");
                 shabbatInfo.havdalahTime = event.fmtTime || null;
-                shabbatInfo.havdalahDate = event.eventTime ? dateFormatter.format(new Date(event.eventTime)) : null;
-                shabbatInfo.havdalahHDate = event.date ? event.date.toString() : null;
+                shabbatInfo.havdalahDate = event.eventTime
+                    ? dateFormatter.format(new Date(event.eventTime))
+                    : null;
+                shabbatInfo.havdalahHDate = event.date
+                    ? event.date.toString()
+                    : null;
             }
         }
-
         return shabbatInfo;
     }
 
+    const handleRefresh = () => {
+        setRefreshing(true);
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1000);
+    };
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView style={styles.scrollViewContent}>
+            <ScrollView
+                style={styles.scrollViewContent}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                    />
+                }
+            >
                 {fontsLoaded ? (
                     <View style={styles.frame}>
                         {shabbatInfo ? (
@@ -223,22 +263,59 @@ export default function Shabbat() {
                                 <Text style={styles.mediumBoldText}>
                                     Parasha
                                 </Text>
-                                {shabbatInfo.parshaEnglish && (
-                                    <Text style={styles.paragraphText}>
-                                        {shabbatInfo.parshaEnglish}
-                                    </Text>
-                                )}
-                                {shabbatInfo.parshaHebrew && (
-                                    <Text style={styles.paragraphText}>
-                                        {shabbatInfo.parshaHebrew}
-                                    </Text>
-                                )}
+                                <View style={styles.list}>
+                                    {shabbatInfo.parshaEnglish && (
+                                        <Text style={styles.paragraphText}>
+                                            {shabbatInfo.parshaEnglish}
+                                        </Text>
+                                    )}
+                                    {shabbatInfo.parshaHebrew && (
+                                        <Text style={styles.paragraphText}>
+                                            {shabbatInfo.parshaHebrew}
+                                        </Text>
+                                    )}
+                                </View>
                             </>
                         ) : (
                             <Text style={styles.paragraphText}>
                                 Loading Shabbat info...
                             </Text>
                         )}
+                        {latitude && longitude && elevation && timezone ? (
+                            <>
+                                <View style={styles.spacer} />
+                                <View style={styles.spacer} />
+                                <View style={styles.spacer} />
+
+                                <View style={styles.footerList}>
+                                    <Text style={styles.footerText}>
+                                        Elevation {""}
+                                    </Text>
+                                    <Text style={styles.footerSubText}>
+                                        {elevation.toFixed(1)} meters
+                                    </Text>
+                                </View>
+                                <View style={styles.footerList}>
+                                    <Text style={styles.footerText}>
+                                        Coordinates {""}
+                                    </Text>
+                                    <Text style={styles.footerSubText}>
+                                        {latitude.toFixed(3)},{" "}
+                                        {longitude.toFixed(3)}
+                                    </Text>
+                                </View>
+                                <View style={styles.footerList}>
+
+                                <Text style={styles.footerWhiteSubText}>
+                                    Timezone {""}
+                                </Text>
+                                <Text style={styles.footerSubText}>
+                                    {timezone.replace(/_/g, " ")}
+                                </Text>
+                                </View>
+
+                            </>
+                        ) : null}
                     </View>
                 ) : null}
             </ScrollView>
@@ -275,9 +352,27 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         marginBottom: 16,
     },
+    footerList: {
+        flexDirection: "row",
+        justifyContent: "start",
+        alignItems: "start",
+    },
     paragraphText: {
         color: "white",
         fontSize: 20,
         marginBottom: 8,
     },
+    footerText: {
+        color: "white",
+        fontSize: 14,
+    },
+    footerSubText: {
+        color: "#82CBFF",
+        fontSize: 14,
+    },
+    footerWhiteSubText: {
+        color: "white",
+        fontSize: 14,
+    },
+
 });
