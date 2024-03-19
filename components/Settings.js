@@ -7,13 +7,14 @@ import {
     setDateDisplay,
     toggleMinorFasts,
     toggleRosheiChodesh,
+    toggleModernHolidays,
 } from "../store/actions";
 
 export default function Settings() {
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
     });
-    const { dateDisplay, minorFasts, rosheiChodesh } = useSelector(
+    const { dateDisplay, minorFasts, rosheiChodesh, modernHolidays } = useSelector(
         (state) => state.settings
     );
 
@@ -29,6 +30,10 @@ export default function Settings() {
 
     const handleToggleRosheiChodesh = () => {
         dispatch(toggleRosheiChodesh());
+    };
+
+    const handleToggleModernHolidays = () => {
+        dispatch(toggleModernHolidays());
     };
 
     return (
@@ -69,6 +74,20 @@ export default function Settings() {
                         />
                     </View> */}
                     <Text style={styles.headerText}>Holiday Options</Text>
+                    <View style={styles.optionContainer}>
+                        <View>
+                            <Text style={styles.smallText}>
+                                Include modern holidays
+                            </Text>
+                        </View>
+                        <Switch
+                            trackColor={{ false: "#767577", true: "#82CBFF" }}
+                            thumbColor={minorFasts ? "white" : "#f4f3f4"}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={handleToggleModernHolidays}
+                            value={modernHolidays}
+                        />
+                    </View>
                     <View style={styles.optionContainer}>
                         <View>
                             <Text style={styles.smallText}>

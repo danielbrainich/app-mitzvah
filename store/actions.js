@@ -1,6 +1,7 @@
 export const SET_DATE_DISPLAY = 'SET_DATE_DISPLAY';
 export const TOGGLE_MINOR_FASTS = 'TOGGLE_MINOR_FASTS';
 export const TOGGLE_ROSHEI_CHODESH = 'TOGGLE_ROSHEI_CHODESH';
+export const TOGGLE_MODERN_HOLIDAYS = 'TOGGLE_MODERN_HOLIDAYS';
 
 export const setDateDisplay = (dateDisplay) => ({
     type: SET_DATE_DISPLAY,
@@ -13,4 +14,8 @@ export const toggleMinorFasts = () => ({
 
 export const toggleRosheiChodesh = () => ({
     type: 'TOGGLE_ROSHEI_CHODESH',
+});
+
+export const toggleModernHolidays = () => ({
+    type: 'TOGGLE_MODERN_HOLIDAYS',
 });

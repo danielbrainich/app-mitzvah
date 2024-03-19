@@ -1,5 +1,5 @@
 import { useFonts } from "expo-font";
-import { StyleSheet, Text, SafeAreaView, View, ScrollView } from "react-native";
+import { StyleSheet, Text, SafeAreaView, ScrollView } from "react-native";
 
 export default function Settings() {
     const [fontsLoaded] = useFonts({
@@ -41,7 +41,7 @@ export default function Settings() {
                     <Text style={styles.headerText}>Credits</Text>
                     <Text style={styles.smallText}>
                         This app was inspired by isitajewishholidaytoday.com and
-                        is powered by the hebcal.com API.
+                        is powered by Hebcal.
                     </Text>
                     <Text style={styles.headerText}>Us</Text>
                     <Text style={styles.smallText}>
