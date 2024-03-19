@@ -13,88 +13,99 @@ import {
     CandleLightingEvent,
     ParshaEvent,
     HavdalahEvent,
+    HDate,
 } from "@hebcal/core";
 import { useFonts } from "expo-font";
 import * as ExpoLocation from "expo-location";
 import { useSelector } from "react-redux";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
     });
     const [location, setLocation] = useState(null);
-    const [latitude, setLatitude] = useState(null);
-    const [longitude, setLongitude] = useState(null);
-    const [elevation, setElevation] = useState(null);
-    const [timezone, setTimezone] = useState(
-        Intl.DateTimeFormat().resolvedOptions().timeZone
-    );
     const [refreshing, setRefreshing] = useState(false);
     const [shabbatInfo, setShabbatInfo] = useState({});
     const dateDisplay = useSelector((state) => state.dateDisplay);
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const today = new Date().toISOString().split("T")[0];
     // const today = "2024-12-29";
 
     useEffect(() => {
-        const fetchLocationData = async () => {
+        (async () => {
             let { status } =
                 await ExpoLocation.requestForegroundPermissionsAsync();
-            if (status !== "granted") {
+            if (status === "granted") {
+                const location = await ExpoLocation.getCurrentPositionAsync({});
+                setLocation({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                    elevation: location.coords.altitude,
+                });
+            } else {
                 console.log("Permission to access location was denied");
-                return;
+                fetchShabbatInfo();
             }
-            const location = await ExpoLocation.getCurrentPositionAsync({});
-            setLocation(location);
-        };
-        fetchLocationData();
+        })();
     }, [refreshing]);
 
     useEffect(() => {
-        const fetchShabbatInfo = async () => {
-            if (!location) {
-                return;
-            }
-            const latitude = location.coords.latitude;
-            setLatitude(latitude);
-            const longitude = location.coords.longitude;
-            setLongitude(longitude);
-            const il = false;
-            const tzid = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const cityName = undefined;
-            const countryCode = "US";
-            const geoId = undefined;
-            const elevation = location.coords.altitude;
-            setElevation(elevation);
-            const hebcalLocation = new Location(
-                latitude,
-                longitude,
-                il,
-                tzid,
-                cityName,
-                countryCode,
-                geoId,
-                elevation
-            );
-
-            const friday = new Date(today);
-            const saturday = new Date(today);
-            friday.setDate(friday.getDate() + 5 - friday.getDay());
-            saturday.setDate(saturday.getDate() + 6 - saturday.getDay());
-            const events = HebrewCalendar.calendar({
-                start: friday,
-                end: saturday,
-                location: hebcalLocation,
-                candlelighting: true,
-                sedrot: true,
-                omer: true,
-                // havdalahMins: 50,
-            });
-            const shabbatInfo = getShabbatInfo(events);
-            setShabbatInfo(shabbatInfo);
-        };
         fetchShabbatInfo();
     }, [location, refreshing]);
+
+    const fetchShabbatInfo = async () => {
+        try {
+            const friday = new Date(today);
+            friday.setDate(friday.getDate() + (5 - friday.getDay()));
+            const saturday = new Date(friday);
+            saturday.setDate(friday.getDate() + 1);
+
+            const erevShabbatDate = dateFormatter.format(friday);
+            const yomShabbatDate = dateFormatter.format(saturday);
+
+            const erevShabbatHebrewDate = new HDate(friday).toString();
+            const yomShabbatHebrewDate = new HDate(saturday).toString();
+
+            let events;
+            if (location) {
+                const hebcalLocation = new Location(
+                    location.latitude,
+                    location.longitude,
+                    false,
+                    timezone,
+                    undefined,
+                    "US",
+                    undefined,
+                    location.elevation
+                );
+
+                events = HebrewCalendar.calendar({
+                    start: friday,
+                    end: saturday,
+                    location: hebcalLocation,
+                    candlelighting: true,
+                    sedrot: true,
+                });
+            } else {
+                events = HebrewCalendar.calendar({
+                    start: friday,
+                    end: saturday,
+                    sedrot: true,
+                });
+            }
+            const newShabbatInfo = getShabbatInfo(events);
+
+            setShabbatInfo({
+                ...newShabbatInfo,
+                erevShabbatDate: erevShabbatDate,
+                erevShabbatHebrewDate: erevShabbatHebrewDate,
+                yomShabbatDate: yomShabbatDate,
+                yomShabbatHebrewDate: yomShabbatHebrewDate,
+            });
+        } catch (error) {
+            console.error("Error fetching Shabbat info:", error);
+        }
+    };
 
     const dateFormatter = new Intl.DateTimeFormat("en-GB", {
         day: "numeric",
@@ -136,6 +147,9 @@ export default function Shabbat() {
             havdalahTime: null,
             havdalahDate: null,
             havdalahHDate: null,
+
+            erevShabbatDate: null,
+            yomShabbatDate: null,
         };
 
         for (const event of events) {
@@ -194,7 +208,7 @@ export default function Shabbat() {
                     <View style={styles.frame}>
                         {shabbatInfo ? (
                             <>
-                                                            <Text style={styles.headerText}>This week</Text>
+                                <Text style={styles.headerText}>This week</Text>
 
                                 <Text style={styles.mediumBoldText}>
                                     Erev Shabbat
@@ -203,36 +217,38 @@ export default function Shabbat() {
                                     <Text style={styles.paragraphText}>
                                         Date
                                     </Text>
-                                    {shabbatInfo.candleDate && (
-                                        <Text style={styles.paragraphText}>
-                                            {dateDisplay === "gregorian"
-                                                ? shabbatInfo.candleDate
-                                                : shabbatInfo.candleHDate}
-                                        </Text>
-                                    )}
+                                    {shabbatInfo.erevShabbatDate &&
+                                        shabbatInfo.erevShabbatHebrewDate && (
+                                            <Text style={styles.paragraphText}>
+                                                {dateDisplay === "gregorian"
+                                                    ? shabbatInfo.erevShabbatDate
+                                                    : shabbatInfo.erevShabbatHebrewDate}
+                                            </Text>
+                                        )}
                                 </View>
 
-                                <View style={styles.list}>
-                                    <Text style={styles.paragraphText}>
-                                        Candle Lighting
-                                    </Text>
-                                    {shabbatInfo.candleTime && (
+                                {shabbatInfo.candleTime && (
+                                    <View style={styles.list}>
+                                        <Text style={styles.paragraphText}>
+                                            Candle Lighting
+                                        </Text>
                                         <Text style={styles.paragraphText}>
                                             {shabbatInfo.candleTime}
                                         </Text>
-                                    )}
-                                </View>
+                                    </View>
+                                )}
 
-                                <View style={styles.list}>
-                                    <Text style={styles.paragraphText}>
-                                        Sundown
-                                    </Text>
-                                    {shabbatInfo.sundown && (
+                                {shabbatInfo.sundown && (
+                                    <View style={styles.list}>
+                                        <Text style={styles.paragraphText}>
+                                            Sundown
+                                        </Text>
                                         <Text style={styles.paragraphText}>
                                             {shabbatInfo.sundown}
                                         </Text>
-                                    )}
-                                </View>
+                                    </View>
+                                )}
+
                                 <View style={styles.spacer} />
                                 <Text style={styles.mediumBoldText}>
                                     Yom Shabbat
@@ -242,24 +258,27 @@ export default function Shabbat() {
                                     <Text style={styles.paragraphText}>
                                         Date
                                     </Text>
-                                    {shabbatInfo.havdalahDate && (
-                                        <Text style={styles.paragraphText}>
-                                            {dateDisplay === "gregorian"
-                                                ? shabbatInfo.havdalahDate
-                                                : shabbatInfo.havdalahHDate}
-                                        </Text>
-                                    )}
+                                    {shabbatInfo.yomShabbatDate &&
+                                        shabbatInfo.yomShabbatHebrewDate && (
+                                            <Text style={styles.paragraphText}>
+                                                {dateDisplay === "gregorian"
+                                                    ? shabbatInfo.yomShabbatDate
+                                                    : shabbatInfo.yomShabbatHebrewDate}
+                                            </Text>
+                                        )}
                                 </View>
-                                <View style={styles.list}>
-                                    <Text style={styles.paragraphText}>
-                                        Havdalah
-                                    </Text>
-                                    {shabbatInfo.havdalahTime && (
+
+                                {shabbatInfo.havdalahTime && (
+                                    <View style={styles.list}>
+                                        <Text style={styles.paragraphText}>
+                                            Havdalah
+                                        </Text>
                                         <Text style={styles.paragraphText}>
                                             {shabbatInfo.havdalahTime}
                                         </Text>
-                                    )}
-                                </View>
+                                    </View>
+                                )}
+
                                 <View style={styles.spacer} />
 
                                 <Text style={styles.mediumBoldText}>
@@ -283,24 +302,17 @@ export default function Shabbat() {
                                 Loading Shabbat info...
                             </Text>
                         )}
-                        {latitude !== null &&
-                        longitude !== null &&
-                        timezone !== null ? (
+                        <View style={styles.spacer} />
+                        <View style={styles.spacer} />
+                        <View style={styles.spacer} />
+                        {location ? (
                             <>
-                                {console.log("latitude", latitude)}
-                                {console.log("longitude", longitude)}
-                                {console.log("elevation", elevation)}
-                                {console.log("timezone", timezone)}
-                                <View style={styles.spacer} />
-                                <View style={styles.spacer} />
-                                <View style={styles.spacer} />
-
                                 <View style={styles.footerList}>
                                     <Text style={styles.footerText}>
                                         Elevation {""}
                                     </Text>
                                     <Text style={styles.footerSubText}>
-                                        {elevation.toFixed(1)} meters
+                                        {location.elevation.toFixed(1)} meters
                                     </Text>
                                 </View>
                                 <View style={styles.footerList}>
@@ -308,8 +320,8 @@ export default function Shabbat() {
                                         Coordinates {""}
                                     </Text>
                                     <Text style={styles.footerSubText}>
-                                        {latitude.toFixed(3)},{" "}
-                                        {longitude.toFixed(3)}
+                                        {location.latitude.toFixed(3)},{" "}
+                                        {location.longitude.toFixed(3)}
                                     </Text>
                                 </View>
                                 <View style={styles.footerList}>
@@ -321,7 +333,11 @@ export default function Shabbat() {
                                     </Text>
                                 </View>
                             </>
-                        ) : null}
+                        ) :
+                            <Text style={styles.blueFooterText}>
+                                For candle lighting and havdalah times, please enable location services.
+                            </Text>
+                        }
                     </View>
                 ) : null}
             </ScrollView>
@@ -370,15 +386,19 @@ const styles = StyleSheet.create({
     },
     footerText: {
         color: "white",
-        fontSize: 14,
+        fontSize: 16,
+    },
+    blueFooterText: {
+        color: "#82CBFF",
+        fontSize: 16,
     },
     footerSubText: {
         color: "#82CBFF",
-        fontSize: 14,
+        fontSize: 16,
     },
     footerWhiteSubText: {
         color: "white",
-        fontSize: 14,
+        fontSize: 16,
     },
     headerText: {
         color: "white",
