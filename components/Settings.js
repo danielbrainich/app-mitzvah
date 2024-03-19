@@ -3,33 +3,32 @@ import { useFonts } from "expo-font";
 import { StyleSheet, Text, SafeAreaView, View, Switch } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
-import { setDateDisplay } from "../store/actions";
+import {
+    setDateDisplay,
+    toggleMinorFasts,
+    toggleRosheiChodesh,
+} from "../store/actions";
 
 export default function Settings() {
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
     });
-    const [holidayNotifications, setHolidayNotifications] = useState(false);
-    const [shabbatNotifications, setShabbatNotifications] = useState(false);
-    const [displayMode, setDisplayMode] = useState(false);
-    const dateDisplay = useSelector((state) => state.dateDisplay);
+    const { dateDisplay, minorFasts, rosheiChodesh } = useSelector(
+        (state) => state.settings
+    );
 
     const dispatch = useDispatch();
-
-    const toggleDisplayMode = () => {
-        dispatch(setDisplayMode(!displayMode));
-    };
 
     const handleDateDisplayChange = (newValue) => {
         dispatch(setDateDisplay(newValue));
     };
 
-    const toggleHolidayNotifications = () => {
-        setHolidayNotifications(!holidayNotifications);
+    const handleToggleMinorFasts = () => {
+        dispatch(toggleMinorFasts());
     };
 
-    const toggleShabbatNotifications = () => {
-        setShabbatNotifications(!shabbatNotifications);
+    const handleToggleRosheiChodesh = () => {
+        dispatch(toggleRosheiChodesh());
     };
 
     return (
@@ -37,7 +36,7 @@ export default function Settings() {
             {fontsLoaded ? (
                 <View style={styles.frame}>
                     <Text style={styles.headerText}>Shabbat Options</Text>
-                    <View style={styles.optionContainer}>
+                    {/* <View style={styles.optionContainer}>
                         <View>
                             <Text style={styles.smallText}>
                                 Custom candle lighting time
@@ -68,7 +67,7 @@ export default function Settings() {
                             onValueChange={toggleHolidayNotifications}
                             value={holidayNotifications}
                         />
-                    </View>
+                    </View> */}
                     <Text style={styles.headerText}>Holiday Options</Text>
                     <View style={styles.optionContainer}>
                         <View>
@@ -78,12 +77,10 @@ export default function Settings() {
                         </View>
                         <Switch
                             trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={
-                                holidayNotifications ? "white" : "#f4f3f4"
-                            }
+                            thumbColor={minorFasts ? "white" : "#f4f3f4"}
                             ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleHolidayNotifications}
-                            value={holidayNotifications}
+                            onValueChange={handleToggleMinorFasts}
+                            value={minorFasts}
                         />
                     </View>
                     <View style={styles.optionContainer}>
@@ -94,12 +91,10 @@ export default function Settings() {
                         </View>
                         <Switch
                             trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={
-                                holidayNotifications ? "white" : "#f4f3f4"
-                            }
+                            thumbColor={rosheiChodesh ? "white" : "#f4f3f4"}
                             ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleHolidayNotifications}
-                            value={holidayNotifications}
+                            onValueChange={handleToggleRosheiChodesh}
+                            value={rosheiChodesh}
                         />
                     </View>
                     <Text style={styles.radioHeaderText}>Date Format</Text>

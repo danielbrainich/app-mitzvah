@@ -9,9 +9,8 @@ import { StyleSheet } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import TabBarTabs from "./components/TabBarTabs";
 import { Provider } from "react-redux";
-import store from "./store";
+import store from "./store/store";
 import * as Font from "expo-font";
-
 
 export default function App() {
     const Stack = createNativeStackNavigator();
@@ -27,6 +26,7 @@ export default function App() {
     }, []);
 
     if (!fontLoaded) return null;
+
 
     return (
         <Provider store={store}>

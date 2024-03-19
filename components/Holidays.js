@@ -16,7 +16,7 @@ export default function Holidays() {
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
     });
-    const dateDisplay = useSelector((state) => state.dateDisplay);
+    const { dateDisplay, minorFasts, rosheiChodesh } = useSelector(state => state.settings);
     const [isTodayHoliday, setIsTodayHoliday] = useState(null);
     const today = new Date().toISOString().split("T")[0];
     // const today = "2024-12-29";
@@ -100,10 +100,10 @@ export default function Holidays() {
                 end: endDate,
                 isHebrewYear: false,
                 candlelighting: false,
-                noMinorFast: true,
+                noMinorFast: !minorFasts,
                 noSpecialShabbat: true,
                 noModern: false,
-                noRoshChodesh: true,
+                noRoshChodesh: !rosheiChodesh,
                 sedrot: false,
                 omer: false,
                 shabbatMevarchim: false,
@@ -128,7 +128,7 @@ export default function Holidays() {
         };
 
         fetchHolidays();
-    }, [refreshing]);
+    }, [refreshing, minorFasts, rosheiChodesh]);
 
     function collectUniqueHolidays(events) {
         const seenHolidays = new Set();

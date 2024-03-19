@@ -26,7 +26,7 @@ export default function Shabbat() {
     const [location, setLocation] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const [shabbatInfo, setShabbatInfo] = useState({});
-    const dateDisplay = useSelector((state) => state.dateDisplay);
+    const { dateDisplay } = useSelector(state => state.settings);
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const today = new Date().toISOString().split("T")[0];
     // const today = "2024-12-29";
