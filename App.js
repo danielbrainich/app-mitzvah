@@ -31,7 +31,7 @@ export default function App() {
     return (
         <Provider store={store}>
             <NavigationContainer>
-                <StatusBar style="auto" />
+                <StatusBar style="light" />
                 <Stack.Navigator
                     initialRouteName="Tabs"
                     screenOptions={{

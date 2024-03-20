@@ -26,7 +26,7 @@ export default function Shabbat() {
     const [location, setLocation] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const [shabbatInfo, setShabbatInfo] = useState({});
-    const { dateDisplay } = useSelector(state => state.settings);
+    const { dateDisplay, candleLightingTime, havdalahTime } = useSelector(state => state.settings);
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const today = new Date().toISOString().split("T")[0];
     // const today = "2024-12-29";
@@ -93,6 +93,7 @@ export default function Shabbat() {
                     sedrot: true,
                 });
             }
+
             const newShabbatInfo = getShabbatInfo(events);
 
             setShabbatInfo({
@@ -155,16 +156,16 @@ export default function Shabbat() {
         for (const event of events) {
             if (event instanceof CandleLightingEvent) {
                 shabbatInfo.candleDesc = event.renderBrief("he-x-NoNikud");
-                shabbatInfo.candleTime = event.fmtTime || null;
                 shabbatInfo.candleDate = event.eventTime
-                    ? dateFormatter.format(new Date(event.eventTime))
-                    : null;
+                ? dateFormatter.format(new Date(event.eventTime))
+                : null;
                 shabbatInfo.candleHDate = event.date
-                    ? event.date.toString()
-                    : null;
+                ? event.date.toString()
+                : null;
 
                 const candleDateTime = new Date(event.eventTime);
                 candleDateTime.setMinutes(candleDateTime.getMinutes() + 18);
+                shabbatInfo.candleTime = event.fmtTime || null;
                 shabbatInfo.sundown = formatTime(candleDateTime);
             } else if (event instanceof ParshaEvent) {
                 shabbatInfo.parshaEnglish = event.render("en");
@@ -209,6 +210,9 @@ export default function Shabbat() {
                         {shabbatInfo ? (
                             <>
                                 <Text style={styles.headerText}>This week</Text>
+                                <Text style={styles.footerText} >
+                                    {`${candleLightingTime} and ${havdalahTime}`}
+                                </Text>
 
                                 <Text style={styles.mediumBoldText}>
                                     Erev Shabbat

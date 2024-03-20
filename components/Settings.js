@@ -78,163 +78,209 @@ export default function Settings() {
     const handleCandleLightingToggle = () => {
         const newToggleState = !candleLightingToggle;
         setCandleLightingToggle(newToggleState);
+        if (!newToggleState) {
+            dispatch(setCandleLightingTime(null));
+        }
         dispatch(setCandleLightingToggle(newToggleState));
     };
 
     const handleHavdalahTimeToggle = () => {
         const newToggleState = !havdalahTimeToggle;
         setHavdalahTimeToggle(newToggleState);
+        if (!newToggleState) {
+            dispatch(setHavdalahTime(null));
+        }
         dispatch(setHavdalahTimeToggle(newToggleState));
     };
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView>
-            {fontsLoaded ? (
-                <View style={styles.frame}>
-                    <Text style={styles.headerText}>Shabbat Options</Text>
-                    <View style={styles.optionContainer}>
-                        <Text style={styles.smallText}>
-                            Custom candle lighting time
-                        </Text>
+                {fontsLoaded ? (
+                    <View style={styles.frame}>
+                        <Text style={styles.headerText}>Shabbat Options</Text>
+                        <View style={styles.optionContainer}>
+                            <Text style={styles.smallText}>
+                                Custom candle lighting time
+                            </Text>
 
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={
-                                candleLightingToggle ? "#f4f3f4" : "#f4f3f4"
-                            }
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={handleCandleLightingToggle}
-                            value={candleLightingToggle}
-                        />
-                    </View>
-                    {candleLightingToggle && (
-                        <>
-                            <Text style={[styles.tinyText, styles.rightMargin]}>
-                                Default is 18 minutes before sunset. Specify
-                                custom minutes before sunset below.
-                            </Text>
-                            <TextInput
-                                style={styles.input}
-                                onChangeText={setCandleTimeInput}
-                                value={candleTimeInput}
-                                keyboardType="numeric"
-                                placeholder="mins"
-                                maxLength={3}
-                                onEndEditing={handleSetCandleTime}
-                                placeholderTextColor="#82CBFF"
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor={
+                                    candleLightingToggle ? "#f4f3f4" : "#f4f3f4"
+                                }
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={handleCandleLightingToggle}
+                                value={candleLightingToggle}
                             />
-                        </>
-                    )}
-                    <View style={styles.optionContainer}>
-                        <Text style={styles.smallText}>
-                            Custom Havdalah time
-                        </Text>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={
-                                havdalahTimeToggle ? "#f4f3f4" : "#f4f3f4"
-                            }
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={handleHavdalahTimeToggle}
-                            value={havdalahTimeToggle}
-                        />
-                    </View>
-                    {havdalahTimeToggle && (
-                        <>
-                            <Text style={[styles.tinyText, styles.rightMargin]}>
-                                Default is{" "}
-                                <Text style={{ fontStyle: "italic" }}>
-                                    tzeit hakochavim
+                        </View>
+                        {candleLightingToggle && (
+                            <>
+                                <View style={styles.flexBox}>
+                                    <TextInput
+                                        style={styles.input}
+                                        onChangeText={(text) =>
+                                            setCandleTimeInput(
+                                                text.replace(/[^0-9]/g, "")
+                                            )
+                                        }
+                                        value={candleTimeInput}
+                                        keyboardType="numeric"
+                                        maxLength={2}
+                                        onEndEditing={handleSetCandleTime}
+                                        selectionColor="#82CBFF"
+                                    />
+                                    <Text style={styles.tinyWhiteText}>
+                                        minutes before sunset
+                                    </Text>
+                                </View>
+
+                                <Text
+                                    style={[
+                                        styles.tinyText,
+                                        styles.rightMargin,
+                                    ]}
+                                >
+                                    Default is 18 minutes before sunset.
                                 </Text>
-                                , calculated as the time the sun is 8.5 degrees
-                                below the horizon. Specify custom minutes after
-                                sunset below.
+                            </>
+                        )}
+                        <View style={styles.optionContainer}>
+                            <Text style={styles.smallText}>
+                                Custom Havdalah time
                             </Text>
-                            <TextInput
-                                style={styles.input}
-                                onChangeText={setHavdalahTimeInput}
-                                value={havdalahTimeInput}
-                                keyboardType="numeric"
-                                placeholder="mins"
-                                maxLength={3}
-                                onEndEditing={handleSetHavdalahTime}
-                                placeholderTextColor="#82CBFF"
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor={
+                                    havdalahTimeToggle ? "#f4f3f4" : "#f4f3f4"
+                                }
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={handleHavdalahTimeToggle}
+                                value={havdalahTimeToggle}
                             />
-                        </>
-                    )}
-                    <Text style={styles.headerText}>Holiday Options</Text>
-                    <View style={styles.optionContainer}>
-                        <View>
-                            <Text style={styles.smallText}>
-                                Include modern holidays
-                            </Text>
                         </View>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={minorFasts ? "white" : "#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={handleToggleModernHolidays}
-                            value={modernHolidays}
-                        />
-                    </View>
-                    <View style={styles.optionContainer}>
-                        <View>
-                            <Text style={styles.smallText}>
-                                Include minor fasts
-                            </Text>
+                        {havdalahTimeToggle && (
+                            <>
+                                <View style={styles.flexBox}>
+                                    <TextInput
+                                        style={styles.input}
+                                        onChangeText={(text) =>
+                                            setHavdalahTimeInput(
+                                                text.replace(/[^0-9]/g, "")
+                                            )
+                                        }
+                                        value={havdalahTimeInput}
+                                        keyboardType="numeric"
+                                        maxLength={2}
+                                        onEndEditing={handleSetHavdalahTime}
+                                        selectionColor="#82CBFF"
+                                    />
+                                    <Text style={styles.tinyWhiteText}>
+                                        minutes after sunset
+                                    </Text>
+                                </View>
+                                <Text
+                                    style={[
+                                        styles.tinyText,
+                                        styles.rightMargin,
+                                    ]}
+                                >
+                                    Default is when the sun is 8.5 degrees below
+                                    the horizon.
+                                </Text>
+                            </>
+                        )}
+                        <Text style={styles.headerText}>Holiday Options</Text>
+                        <View style={styles.optionContainer}>
+                            <View>
+                                <Text style={styles.smallText}>
+                                    Include modern holidays
+                                </Text>
+                            </View>
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor={minorFasts ? "white" : "#f4f3f4"}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={handleToggleModernHolidays}
+                                value={modernHolidays}
+                            />
                         </View>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={minorFasts ? "white" : "#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={handleToggleMinorFasts}
-                            value={minorFasts}
-                        />
-                    </View>
-                    <View style={styles.optionContainer}>
-                        <View>
-                            <Text style={styles.smallText}>
-                                Include roshei chodesh
-                            </Text>
+                        <View style={styles.optionContainer}>
+                            <View>
+                                <Text style={styles.smallText}>
+                                    Include minor fasts
+                                </Text>
+                            </View>
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor={minorFasts ? "white" : "#f4f3f4"}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={handleToggleMinorFasts}
+                                value={minorFasts}
+                            />
                         </View>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={rosheiChodesh ? "white" : "#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={handleToggleRosheiChodesh}
-                            value={rosheiChodesh}
-                        />
+                        <View style={styles.optionContainer}>
+                            <View>
+                                <Text style={styles.smallText}>
+                                    Include roshei chodesh
+                                </Text>
+                            </View>
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor={rosheiChodesh ? "white" : "#f4f3f4"}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={handleToggleRosheiChodesh}
+                                value={rosheiChodesh}
+                            />
+                        </View>
+                        <Text style={styles.radioHeaderText}>Date Format</Text>
+                        <View style={styles.radioContainer}>
+                            <RadioButton
+                                color="#82CBFF"
+                                value="gregorian"
+                                status={
+                                    dateDisplay === "gregorian"
+                                        ? "checked"
+                                        : "unchecked"
+                                }
+                                onPress={() =>
+                                    handleDateDisplayChange("gregorian")
+                                }
+                            />
+                            <Text style={styles.radioText}>Gregorian</Text>
+                        </View>
+                        <View style={styles.radioContainer}>
+                            <RadioButton
+                                color="#82CBFF"
+                                value="hebrew"
+                                status={
+                                    dateDisplay === "hebrew"
+                                        ? "checked"
+                                        : "unchecked"
+                                }
+                                onPress={() =>
+                                    handleDateDisplayChange("hebrew")
+                                }
+                            />
+                            <Text style={styles.radioText}>Hebrew</Text>
+                        </View>
                     </View>
-                    <Text style={styles.radioHeaderText}>Date Format</Text>
-                    <View style={styles.radioContainer}>
-                        <RadioButton
-                            color="#82CBFF"
-                            value="gregorian"
-                            status={
-                                dateDisplay === "gregorian"
-                                    ? "checked"
-                                    : "unchecked"
-                            }
-                            onPress={() => handleDateDisplayChange("gregorian")}
-                        />
-                        <Text style={styles.radioText}>Gregorian</Text>
-                    </View>
-                    <View style={styles.radioContainer}>
-                        <RadioButton
-                            color="#82CBFF"
-                            value="hebrew"
-                            status={
-                                dateDisplay === "hebrew"
-                                    ? "checked"
-                                    : "unchecked"
-                            }
-                            onPress={() => handleDateDisplayChange("hebrew")}
-                        />
-                        <Text style={styles.radioText}>Hebrew</Text>
-                    </View>
-                </View>
-            ) : null}
+                ) : null}
             </ScrollView>
         </SafeAreaView>
     );
@@ -264,9 +310,9 @@ const styles = StyleSheet.create({
     },
     input: {
         height: 40,
-        width: 100,
-        marginTop: 0,
-        marginBottom: 22,
+        width: 50,
+        marginRight: 12,
+        marginBottom: 12,
         borderWidth: 1,
         borderColor: "white",
         padding: 10,
@@ -295,6 +341,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 18,
     },
+    tinyWhiteText: {
+        color: "white",
+        fontSize: 16,
+    },
     radioHeaderText: {
         color: "#82CBFF",
         fontSize: 30,
@@ -312,5 +362,10 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginLeft: 6,
         marginBottom: 22,
+    },
+    flexBox: {
+        flexDirection: "row",
+        justifyContent: "start",
+        alignItems: "center",
     },
 });

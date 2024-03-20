@@ -18,14 +18,9 @@ export default function Settings() {
                     <Text style={styles.headerText}>Important</Text>
                     <Text style={styles.smallText}>
                         Candle lighting and Havdalah times are based on
-                        coordinates and elevation provided by your device.
-                    </Text>
-                    <Text style={styles.smallText}>
-                        Consult a{" "}
+                        coordinates and elevation provided by your device. Consult a{" "}
                         <Text style={{ fontStyle: "italic" }}>halachic</Text>{" "}
-                        authority for exact times according to your{" "}
-                        <Text style={{ fontStyle: "italic" }}>minhag</Text> and
-                        location.
+                        authority for exact times based on your community's customs.
                     </Text>
                     <Text style={styles.headerText}>Credits</Text>
                     <Text style={styles.smallText}>
