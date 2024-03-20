@@ -15,6 +15,7 @@ export default function Settings() {
                         This app provides information about Jewish holidays and
                         Shabbat times.
                     </Text>
+                    <Text style={styles.headerText}>Important</Text>
                     <Text style={styles.smallText}>
                         Candle lighting and Havdalah times are based on
                         coordinates and elevation provided by your device.
@@ -25,18 +26,6 @@ export default function Settings() {
                         authority for exact times according to your{" "}
                         <Text style={{ fontStyle: "italic" }}>minhag</Text> and
                         location.
-                    </Text>
-                    <Text style={styles.smallText}>
-                        This app's candle lighting time is calculated as 18
-                        minutes before sunset.
-                    </Text>
-                    <Text style={styles.smallText}>
-                        This app's default Havdalah time is{" "}
-                        <Text style={{ fontStyle: "italic" }}>
-                            tzeit hakochavim
-                        </Text>
-                        , calculated as the time the sun is 8.5 degrees below
-                        the horizon.
                     </Text>
                     <Text style={styles.headerText}>Credits</Text>
                     <Text style={styles.smallText}>

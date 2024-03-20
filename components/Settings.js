@@ -6,6 +6,7 @@ import {
     View,
     Switch,
     TextInput,
+    ScrollView,
 } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
@@ -20,7 +21,6 @@ import {
     setCandleLightingToggle,
     setHavdalahTimeToggle,
 } from "../store/actions";
-
 export default function Settings() {
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
@@ -89,6 +89,7 @@ export default function Settings() {
 
     return (
         <SafeAreaView style={styles.container}>
+            <ScrollView>
             {fontsLoaded ? (
                 <View style={styles.frame}>
                     <Text style={styles.headerText}>Shabbat Options</Text>
@@ -96,6 +97,7 @@ export default function Settings() {
                         <Text style={styles.smallText}>
                             Custom candle lighting time
                         </Text>
+
                         <Switch
                             trackColor={{ false: "#767577", true: "#82CBFF" }}
                             thumbColor={
@@ -107,14 +109,22 @@ export default function Settings() {
                         />
                     </View>
                     {candleLightingToggle && (
-                        <TextInput
-                            style={styles.input}
-                            onChangeText={setCandleTimeInput}
-                            value={candleTimeInput}
-                            keyboardType="numeric"
-                            placeholder="Enter time in minutes"
-                            onEndEditing={handleSetCandleTime}
-                        />
+                        <>
+                            <Text style={[styles.tinyText, styles.rightMargin]}>
+                                Default is 18 minutes before sunset. Specify
+                                custom minutes before sunset below.
+                            </Text>
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={setCandleTimeInput}
+                                value={candleTimeInput}
+                                keyboardType="numeric"
+                                placeholder="mins"
+                                maxLength={3}
+                                onEndEditing={handleSetCandleTime}
+                                placeholderTextColor="#82CBFF"
+                            />
+                        </>
                     )}
                     <View style={styles.optionContainer}>
                         <Text style={styles.smallText}>
@@ -131,14 +141,27 @@ export default function Settings() {
                         />
                     </View>
                     {havdalahTimeToggle && (
-                        <TextInput
-                            style={styles.input}
-                            onChangeText={setHavdalahTimeInput}
-                            value={havdalahTimeInput}
-                            keyboardType="numeric"
-                            placeholder="Enter time in minutes"
-                            onEndEditing={handleSetHavdalahTime}
-                        />
+                        <>
+                            <Text style={[styles.tinyText, styles.rightMargin]}>
+                                Default is{" "}
+                                <Text style={{ fontStyle: "italic" }}>
+                                    tzeit hakochavim
+                                </Text>
+                                , calculated as the time the sun is 8.5 degrees
+                                below the horizon. Specify custom minutes after
+                                sunset below.
+                            </Text>
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={setHavdalahTimeInput}
+                                value={havdalahTimeInput}
+                                keyboardType="numeric"
+                                placeholder="mins"
+                                maxLength={3}
+                                onEndEditing={handleSetHavdalahTime}
+                                placeholderTextColor="#82CBFF"
+                            />
+                        </>
                     )}
                     <Text style={styles.headerText}>Holiday Options</Text>
                     <View style={styles.optionContainer}>
@@ -212,6 +235,7 @@ export default function Settings() {
                     </View>
                 </View>
             ) : null}
+            </ScrollView>
         </SafeAreaView>
     );
 }
@@ -244,11 +268,14 @@ const styles = StyleSheet.create({
         marginTop: 0,
         marginBottom: 22,
         borderWidth: 1,
-        borderColor: "#82CBFF",
+        borderColor: "white",
         padding: 10,
         color: "white",
         backgroundColor: "black",
         borderRadius: 6,
+    },
+    rightMargin: {
+        marginRight: 65,
     },
     frame: {
         padding: 20,
@@ -266,7 +293,7 @@ const styles = StyleSheet.create({
     tinyText: {
         color: "#82CBFF",
         fontSize: 16,
-        marginBottom: 28,
+        marginBottom: 18,
     },
     radioHeaderText: {
         color: "#82CBFF",
