@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useFonts } from "expo-font";
 import { StyleSheet, Text, SafeAreaView, View, Switch } from "react-native";
 import { RadioButton } from "react-native-paper";
