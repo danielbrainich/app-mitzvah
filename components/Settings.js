@@ -1,21 +1,53 @@
 import { useFonts } from "expo-font";
-import { StyleSheet, Text, SafeAreaView, View, Switch } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    SafeAreaView,
+    View,
+    Switch,
+    TextInput,
+} from "react-native";
 import { RadioButton } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
 import {
     setDateDisplay,
     toggleMinorFasts,
     toggleRosheiChodesh,
     toggleModernHolidays,
+    setCandleLightingTime,
+    setHavdalahTime,
+    setCandleLightingToggle,
+    setHavdalahTimeToggle,
 } from "../store/actions";
 
 export default function Settings() {
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
     });
-    const { dateDisplay, minorFasts, rosheiChodesh, modernHolidays } = useSelector(
-        (state) => state.settings
+
+    const {
+        dateDisplay,
+        minorFasts,
+        rosheiChodesh,
+        modernHolidays,
+        candleLightingTime,
+        havdalahTime,
+        candleLightingToggle,
+        havdalahTimeToggle,
+    } = useSelector((state) => state.settings);
+
+    const [candleTimeInput, setCandleTimeInput] = useState(
+        candleLightingTime?.toString() || ""
     );
+    const [havdalahTimeInput, setHavdalahTimeInput] = useState(
+        havdalahTime?.toString() || ""
+    );
+
+    useEffect(() => {
+        setCandleTimeInput(candleLightingTime?.toString() || "");
+        setHavdalahTimeInput(havdalahTime?.toString() || "");
+    }, [candleLightingTime, havdalahTime]);
 
     const dispatch = useDispatch();
 
@@ -35,43 +67,79 @@ export default function Settings() {
         dispatch(toggleModernHolidays());
     };
 
+    const handleSetCandleTime = () => {
+        dispatch(setCandleLightingTime(parseInt(candleTimeInput, 10) || null));
+    };
+
+    const handleSetHavdalahTime = () => {
+        dispatch(setHavdalahTime(parseInt(havdalahTimeInput, 10) || null));
+    };
+
+    const handleCandleLightingToggle = () => {
+        const newToggleState = !candleLightingToggle;
+        setCandleLightingToggle(newToggleState);
+        dispatch(setCandleLightingToggle(newToggleState));
+    };
+
+    const handleHavdalahTimeToggle = () => {
+        const newToggleState = !havdalahTimeToggle;
+        setHavdalahTimeToggle(newToggleState);
+        dispatch(setHavdalahTimeToggle(newToggleState));
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             {fontsLoaded ? (
                 <View style={styles.frame}>
                     <Text style={styles.headerText}>Shabbat Options</Text>
-                    {/* <View style={styles.optionContainer}>
-                        <View>
-                            <Text style={styles.smallText}>
-                                Custom candle lighting time
-                            </Text>
-                        </View>
+                    <View style={styles.optionContainer}>
+                        <Text style={styles.smallText}>
+                            Custom candle lighting time
+                        </Text>
                         <Switch
                             trackColor={{ false: "#767577", true: "#82CBFF" }}
                             thumbColor={
-                                holidayNotifications ? "white" : "#f4f3f4"
+                                candleLightingToggle ? "#f4f3f4" : "#f4f3f4"
                             }
                             ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleHolidayNotifications}
-                            value={holidayNotifications}
+                            onValueChange={handleCandleLightingToggle}
+                            value={candleLightingToggle}
                         />
                     </View>
+                    {candleLightingToggle && (
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={setCandleTimeInput}
+                            value={candleTimeInput}
+                            keyboardType="numeric"
+                            placeholder="Enter time in minutes"
+                            onEndEditing={handleSetCandleTime}
+                        />
+                    )}
                     <View style={styles.optionContainer}>
-                        <View>
-                            <Text style={styles.smallText}>
-                                Custom havdalah time
-                            </Text>
-                        </View>
+                        <Text style={styles.smallText}>
+                            Custom Havdalah time
+                        </Text>
                         <Switch
                             trackColor={{ false: "#767577", true: "#82CBFF" }}
                             thumbColor={
-                                holidayNotifications ? "white" : "#f4f3f4"
+                                havdalahTimeToggle ? "#f4f3f4" : "#f4f3f4"
                             }
                             ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleHolidayNotifications}
-                            value={holidayNotifications}
+                            onValueChange={handleHavdalahTimeToggle}
+                            value={havdalahTimeToggle}
                         />
-                    </View> */}
+                    </View>
+                    {havdalahTimeToggle && (
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={setHavdalahTimeInput}
+                            value={havdalahTimeInput}
+                            keyboardType="numeric"
+                            placeholder="Enter time in minutes"
+                            onEndEditing={handleSetHavdalahTime}
+                        />
+                    )}
                     <Text style={styles.headerText}>Holiday Options</Text>
                     <View style={styles.optionContainer}>
                         <View>
@@ -169,6 +237,18 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "flex-center",
+    },
+    input: {
+        height: 40,
+        width: 100,
+        marginTop: 0,
+        marginBottom: 22,
+        borderWidth: 1,
+        borderColor: "#82CBFF",
+        padding: 10,
+        color: "white",
+        backgroundColor: "black",
+        borderRadius: 6,
     },
     frame: {
         padding: 20,
