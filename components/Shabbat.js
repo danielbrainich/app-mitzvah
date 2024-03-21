@@ -87,7 +87,7 @@ export default function Shabbat() {
                     location: hebcalLocation,
                     candlelighting: true,
                     havdalahMins: havdalahTime,
-                    candleLightingMins: 0,
+                    candleLightingMins: 1,
                     sedrot: true,
                 });
             } else {
@@ -165,13 +165,19 @@ export default function Shabbat() {
                     : null;
 
                 const sundownTime = new Date(event.eventTime);
+                sundownTime.setMinutes(sundownTime.getMinutes() + 1);
                 shabbatInfo.sundown = formatTime(sundownTime);
 
-                const candleDateTime = new Date(event.eventTime);
-                const adjustmentTime = (candleLightingTime !== null && candleLightingTime !== undefined) ? candleLightingTime : 18;
-                candleDateTime.setMinutes(candleDateTime.getMinutes() - adjustmentTime);
+                const adjustmentTime =
+                    candleLightingTime !== null &&
+                    candleLightingTime !== undefined
+                        ? candleLightingTime
+                        : 18;
+                const candleDateTime = new Date(sundownTime);
+                candleDateTime.setMinutes(
+                    candleDateTime.getMinutes() - adjustmentTime
+                );
                 shabbatInfo.candleTime = formatTime(candleDateTime);
-
             } else if (event instanceof ParshaEvent) {
                 shabbatInfo.parshaEnglish = event.render("en");
                 shabbatInfo.parshaHebrew = event.renderBrief("he-x-NoNikud");

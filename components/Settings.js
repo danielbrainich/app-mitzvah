@@ -146,7 +146,7 @@ export default function Settings() {
                                 value={candleLightingToggle}
                             />
                         </View>
-                        {candleLightingToggle && (
+                        {candleLightingToggle ? (
                             <>
                                 <View style={styles.flexBox}>
                                     <Stepper
@@ -158,16 +158,11 @@ export default function Settings() {
                                         minutes before sunset
                                     </Text>
                                 </View>
-
-                                <Text
-                                    style={[
-                                        styles.tinyText,
-                                        styles.rightMargin,
-                                    ]}
-                                >
-                                    Default is 18 minutes before sunset.
-                                </Text>
                             </>
+                        ) : (
+                            <Text style={[styles.tinyText, styles.rightMargin]}>
+                                Default is 18 minutes before sunset.
+                            </Text>
                         )}
                         <View style={styles.optionContainer}>
                             <Text style={styles.smallText}>
@@ -186,7 +181,7 @@ export default function Settings() {
                                 value={havdalahTimeToggle}
                             />
                         </View>
-                        {havdalahTimeToggle && (
+                        {havdalahTimeToggle ? (
                             <>
                                 <View style={styles.flexBox}>
                                     <Stepper
@@ -198,16 +193,12 @@ export default function Settings() {
                                         minutes after sunset
                                     </Text>
                                 </View>
-                                <Text
-                                    style={[
-                                        styles.tinyText,
-                                        styles.rightMargin,
-                                    ]}
-                                >
-                                    Default is when the sun is 8.5 degrees below
-                                    the horizon.
-                                </Text>
                             </>
+                        ) : (
+                            <Text style={[styles.tinyText, styles.rightMargin]}>
+                                Default is when the sun is 8.5 degrees below the
+                                horizon.
+                            </Text>
                         )}
                         <Text style={styles.headerText}>Holiday Options</Text>
                         <View style={styles.optionContainer}>
