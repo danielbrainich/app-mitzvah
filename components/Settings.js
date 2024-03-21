@@ -236,13 +236,13 @@ export default function Settings() {
                                         value={candleTimeInput.toString()}
                                         onIncrement={incrementCandleTime}
                                         onDecrement={decrementCandleTime}
-                                        message="minutes before sundown"
+                                        message="min. before sundown"
                                     />
                                 </View>
                             </>
                         ) : (
                             <Text style={[styles.tinyText, styles.rightMargin]}>
-                                Default is 18 minutes before sundown.
+                                Default is 18 min. before sundown
                             </Text>
                         )}
                         <View style={styles.optionContainer}>
@@ -269,14 +269,14 @@ export default function Settings() {
                                         value={havdalahTimeInput.toString()}
                                         onIncrement={incrementHavdalahTime}
                                         onDecrement={decrementHavdalahTime}
-                                        message="minutes after sundown"
+                                        message="min. after sundown"
                                     />
                                 </View>
                             </>
                         ) : (
                             <Text style={[styles.tinyText, styles.rightMargin]}>
                                 Default is when the sun is 8.5 degrees below the
-                                horizon.
+                                horizon
                             </Text>
                         )}
                     </View>
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
         alignItems: "flex-center",
     },
     rightMargin: {
-        marginRight: 65,
+        marginRight: 45,
     },
     frame: {
         padding: 20,

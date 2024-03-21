@@ -377,12 +377,8 @@ export default function Shabbat() {
                                     </Text>
                                     <Text style={styles.footerSubText}>
                                         {candleLightingTime
-                                            ? `${candleLightingTime} minute${
-                                                  candleLightingTime === 1
-                                                      ? ""
-                                                      : "s"
-                                              } before sundown`
-                                            : "18 minutes before sundown"}
+                                            ? `${candleLightingTime} min. before sundown`
+                                            : "18 min. before sundown"}
                                     </Text>
                                 </View>
                                 <View style={styles.footerList}>
@@ -392,11 +388,7 @@ export default function Shabbat() {
                                     <View style={{ flex: 1, paddingLeft: 5 }}>
                                         <Text style={styles.footerSubText}>
                                             {havdalahTime
-                                                ? `${havdalahTime} minute${
-                                                      havdalahTime === 1
-                                                          ? ""
-                                                          : "s"
-                                                  } after sundown`
+                                                ? `${havdalahTime} min. after sundown`
                                                 : "Sun is 8.5° below horizon"}
                                         </Text>
                                     </View>
