@@ -5,9 +5,9 @@ import {
     SafeAreaView,
     View,
     Switch,
-    TextInput,
     ScrollView,
 } from "react-native";
+import Stepper from "./Stepper";
 import { RadioButton } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
 import React, { useState, useEffect } from "react";
@@ -38,15 +38,15 @@ export default function Settings() {
     } = useSelector((state) => state.settings);
 
     const [candleTimeInput, setCandleTimeInput] = useState(
-        candleLightingTime?.toString() || ""
+        candleLightingTime?.toString() || "1"
     );
     const [havdalahTimeInput, setHavdalahTimeInput] = useState(
-        havdalahTime?.toString() || ""
+        havdalahTime?.toString() || "1"
     );
 
     useEffect(() => {
-        setCandleTimeInput(candleLightingTime?.toString() || "");
-        setHavdalahTimeInput(havdalahTime?.toString() || "");
+        setCandleTimeInput(candleLightingTime?.toString() || "1");
+        setHavdalahTimeInput(havdalahTime?.toString() || "1");
     }, [candleLightingTime, havdalahTime]);
 
     const dispatch = useDispatch();
@@ -67,30 +67,59 @@ export default function Settings() {
         dispatch(toggleModernHolidays());
     };
 
-    const handleSetCandleTime = () => {
-        dispatch(setCandleLightingTime(parseInt(candleTimeInput, 10) || null));
+    const incrementCandleTime = () => {
+        const currentValue = parseInt(candleTimeInput, 10);
+        const newValue = currentValue >= 60 ? 60 : currentValue + 1;
+        setCandleTimeInput(newValue.toString());
+        dispatch(setCandleLightingTime(newValue));
     };
 
-    const handleSetHavdalahTime = () => {
-        dispatch(setHavdalahTime(parseInt(havdalahTimeInput, 10) || null));
+    const decrementCandleTime = () => {
+        const currentValue = parseInt(candleTimeInput, 10);
+        const newValue = currentValue <= 1 ? 1 : currentValue - 1;
+        setCandleTimeInput(newValue.toString());
+        dispatch(setCandleLightingTime(newValue));
+    };
+
+    const incrementHavdalahTime = () => {
+        const currentValue = parseInt(havdalahTimeInput, 10);
+        const newValue = currentValue >= 60 ? 60 : currentValue + 1;
+        setHavdalahTimeInput(newValue.toString());
+        dispatch(setHavdalahTime(newValue));
+    };
+
+    const decrementHavdalahTime = () => {
+        const currentValue = parseInt(havdalahTimeInput, 10);
+        const newValue = currentValue <= 1 ? 1 : currentValue - 1;
+        setHavdalahTimeInput(newValue.toString());
+        dispatch(setHavdalahTime(newValue));
     };
 
     const handleCandleLightingToggle = () => {
         const newToggleState = !candleLightingToggle;
-        setCandleLightingToggle(newToggleState);
-        if (!newToggleState) {
+        dispatch(setCandleLightingToggle(newToggleState));
+        if (newToggleState) {
+            const newValue = candleTimeInput !== null ? candleTimeInput : "1";
+            setCandleTimeInput(newValue);
+            dispatch(setCandleLightingTime(parseInt(newValue, 10)));
+        } else {
+            setCandleTimeInput(null);
             dispatch(setCandleLightingTime(null));
         }
-        dispatch(setCandleLightingToggle(newToggleState));
     };
 
     const handleHavdalahTimeToggle = () => {
         const newToggleState = !havdalahTimeToggle;
-        setHavdalahTimeToggle(newToggleState);
-        if (!newToggleState) {
+        dispatch(setHavdalahTimeToggle(newToggleState));
+        if (newToggleState) {
+            const newValue =
+                havdalahTimeInput !== null ? havdalahTimeInput : "1";
+            setHavdalahTimeInput(newValue);
+            dispatch(setHavdalahTime(parseInt(newValue, 10)));
+        } else {
+            setHavdalahTimeInput(null);
             dispatch(setHavdalahTime(null));
         }
-        dispatch(setHavdalahTimeToggle(newToggleState));
     };
 
     return (
@@ -120,18 +149,10 @@ export default function Settings() {
                         {candleLightingToggle && (
                             <>
                                 <View style={styles.flexBox}>
-                                    <TextInput
-                                        style={styles.input}
-                                        onChangeText={(text) =>
-                                            setCandleTimeInput(
-                                                text.replace(/[^0-9]/g, "")
-                                            )
-                                        }
-                                        value={candleTimeInput}
-                                        keyboardType="numeric"
-                                        maxLength={2}
-                                        onEndEditing={handleSetCandleTime}
-                                        selectionColor="#82CBFF"
+                                    <Stepper
+                                        value={candleTimeInput.toString()}
+                                        onIncrement={incrementCandleTime}
+                                        onDecrement={decrementCandleTime}
                                     />
                                     <Text style={styles.tinyWhiteText}>
                                         minutes before sunset
@@ -168,18 +189,10 @@ export default function Settings() {
                         {havdalahTimeToggle && (
                             <>
                                 <View style={styles.flexBox}>
-                                    <TextInput
-                                        style={styles.input}
-                                        onChangeText={(text) =>
-                                            setHavdalahTimeInput(
-                                                text.replace(/[^0-9]/g, "")
-                                            )
-                                        }
-                                        value={havdalahTimeInput}
-                                        keyboardType="numeric"
-                                        maxLength={2}
-                                        onEndEditing={handleSetHavdalahTime}
-                                        selectionColor="#82CBFF"
+                                    <Stepper
+                                        value={havdalahTimeInput.toString()}
+                                        onIncrement={incrementHavdalahTime}
+                                        onDecrement={decrementHavdalahTime}
                                     />
                                     <Text style={styles.tinyWhiteText}>
                                         minutes after sunset
@@ -307,18 +320,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "flex-center",
-    },
-    input: {
-        height: 40,
-        width: 50,
-        marginRight: 12,
-        marginBottom: 12,
-        borderWidth: 1,
-        borderColor: "white",
-        padding: 10,
-        color: "white",
-        backgroundColor: "black",
-        borderRadius: 6,
     },
     rightMargin: {
         marginRight: 65,

@@ -26,7 +26,9 @@ export default function Shabbat() {
     const [location, setLocation] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const [shabbatInfo, setShabbatInfo] = useState({});
-    const { dateDisplay, candleLightingTime, havdalahTime } = useSelector(state => state.settings);
+    const { dateDisplay, candleLightingTime, havdalahTime } = useSelector(
+        (state) => state.settings
+    );
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const today = new Date().toISOString().split("T")[0];
     // const today = "2024-12-29";
@@ -51,7 +53,7 @@ export default function Shabbat() {
 
     useEffect(() => {
         fetchShabbatInfo();
-    }, [location, refreshing]);
+    }, [location, refreshing, havdalahTime, candleLightingTime]);
 
     const fetchShabbatInfo = async () => {
         try {
@@ -84,6 +86,8 @@ export default function Shabbat() {
                     end: saturday,
                     location: hebcalLocation,
                     candlelighting: true,
+                    havdalahMins: havdalahTime,
+                    candleLightingMins: 0,
                     sedrot: true,
                 });
             } else {
@@ -139,16 +143,13 @@ export default function Shabbat() {
             sundown: null,
             candleDate: null,
             candleHDate: null,
-
             parshaHebrew: null,
             parshaEnglish: null,
             parshaHDate: null,
-
             havdalahDesc: null,
             havdalahTime: null,
             havdalahDate: null,
             havdalahHDate: null,
-
             erevShabbatDate: null,
             yomShabbatDate: null,
         };
@@ -157,16 +158,20 @@ export default function Shabbat() {
             if (event instanceof CandleLightingEvent) {
                 shabbatInfo.candleDesc = event.renderBrief("he-x-NoNikud");
                 shabbatInfo.candleDate = event.eventTime
-                ? dateFormatter.format(new Date(event.eventTime))
-                : null;
+                    ? dateFormatter.format(new Date(event.eventTime))
+                    : null;
                 shabbatInfo.candleHDate = event.date
-                ? event.date.toString()
-                : null;
+                    ? event.date.toString()
+                    : null;
+
+                const sundownTime = new Date(event.eventTime);
+                shabbatInfo.sundown = formatTime(sundownTime);
 
                 const candleDateTime = new Date(event.eventTime);
-                candleDateTime.setMinutes(candleDateTime.getMinutes() + 18);
-                shabbatInfo.candleTime = event.fmtTime || null;
-                shabbatInfo.sundown = formatTime(candleDateTime);
+                const adjustmentTime = (candleLightingTime !== null && candleLightingTime !== undefined) ? candleLightingTime : 18;
+                candleDateTime.setMinutes(candleDateTime.getMinutes() - adjustmentTime);
+                shabbatInfo.candleTime = formatTime(candleDateTime);
+
             } else if (event instanceof ParshaEvent) {
                 shabbatInfo.parshaEnglish = event.render("en");
                 shabbatInfo.parshaHebrew = event.renderBrief("he-x-NoNikud");
@@ -210,7 +215,7 @@ export default function Shabbat() {
                         {shabbatInfo ? (
                             <>
                                 <Text style={styles.headerText}>This week</Text>
-                                <Text style={styles.footerText} >
+                                <Text style={styles.footerText}>
                                     {`${candleLightingTime} and ${havdalahTime}`}
                                 </Text>
 
@@ -337,11 +342,12 @@ export default function Shabbat() {
                                     </Text>
                                 </View>
                             </>
-                        ) :
+                        ) : (
                             <Text style={styles.blueFooterText}>
-                                For candle lighting and havdalah times, please enable location services.
+                                For candle lighting and havdalah times, please
+                                enable location services.
                             </Text>
-                        }
+                        )}
                     </View>
                 ) : null}
             </ScrollView>
