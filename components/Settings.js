@@ -127,79 +127,37 @@ export default function Settings() {
             <ScrollView>
                 {fontsLoaded ? (
                     <View style={styles.frame}>
-                        <Text style={styles.headerText}>Shabbat Options</Text>
-                        <View style={styles.optionContainer}>
-                            <Text style={styles.smallText}>
-                                Custom candle lighting time
-                            </Text>
-
-                            <Switch
-                                trackColor={{
-                                    false: "#767577",
-                                    true: "#82CBFF",
-                                }}
-                                thumbColor={
-                                    candleLightingToggle ? "#f4f3f4" : "#f4f3f4"
+                        <Text style={styles.radioHeaderText}>Date Format</Text>
+                        <View style={styles.radioContainer}>
+                            <RadioButton
+                                color="#82CBFF"
+                                value="gregorian"
+                                status={
+                                    dateDisplay === "gregorian"
+                                        ? "checked"
+                                        : "unchecked"
                                 }
-                                ios_backgroundColor="#3e3e3e"
-                                onValueChange={handleCandleLightingToggle}
-                                value={candleLightingToggle}
-                            />
-                        </View>
-                        {candleLightingToggle ? (
-                            <>
-                                <View style={styles.flexBox}>
-                                    <Stepper
-                                        value={candleTimeInput.toString()}
-                                        onIncrement={incrementCandleTime}
-                                        onDecrement={decrementCandleTime}
-                                    />
-                                    <Text style={styles.tinyWhiteText}>
-                                        minutes before sunset
-                                    </Text>
-                                </View>
-                            </>
-                        ) : (
-                            <Text style={[styles.tinyText, styles.rightMargin]}>
-                                Default is 18 minutes before sunset.
-                            </Text>
-                        )}
-                        <View style={styles.optionContainer}>
-                            <Text style={styles.smallText}>
-                                Custom Havdalah time
-                            </Text>
-                            <Switch
-                                trackColor={{
-                                    false: "#767577",
-                                    true: "#82CBFF",
-                                }}
-                                thumbColor={
-                                    havdalahTimeToggle ? "#f4f3f4" : "#f4f3f4"
+                                onPress={() =>
+                                    handleDateDisplayChange("gregorian")
                                 }
-                                ios_backgroundColor="#3e3e3e"
-                                onValueChange={handleHavdalahTimeToggle}
-                                value={havdalahTimeToggle}
                             />
+                            <Text style={styles.radioText}>Gregorian</Text>
                         </View>
-                        {havdalahTimeToggle ? (
-                            <>
-                                <View style={styles.flexBox}>
-                                    <Stepper
-                                        value={havdalahTimeInput.toString()}
-                                        onIncrement={incrementHavdalahTime}
-                                        onDecrement={decrementHavdalahTime}
-                                    />
-                                    <Text style={styles.tinyWhiteText}>
-                                        minutes after sunset
-                                    </Text>
-                                </View>
-                            </>
-                        ) : (
-                            <Text style={[styles.tinyText, styles.rightMargin]}>
-                                Default is when the sun is 8.5 degrees below the
-                                horizon.
-                            </Text>
-                        )}
+                        <View style={styles.radioContainer}>
+                            <RadioButton
+                                color="#82CBFF"
+                                value="hebrew"
+                                status={
+                                    dateDisplay === "hebrew"
+                                        ? "checked"
+                                        : "unchecked"
+                                }
+                                onPress={() =>
+                                    handleDateDisplayChange("hebrew")
+                                }
+                            />
+                            <Text style={styles.radioText}>Hebrew</Text>
+                        </View>
                         <Text style={styles.headerText}>Holiday Options</Text>
                         <View style={styles.optionContainer}>
                             <View>
@@ -252,37 +210,75 @@ export default function Settings() {
                                 value={rosheiChodesh}
                             />
                         </View>
-                        <Text style={styles.radioHeaderText}>Date Format</Text>
-                        <View style={styles.radioContainer}>
-                            <RadioButton
-                                color="#82CBFF"
-                                value="gregorian"
-                                status={
-                                    dateDisplay === "gregorian"
-                                        ? "checked"
-                                        : "unchecked"
+                        <Text style={styles.headerText}>Shabbat Options</Text>
+                        <View style={styles.optionContainer}>
+                            <Text style={styles.smallTopText}>
+                                Custom candle lighting time
+                            </Text>
+
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor={
+                                    candleLightingToggle ? "#f4f3f4" : "#f4f3f4"
                                 }
-                                onPress={() =>
-                                    handleDateDisplayChange("gregorian")
-                                }
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={handleCandleLightingToggle}
+                                value={candleLightingToggle}
                             />
-                            <Text style={styles.radioText}>Gregorian</Text>
                         </View>
-                        <View style={styles.radioContainer}>
-                            <RadioButton
-                                color="#82CBFF"
-                                value="hebrew"
-                                status={
-                                    dateDisplay === "hebrew"
-                                        ? "checked"
-                                        : "unchecked"
+                        {candleLightingToggle ? (
+                            <>
+                                <View style={styles.flexBox}>
+                                    <Stepper
+                                        value={candleTimeInput.toString()}
+                                        onIncrement={incrementCandleTime}
+                                        onDecrement={decrementCandleTime}
+                                        message="minutes before sundown"
+                                    />
+                                </View>
+                            </>
+                        ) : (
+                            <Text style={[styles.tinyText, styles.rightMargin]}>
+                                Default is 18 minutes before sundown.
+                            </Text>
+                        )}
+                        <View style={styles.optionContainer}>
+                            <Text style={styles.smallTopText}>
+                                Custom Havdalah time
+                            </Text>
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor={
+                                    havdalahTimeToggle ? "#f4f3f4" : "#f4f3f4"
                                 }
-                                onPress={() =>
-                                    handleDateDisplayChange("hebrew")
-                                }
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={handleHavdalahTimeToggle}
+                                value={havdalahTimeToggle}
                             />
-                            <Text style={styles.radioText}>Hebrew</Text>
                         </View>
+                        {havdalahTimeToggle ? (
+                            <>
+                                <View style={styles.flexBox}>
+                                    <Stepper
+                                        value={havdalahTimeInput.toString()}
+                                        onIncrement={incrementHavdalahTime}
+                                        onDecrement={decrementHavdalahTime}
+                                        message="minutes after sundown"
+                                    />
+                                </View>
+                            </>
+                        ) : (
+                            <Text style={[styles.tinyText, styles.rightMargin]}>
+                                Default is when the sun is 8.5 degrees below the
+                                horizon.
+                            </Text>
+                        )}
                     </View>
                 ) : null}
             </ScrollView>
@@ -328,14 +324,15 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginBottom: 22,
     },
+    smallTopText: {
+        color: "white",
+        fontSize: 20,
+        marginBottom: 12,
+    },
     tinyText: {
         color: "#82CBFF",
         fontSize: 16,
-        marginBottom: 18,
-    },
-    tinyWhiteText: {
-        color: "white",
-        fontSize: 16,
+        marginBottom: 22,
     },
     radioHeaderText: {
         color: "#82CBFF",

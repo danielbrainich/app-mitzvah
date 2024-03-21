@@ -6,6 +6,9 @@ import {
     SafeAreaView,
     ScrollView,
     RefreshControl,
+    Linking,
+    TouchableOpacity,
+    AppState,
 } from "react-native";
 import {
     HebrewCalendar,
@@ -30,26 +33,45 @@ export default function Shabbat() {
         (state) => state.settings
     );
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const [appState, setAppState] = useState(AppState.currentState);
     const today = new Date().toISOString().split("T")[0];
     // const today = "2024-12-29";
 
+    const checkPermissionsAndFetchLocation = async () => {
+        let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+            console.log("Location permission not granted");
+            return;
+        }
+        const location = await ExpoLocation.getCurrentPositionAsync({});
+        setLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            elevation: location.coords.altitude,
+        });
+        // Potentially fetch Shabbat info here
+    };
+
     useEffect(() => {
-        (async () => {
-            let { status } =
-                await ExpoLocation.requestForegroundPermissionsAsync();
-            if (status === "granted") {
-                const location = await ExpoLocation.getCurrentPositionAsync({});
-                setLocation({
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude,
-                    elevation: location.coords.altitude,
-                });
-            } else {
-                console.log("Permission to access location was denied");
-                fetchShabbatInfo();
+        checkPermissionsAndFetchLocation(); // Check permissions on load
+
+        const handleAppStateChange = (nextAppState) => {
+            if (
+                appState.match(/inactive|background/) &&
+                nextAppState === "active"
+            ) {
+                console.log("App has come to the foreground!");
+                checkPermissionsAndFetchLocation();
             }
-        })();
-    }, [refreshing]);
+            setAppState(nextAppState);
+        };
+
+        const subscription = AppState.addEventListener(
+            "change",
+            handleAppStateChange
+        );
+        return () => subscription.remove();
+    }, [appState]);
 
     useEffect(() => {
         fetchShabbatInfo();
@@ -205,6 +227,12 @@ export default function Shabbat() {
         }, 1000);
     };
 
+    const openSettings = () => {
+        Linking.openSettings().catch(() => {
+            Alert.alert("Unable to open settings");
+        });
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView
@@ -221,10 +249,6 @@ export default function Shabbat() {
                         {shabbatInfo ? (
                             <>
                                 <Text style={styles.headerText}>This week</Text>
-                                <Text style={styles.footerText}>
-                                    {`${candleLightingTime} and ${havdalahTime}`}
-                                </Text>
-
                                 <Text style={styles.mediumBoldText}>
                                     Erev Shabbat
                                 </Text>
@@ -347,12 +371,51 @@ export default function Shabbat() {
                                         {timezone.replace(/_/g, " ")}
                                     </Text>
                                 </View>
+                                <View style={styles.footerList}>
+                                    <Text style={styles.footerText}>
+                                        Candle Time: {""}
+                                    </Text>
+                                    <Text style={styles.footerSubText}>
+                                        {candleLightingTime
+                                            ? `${candleLightingTime} minute${
+                                                  candleLightingTime === 1
+                                                      ? ""
+                                                      : "s"
+                                              } before sundown`
+                                            : "18 minutes before sundown"}
+                                    </Text>
+                                </View>
+                                <View style={styles.footerList}>
+                                    <Text style={styles.footerText}>
+                                        Havdalah Time:
+                                    </Text>
+                                    <View style={{ flex: 1, paddingLeft: 5 }}>
+                                        <Text style={styles.footerSubText}>
+                                            {havdalahTime
+                                                ? `${havdalahTime} minute${
+                                                      havdalahTime === 1
+                                                          ? ""
+                                                          : "s"
+                                                  } after sundown`
+                                                : "Sun is 8.5° below horizon"}
+                                        </Text>
+                                    </View>
+                                </View>
                             </>
                         ) : (
-                            <Text style={styles.blueFooterText}>
-                                For candle lighting and havdalah times, please
-                                enable location services.
-                            </Text>
+                            <View style={styles.footerList}>
+                                <Text style={styles.footerText}>
+                                    For candle lighting and havdalah times,
+                                    please
+                                </Text>
+                                <TouchableOpacity
+                                    onPress={() => Linking.openSettings()}
+                                >
+                                    <Text style={styles.blueFooterText}>
+                                        enable location services.
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
                         )}
                     </View>
                 ) : null}
@@ -392,8 +455,9 @@ const styles = StyleSheet.create({
     },
     footerList: {
         flexDirection: "row",
-        justifyContent: "start",
-        alignItems: "start",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        flexWrap: "wrap",
     },
     paragraphText: {
         color: "white",
