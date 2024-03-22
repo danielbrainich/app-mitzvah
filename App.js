@@ -9,8 +9,10 @@ import { StyleSheet } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import TabBarTabs from "./components/TabBarTabs";
 import { Provider } from "react-redux";
-import store from "./store/store";
+import { store, persistor } from "./store/store";
 import * as Font from "expo-font";
+
+import { PersistGate } from "redux-persist/integration/react";
 
 export default function App() {
     const Stack = createNativeStackNavigator();
@@ -29,64 +31,68 @@ export default function App() {
 
     return (
         <Provider store={store}>
-            <NavigationContainer>
-                <StatusBar style="light" />
-                <Stack.Navigator
-                    initialRouteName="Tabs"
-                    screenOptions={{
-                        headerStyle: {
-                            backgroundColor: "black",
-                        },
-                        headerTintColor: "white",
-                        title: "",
-                    }}
-                >
-                    <Stack.Screen
-                        name="Tabs"
-                        component={TabBarTabs}
-                        options={({ navigation }) => ({
-                            headerRight: () => (
-                                <>
-                                    <MaterialCommunityIcons
-                                        name="information"
-                                        size={30}
-                                        onPress={() =>
-                                            navigation.navigate("Information")
-                                        }
-                                        color="white"
-                                        marginRight={10}
-                                    />
-                                    <MaterialCommunityIcons
-                                        name="cog"
-                                        size={30}
-                                        onPress={() =>
-                                            navigation.navigate("Settings")
-                                        }
-                                        color="white"
-                                    />
-                                </>
-                            ),
-                            title: "",
-
-                            headerTitleStyle: {
-                                color: "#82CBFF",
-                                fontSize: 20,
-                                fontFamily: "Nayuki",
+            <PersistGate loading={null} persistor={persistor}>
+                <NavigationContainer>
+                    <StatusBar style="light" />
+                    <Stack.Navigator
+                        initialRouteName="Tabs"
+                        screenOptions={{
+                            headerStyle: {
+                                backgroundColor: "black",
                             },
-                        })}
-                    />
-                    <Stack.Screen
-                        name="Settings"
-                        component={Settings}
-                        options={{ headerBackTitleVisible: false }}
-                    />
-                    <Stack.Screen
-                        name="Information"
-                        component={Information}
-                        options={{ headerBackTitleVisible: false }}
-                    />
-                </Stack.Navigator>
-            </NavigationContainer>
+                            headerTintColor: "white",
+                            title: "",
+                        }}
+                    >
+                        <Stack.Screen
+                            name="Tabs"
+                            component={TabBarTabs}
+                            options={({ navigation }) => ({
+                                headerRight: () => (
+                                    <>
+                                        <MaterialCommunityIcons
+                                            name="information"
+                                            size={30}
+                                            onPress={() =>
+                                                navigation.navigate(
+                                                    "Information"
+                                                )
+                                            }
+                                            color="white"
+                                            marginRight={10}
+                                        />
+                                        <MaterialCommunityIcons
+                                            name="cog"
+                                            size={30}
+                                            onPress={() =>
+                                                navigation.navigate("Settings")
+                                            }
+                                            color="white"
+                                        />
+                                    </>
+                                ),
+                                title: "",
+
+                                headerTitleStyle: {
+                                    color: "#82CBFF",
+                                    fontSize: 20,
+                                    fontFamily: "Nayuki",
+                                },
+                            })}
+                        />
+                        <Stack.Screen
+                            name="Settings"
+                            component={Settings}
+                            options={{ headerBackTitleVisible: false }}
+                        />
+                        <Stack.Screen
+                            name="Information"
+                            component={Information}
+                            options={{ headerBackTitleVisible: false }}
+                        />
+                    </Stack.Navigator>
+                </NavigationContainer>
+            </PersistGate>
         </Provider>
     );
 }
