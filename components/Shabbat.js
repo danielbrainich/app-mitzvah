@@ -38,17 +38,23 @@ export default function Shabbat() {
     // const today = "2024-12-29";
 
     const checkPermissionsAndFetchLocation = async () => {
-        let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-            console.log("Location permission not granted");
-            return;
+        try {
+            let { status } =
+                await ExpoLocation.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                console.log("Location permission not granted");
+                return;
+            }
+
+            const location = await ExpoLocation.getCurrentPositionAsync({});
+            setLocation({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                elevation: location.coords.altitude,
+            });
+        } catch (error) {
+            console.error("Error fetching location:", error);
         }
-        const location = await ExpoLocation.getCurrentPositionAsync({});
-        setLocation({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            elevation: location.coords.altitude,
-        });
     };
 
     useEffect(() => {
@@ -59,7 +65,6 @@ export default function Shabbat() {
                 appState.match(/inactive|background/) &&
                 nextAppState === "active"
             ) {
-                console.log("App has come to the foreground!");
                 checkPermissionsAndFetchLocation();
             }
             setAppState(nextAppState);
@@ -142,12 +147,11 @@ export default function Shabbat() {
 
                 const dummyHavdalahEvent = dummyEvents.find(
                     (event) => event instanceof HavdalahEvent
-                    );
+                );
                 if (dummyHavdalahEvent) {
                     const sundownTime = new Date(dummyHavdalahEvent.eventTime);
                     sundownTime.setMinutes(sundownTime.getMinutes() - 1);
                     newShabbatInfo.sundownSaturday = formatTime(sundownTime);
-
                 }
             }
 
@@ -236,7 +240,7 @@ export default function Shabbat() {
                     ? event.date.toString()
                     : null;
             } else if (event instanceof HavdalahEvent) {
-                shabbatInfo.sundownSaturday = 'test';
+                shabbatInfo.sundownSaturday = "test";
                 shabbatInfo.havdalahDesc = event.renderBrief("he-x-NoNikud");
                 shabbatInfo.havdalahTime = event.fmtTime || null;
                 shabbatInfo.havdalahDate = event.eventTime
