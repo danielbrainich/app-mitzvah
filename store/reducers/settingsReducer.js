@@ -2,9 +2,9 @@ import * as actionTypes from "../actions.js";
 
 const initialState = {
     dateDisplay: "gregorian",
-    minorFasts: false,
-    rosheiChodesh: false,
-    modernHolidays: false,
+    minorFasts: true,
+    rosheiChodesh: true,
+    modernHolidays: true,
     candleLightingTime: null,
     havdalahTime: null,
 };

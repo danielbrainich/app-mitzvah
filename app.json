@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "appMitzvah",
-    "slug": "appMitzvah",
+    "slug": "appmitzvah",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,20 +17,34 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show you accurate Havdalah and Shabbat candle lighting times ."
-      }
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show you accurate Havdalah and Shabbat candle lighting times."
+      },
+      "bundleIdentifier": "com.danielbrainich.appmitzvah"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.danielbrainich.appmitzvah"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "0ef1a8ba-991b-4ae3-9e4e-fd073ac54bb0"
+      }
+    },
+    "owner": "danielbrainich",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0ef1a8ba-991b-4ae3-9e4e-fd073ac54bb0"
+    }
   }
 }

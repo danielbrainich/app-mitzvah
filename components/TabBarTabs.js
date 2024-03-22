@@ -1,8 +1,8 @@
-import React from 'react';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { StyleSheet } from 'react-native';
-import Shabbat from './Shabbat';
-import Holidays from './Holidays';
+import React from "react";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { StyleSheet } from "react-native";
+import Shabbat from "./Shabbat";
+import Holidays from "./Holidays";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -12,9 +12,13 @@ export default function TabBarTabs() {
             screenOptions={{
                 tabBarStyle: styles.tabBar,
                 tabBarIndicatorStyle: styles.tabBarIndicator,
-                tabBarActiveTintColor: '#82CBFF',
-                tabBarInactiveTintColor: 'white',
-                tabBarLabelStyle: { fontSize: 16, fontWeight: 'bold', textTransform: 'none' },
+                tabBarActiveTintColor: "#82CBFF",
+                tabBarInactiveTintColor: "white",
+                tabBarLabelStyle: {
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    textTransform: "none",
+                },
             }}
         >
             <Tab.Screen name="Holidays" component={Holidays} />
@@ -25,10 +29,10 @@ export default function TabBarTabs() {
 
 const styles = StyleSheet.create({
     tabBar: {
-        backgroundColor: 'black',
+        backgroundColor: "black",
     },
     tabBarIndicator: {
-        backgroundColor: '#82CBFF',
+        backgroundColor: "#82CBFF",
         height: 3,
     },
 });

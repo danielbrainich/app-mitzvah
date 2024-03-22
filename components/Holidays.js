@@ -16,7 +16,8 @@ export default function Holidays() {
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
     });
-    const { dateDisplay, minorFasts, rosheiChodesh, modernHolidays } = useSelector(state => state.settings);
+    const { dateDisplay, minorFasts, rosheiChodesh, modernHolidays } =
+        useSelector((state) => state.settings);
     const [isTodayHoliday, setIsTodayHoliday] = useState(null);
     const today = new Date().toISOString().split("T")[0];
     // const today = "2024-12-29";

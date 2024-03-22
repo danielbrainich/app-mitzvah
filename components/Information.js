@@ -12,24 +12,26 @@ export default function Settings() {
                 <ScrollView style={styles.frame}>
                     <Text style={styles.headerText}>About</Text>
                     <Text style={styles.smallText}>
-                        This app provides information about Jewish holidays and
-                        Shabbat times.
+                        AppMitzvah provides information about Jewish holidays
+                        and Shabbat times.
                     </Text>
                     <Text style={styles.headerText}>Important</Text>
                     <Text style={styles.smallText}>
                         Candle lighting and Havdalah times are based on
-                        coordinates and elevation provided by your device. Consult a{" "}
+                        coordinates and elevation provided by your device.
+                        Consult a{" "}
                         <Text style={{ fontStyle: "italic" }}>halachic</Text>{" "}
-                        authority for exact times based on your community's customs.
+                        authority for exact times based on your community's
+                        customs.
                     </Text>
                     <Text style={styles.headerText}>Credits</Text>
                     <Text style={styles.smallText}>
-                        This app was inspired by isitajewishholidaytoday.com and
-                        is powered by Hebcal.
+                        AppMitzvah was inspired by isitajewishholidaytoday.com
+                        and is powered by Hebcal.
                     </Text>
                     <Text style={styles.headerText}>Us</Text>
                     <Text style={styles.smallText}>
-                        This app was developed by Daniel Brainich and designed
+                        AppMitzvah was developed by Daniel Brainich and designed
                         by Andrea Portillo.
                     </Text>
                 </ScrollView>

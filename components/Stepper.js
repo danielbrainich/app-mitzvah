@@ -23,7 +23,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         width: 65,
-
     },
     stepperFrame: {
         flexDirection: "row",

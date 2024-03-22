@@ -27,7 +27,6 @@ export default function App() {
 
     if (!fontLoaded) return null;
 
-
     return (
         <Provider store={store}>
             <NavigationContainer>

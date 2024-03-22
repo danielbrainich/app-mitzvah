@@ -49,11 +49,10 @@ export default function Shabbat() {
             longitude: location.coords.longitude,
             elevation: location.coords.altitude,
         });
-        // Potentially fetch Shabbat info here
     };
 
     useEffect(() => {
-        checkPermissionsAndFetchLocation(); // Check permissions on load
+        checkPermissionsAndFetchLocation();
 
         const handleAppStateChange = (nextAppState) => {
             if (
@@ -370,28 +369,6 @@ export default function Shabbat() {
                                     <Text style={styles.footerSubText}>
                                         {timezone.replace(/_/g, " ")}
                                     </Text>
-                                </View>
-                                <View style={styles.footerList}>
-                                    <Text style={styles.footerText}>
-                                        Candle Time: {""}
-                                    </Text>
-                                    <Text style={styles.footerSubText}>
-                                        {candleLightingTime
-                                            ? `${candleLightingTime} min. before sundown`
-                                            : "18 min. before sundown"}
-                                    </Text>
-                                </View>
-                                <View style={styles.footerList}>
-                                    <Text style={styles.footerText}>
-                                        Havdalah Time:
-                                    </Text>
-                                    <View style={{ flex: 1, paddingLeft: 5 }}>
-                                        <Text style={styles.footerSubText}>
-                                            {havdalahTime
-                                                ? `${havdalahTime} min. after sundown`
-                                                : "Sun is 8.5° below horizon"}
-                                        </Text>
-                                    </View>
                                 </View>
                             </>
                         ) : (
