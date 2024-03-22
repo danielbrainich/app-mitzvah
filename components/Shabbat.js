@@ -121,6 +121,36 @@ export default function Shabbat() {
 
             const newShabbatInfo = getShabbatInfo(events);
 
+            // Additional fetch for sundown time on Saturday
+            if (location) {
+                const dummyEvents = HebrewCalendar.calendar({
+                    start: saturday,
+                    end: saturday,
+                    location: new Location(
+                        location.latitude,
+                        location.longitude,
+                        false,
+                        timezone,
+                        undefined,
+                        "US",
+                        undefined,
+                        location.elevation
+                    ),
+                    candlelighting: true,
+                    havdalahMins: 1,
+                });
+
+                const dummyHavdalahEvent = dummyEvents.find(
+                    (event) => event instanceof HavdalahEvent
+                    );
+                if (dummyHavdalahEvent) {
+                    const sundownTime = new Date(dummyHavdalahEvent.eventTime);
+                    sundownTime.setMinutes(sundownTime.getMinutes() - 1);
+                    newShabbatInfo.sundownSaturday = formatTime(sundownTime);
+
+                }
+            }
+
             setShabbatInfo({
                 ...newShabbatInfo,
                 erevShabbatDate: erevShabbatDate,
@@ -161,7 +191,8 @@ export default function Shabbat() {
         const shabbatInfo = {
             candleDesc: null,
             candleTime: null,
-            sundown: null,
+            sundownFriday: null,
+            sundownSaturday: null,
             candleDate: null,
             candleHDate: null,
             parshaHebrew: null,
@@ -174,7 +205,6 @@ export default function Shabbat() {
             erevShabbatDate: null,
             yomShabbatDate: null,
         };
-
         for (const event of events) {
             if (event instanceof CandleLightingEvent) {
                 shabbatInfo.candleDesc = event.renderBrief("he-x-NoNikud");
@@ -187,7 +217,7 @@ export default function Shabbat() {
 
                 const sundownTime = new Date(event.eventTime);
                 sundownTime.setMinutes(sundownTime.getMinutes() + 1);
-                shabbatInfo.sundown = formatTime(sundownTime);
+                shabbatInfo.sundownFriday = formatTime(sundownTime);
 
                 const adjustmentTime =
                     candleLightingTime !== null &&
@@ -206,6 +236,7 @@ export default function Shabbat() {
                     ? event.date.toString()
                     : null;
             } else if (event instanceof HavdalahEvent) {
+                shabbatInfo.sundownSaturday = 'test';
                 shabbatInfo.havdalahDesc = event.renderBrief("he-x-NoNikud");
                 shabbatInfo.havdalahTime = event.fmtTime || null;
                 shabbatInfo.havdalahDate = event.eventTime
@@ -276,13 +307,13 @@ export default function Shabbat() {
                                     </View>
                                 )}
 
-                                {shabbatInfo.sundown && (
+                                {shabbatInfo.sundownFriday && (
                                     <View style={styles.list}>
                                         <Text style={styles.paragraphText}>
                                             Sundown
                                         </Text>
                                         <Text style={styles.paragraphText}>
-                                            {shabbatInfo.sundown}
+                                            {shabbatInfo.sundownFriday}
                                         </Text>
                                     </View>
                                 )}
@@ -317,6 +348,16 @@ export default function Shabbat() {
                                     </View>
                                 )}
 
+                                {shabbatInfo.sundownSaturday && (
+                                    <View style={styles.list}>
+                                        <Text style={styles.paragraphText}>
+                                            Sundown
+                                        </Text>
+                                        <Text style={styles.paragraphText}>
+                                            {shabbatInfo.sundownSaturday}
+                                        </Text>
+                                    </View>
+                                )}
                                 <View style={styles.spacer} />
 
                                 <Text style={styles.mediumBoldText}>
