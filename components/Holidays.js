@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     StyleSheet,
     Text,
@@ -11,6 +11,87 @@ import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 
+function formatDate(inputDate) {
+    const date = new Date(inputDate);
+    const day = date.getUTCDate();
+    const month = getMonthName(date.getUTCMonth());
+    const year = date.getUTCFullYear();
+
+    return `${day} ${month} ${year}`;
+}
+
+function formatShortDate(inputDate) {
+    const date = new Date(inputDate);
+    const day = date.getUTCDate();
+    const month = getShortMonthName(date.getUTCMonth());
+    const year = date.getUTCFullYear();
+
+    return `${day} ${month} ${year}`;
+}
+
+function getMonthName(monthIndex) {
+    const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
+
+    return monthNames[monthIndex];
+}
+
+function getShortMonthName(monthIndex) {
+    const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+    ];
+
+    return monthNames[monthIndex];
+}
+
+function removeParentheses(text) {
+    return text.replace(/\s*\([^)]*\)/g, "");
+}
+
+const calculateTimeUntilMidnight = () => {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setDate(now.getDate() + 1);
+    midnight.setHours(0, 0, 0, 0);
+    return midnight.getTime() - now.getTime();
+};
+
+function collectUniqueHolidays(events) {
+    const seenHolidays = new Set();
+    const collectedHolidays = [];
+
+    for (const event of events) {
+        if (event instanceof Event && !seenHolidays.has(event.getDesc())) {
+            seenHolidays.add(event.getDesc());
+            collectedHolidays.push(event);
+        }
+    }
+    return collectedHolidays;
+}
+
 export default function Holidays() {
     const [holidays, setHolidays] = useState([]);
     const [fontsLoaded] = useFonts({
@@ -19,74 +100,16 @@ export default function Holidays() {
     const { dateDisplay, minorFasts, rosheiChodesh, modernHolidays } =
         useSelector((state) => state.settings);
     const [isTodayHoliday, setIsTodayHoliday] = useState(null);
-    const today = new Date().toISOString().split("T")[0];
-    // const today = "2024-12-29";
+    // const today = new Date().toISOString().split("T")[0];
+    const today = "2024-12-31";
     const [displayCount, setDisplayCount] = useState(4);
     const [refreshing, setRefreshing] = useState(false);
-
-    function formatDate(inputDate) {
-        const date = new Date(inputDate);
-        const day = date.getUTCDate();
-        const month = getMonthName(date.getUTCMonth());
-        const year = date.getUTCFullYear();
-
-        return `${day} ${month} ${year}`;
-    }
-
-    function formatShortDate(inputDate) {
-        const date = new Date(inputDate);
-        const day = date.getUTCDate();
-        const month = getShortMonthName(date.getUTCMonth());
-        const year = date.getUTCFullYear();
-
-        return `${day} ${month} ${year}`;
-    }
-
-    function getMonthName(monthIndex) {
-        const monthNames = [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December",
-        ];
-
-        return monthNames[monthIndex];
-    }
-
-    function getShortMonthName(monthIndex) {
-        const monthNames = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-        ];
-
-        return monthNames[monthIndex];
-    }
+    const timeoutIdRef = useRef(null);
+    const intervalIdRef = useRef(null);
 
     function checkIfTodayIsHoliday(holidays) {
         const todayHoliday = holidays.find((holiday) => holiday.date === today);
         setIsTodayHoliday(todayHoliday || null);
-    }
-
-    function removeParentheses(text) {
-        return text.replace(/\s*\([^)]*\)/g, "");
     }
 
     useEffect(() => {
@@ -128,21 +151,27 @@ export default function Holidays() {
             checkIfTodayIsHoliday(formattedEvents);
         };
 
+        const setupDailyRefresh = () => {
+            const timeoutDuration = calculateTimeUntilMidnight();
+            if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+            timeoutIdRef.current = setTimeout(() => {
+                fetchHolidays();
+                if (intervalIdRef.current) clearInterval(intervalIdRef.current);
+                intervalIdRef.current = setInterval(fetchHolidays, 86400000);
+            }, timeoutDuration);
+        };
+
+        const cleanup = () => {
+            if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+            if (intervalIdRef.current) clearInterval(intervalIdRef.current);
+        };
+
+        cleanup();
         fetchHolidays();
+        setupDailyRefresh();
+
+        return cleanup;
     }, [refreshing, minorFasts, rosheiChodesh, modernHolidays]);
-
-    function collectUniqueHolidays(events) {
-        const seenHolidays = new Set();
-        const collectedHolidays = [];
-
-        for (const event of events) {
-            if (event instanceof Event && !seenHolidays.has(event.getDesc())) {
-                seenHolidays.add(event.getDesc());
-                collectedHolidays.push(event);
-            }
-        }
-        return collectedHolidays;
-    }
 
     function handleShowMore() {
         setDisplayCount((prevCount) => prevCount + 4);
