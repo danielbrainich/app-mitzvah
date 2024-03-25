@@ -100,8 +100,8 @@ export default function Holidays() {
     const { dateDisplay, minorFasts, rosheiChodesh, modernHolidays } =
         useSelector((state) => state.settings);
     const [todayHolidays, setTodayHolidays] = useState([]);
-    // const today = new Date().toISOString().split("T")[0];
-    const today = "2024-12-31";
+    const today = new Date().toISOString().split("T")[0];
+    // const today = "2024-12-31";
     const [displayCount, setDisplayCount] = useState(4);
     const [refreshing, setRefreshing] = useState(false);
     const timeoutIdRef = useRef(null);
@@ -210,7 +210,13 @@ export default function Holidays() {
                                                 and
                                             </Text>
                                         )}
-                                        <Text style={styles.smallBoldText}>
+                                        <Text
+                                            style={
+                                                todayHolidays.length > 1
+                                                    ? styles.smallBoldText
+                                                    : styles.bigBoldText
+                                            }
+                                        >
                                             {removeParentheses(holiday.title)}
                                         </Text>
                                         <Text style={styles.hebrewText}>
@@ -327,13 +333,12 @@ const styles = StyleSheet.create({
         fontFamily: "Nayuki",
         fontSize: 48,
         marginVertical: 4,
-      },
-      andText: {
+    },
+    andText: {
         color: "white",
         fontSize: 24,
         marginBottom: 16,
-
-      },
+    },
     hebrewText: {
         color: "#82CBFF",
         fontSize: 38,
