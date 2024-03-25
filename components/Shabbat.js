@@ -155,9 +155,11 @@ export default function Shabbat() {
             if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
             timeoutIdRef.current = setTimeout(() => {
                 setRefreshing(true);
+                fetchShabbatInfo();
                 if (intervalIdRef.current) clearInterval(intervalIdRef.current);
                 intervalIdRef.current = setInterval(() => {
                     setRefreshing(true);
+                    fetchShabbatInfo();
                 }, 86400000);
             }, timeoutDuration);
         };
