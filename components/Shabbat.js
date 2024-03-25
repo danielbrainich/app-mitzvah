@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     View,
     Text,
@@ -22,6 +22,71 @@ import { useFonts } from "expo-font";
 import * as ExpoLocation from "expo-location";
 import { useSelector } from "react-redux";
 
+function formatTime(date) {
+    return timeFormatter
+        .formatToParts(date)
+        .map(({ type, value }) => {
+            if (type === "dayPeriod") {
+                return value.toLowerCase();
+            }
+            return value;
+        })
+        .join("");
+}
+
+const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+});
+
+const timeFormatter = new Intl.DateTimeFormat("en-GB", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+});
+
+const calculateTimeUntilMidnight = () => {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setDate(now.getDate() + 1);
+    midnight.setHours(0, 0, 0, 0);
+    return midnight.getTime() - now.getTime();
+};
+
+function getShabbatInfo(events, candleLightingTime) {
+    const shabbatInfo = {};
+
+    for (const event of events) {
+        if (event instanceof CandleLightingEvent) {
+            shabbatInfo.candleDesc = event.renderBrief("he-x-NoNikud");
+            shabbatInfo.candleHDate = event.date ? event.date.toString() : null;
+
+            const sundownTime = new Date(event.eventTime);
+            sundownTime.setMinutes(sundownTime.getMinutes() + 1);
+            shabbatInfo.sundownFriday = formatTime(sundownTime);
+
+            const adjustmentTime =
+                candleLightingTime !== null && candleLightingTime !== undefined
+                    ? candleLightingTime
+                    : 18;
+            const candleDateTime = new Date(sundownTime);
+            candleDateTime.setMinutes(
+                candleDateTime.getMinutes() - adjustmentTime
+            );
+            shabbatInfo.candleTime = formatTime(candleDateTime);
+        } else if (event instanceof ParshaEvent) {
+            shabbatInfo.parshaEnglish = event.render("en");
+            shabbatInfo.parshaHebrew = event.renderBrief("he-x-NoNikud");
+            shabbatInfo.parshaHDate = event.date ? event.date.toString() : null;
+        } else if (event instanceof HavdalahEvent) {
+            shabbatInfo.havdalahDesc = event.renderBrief("he-x-NoNikud");
+            shabbatInfo.havdalahTime = event.fmtTime || null;
+        }
+    }
+    return shabbatInfo;
+}
+
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
@@ -36,6 +101,8 @@ export default function Shabbat() {
     const [appState, setAppState] = useState(AppState.currentState);
     const today = new Date().toISOString().split("T")[0];
     // const today = "2024-12-29";
+    const timeoutIdRef = useRef(null);
+    const intervalIdRef = useRef(null);
 
     const checkPermissionsAndFetchLocation = async () => {
         try {
@@ -79,7 +146,29 @@ export default function Shabbat() {
 
     useEffect(() => {
         fetchShabbatInfo();
-    }, [location, refreshing, havdalahTime, candleLightingTime]);
+    }, [location, havdalahTime, candleLightingTime]);
+
+    useEffect(() => {
+        const setupDailyRefresh = () => {
+            const timeoutDuration = calculateTimeUntilMidnight();
+
+            if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+            timeoutIdRef.current = setTimeout(() => {
+                setRefreshing(true);
+                if (intervalIdRef.current) clearInterval(intervalIdRef.current);
+                intervalIdRef.current = setInterval(() => {
+                    setRefreshing(true);
+                }, 86400000);
+            }, timeoutDuration);
+        };
+
+        setupDailyRefresh();
+
+        return () => {
+            if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+            if (intervalIdRef.current) clearInterval(intervalIdRef.current);
+        };
+    }, []);
 
     const fetchShabbatInfo = async () => {
         try {
@@ -124,7 +213,7 @@ export default function Shabbat() {
                 });
             }
 
-            const newShabbatInfo = getShabbatInfo(events);
+            const newShabbatInfo = getShabbatInfo(events, candleLightingTime);
 
             // Additional fetch for sundown time on Saturday
             if (location) {
@@ -167,95 +256,9 @@ export default function Shabbat() {
         }
     };
 
-    const dateFormatter = new Intl.DateTimeFormat("en-GB", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
-
-    const timeFormatter = new Intl.DateTimeFormat("en-GB", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-    });
-
-    function formatTime(date) {
-        return timeFormatter
-            .formatToParts(date)
-            .map(({ type, value }) => {
-                if (type === "dayPeriod") {
-                    return value.toLowerCase();
-                }
-                return value;
-            })
-            .join("");
-    }
-
-    function getShabbatInfo(events) {
-        const shabbatInfo = {
-            candleDesc: null,
-            candleTime: null,
-            sundownFriday: null,
-            sundownSaturday: null,
-            candleDate: null,
-            candleHDate: null,
-            parshaHebrew: null,
-            parshaEnglish: null,
-            parshaHDate: null,
-            havdalahDesc: null,
-            havdalahTime: null,
-            havdalahDate: null,
-            havdalahHDate: null,
-            erevShabbatDate: null,
-            yomShabbatDate: null,
-        };
-        for (const event of events) {
-            if (event instanceof CandleLightingEvent) {
-                shabbatInfo.candleDesc = event.renderBrief("he-x-NoNikud");
-                shabbatInfo.candleDate = event.eventTime
-                    ? dateFormatter.format(new Date(event.eventTime))
-                    : null;
-                shabbatInfo.candleHDate = event.date
-                    ? event.date.toString()
-                    : null;
-
-                const sundownTime = new Date(event.eventTime);
-                sundownTime.setMinutes(sundownTime.getMinutes() + 1);
-                shabbatInfo.sundownFriday = formatTime(sundownTime);
-
-                const adjustmentTime =
-                    candleLightingTime !== null &&
-                    candleLightingTime !== undefined
-                        ? candleLightingTime
-                        : 18;
-                const candleDateTime = new Date(sundownTime);
-                candleDateTime.setMinutes(
-                    candleDateTime.getMinutes() - adjustmentTime
-                );
-                shabbatInfo.candleTime = formatTime(candleDateTime);
-            } else if (event instanceof ParshaEvent) {
-                shabbatInfo.parshaEnglish = event.render("en");
-                shabbatInfo.parshaHebrew = event.renderBrief("he-x-NoNikud");
-                shabbatInfo.parshaHDate = event.date
-                    ? event.date.toString()
-                    : null;
-            } else if (event instanceof HavdalahEvent) {
-                shabbatInfo.sundownSaturday = "test";
-                shabbatInfo.havdalahDesc = event.renderBrief("he-x-NoNikud");
-                shabbatInfo.havdalahTime = event.fmtTime || null;
-                shabbatInfo.havdalahDate = event.eventTime
-                    ? dateFormatter.format(new Date(event.eventTime))
-                    : null;
-                shabbatInfo.havdalahHDate = event.date
-                    ? event.date.toString()
-                    : null;
-            }
-        }
-        return shabbatInfo;
-    }
-
     const handleRefresh = () => {
         setRefreshing(true);
+        fetchShabbatInfo();
         setTimeout(() => {
             setRefreshing(false);
         }, 1000);
