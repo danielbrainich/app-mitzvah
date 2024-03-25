@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import {
     StyleSheet,
     Text,
@@ -99,7 +99,7 @@ export default function Holidays() {
     });
     const { dateDisplay, minorFasts, rosheiChodesh, modernHolidays } =
         useSelector((state) => state.settings);
-    const [isTodayHoliday, setIsTodayHoliday] = useState(null);
+    const [todayHolidays, setTodayHolidays] = useState([]);
     // const today = new Date().toISOString().split("T")[0];
     const today = "2024-12-31";
     const [displayCount, setDisplayCount] = useState(4);
@@ -108,8 +108,10 @@ export default function Holidays() {
     const intervalIdRef = useRef(null);
 
     function checkIfTodayIsHoliday(holidays) {
-        const todayHoliday = holidays.find((holiday) => holiday.date === today);
-        setIsTodayHoliday(todayHoliday || null);
+        const todayHolidays = holidays.filter(
+            (holiday) => holiday.date === today
+        );
+        setTodayHolidays(todayHolidays);
     }
 
     useEffect(() => {
@@ -198,19 +200,28 @@ export default function Holidays() {
             >
                 {fontsLoaded ? (
                     <>
-                        {isTodayHoliday ? (
+                        {todayHolidays.length > 0 ? (
                             <View style={styles.frame}>
                                 <Text style={styles.headerText}>Today is</Text>
-                                <Text style={styles.bigBoldText}>
-                                    {removeParentheses(isTodayHoliday.title)}
-                                </Text>
-                                <Text style={styles.hebrewText}>
-                                    {isTodayHoliday.hebrewTitle}
-                                </Text>
+                                {todayHolidays.map((holiday, index) => (
+                                    <Fragment key={index}>
+                                        {index > 0 && (
+                                            <Text style={styles.andText}>
+                                                and
+                                            </Text>
+                                        )}
+                                        <Text style={styles.smallBoldText}>
+                                            {removeParentheses(holiday.title)}
+                                        </Text>
+                                        <Text style={styles.hebrewText}>
+                                            {holiday.hebrewTitle}
+                                        </Text>
+                                    </Fragment>
+                                ))}
                                 <Text style={styles.dateText}>
                                     {dateDisplay === "gregorian"
-                                        ? formatDate(isTodayHoliday.date)
-                                        : isTodayHoliday.hebrewDate}
+                                        ? formatDate(todayHolidays[0].date)
+                                        : new HDate().toString()}
                                 </Text>
                             </View>
                         ) : (
@@ -311,6 +322,18 @@ const styles = StyleSheet.create({
         fontFamily: "Nayuki",
         fontSize: 72,
     },
+    smallBoldText: {
+        color: "#82CBFF",
+        fontFamily: "Nayuki",
+        fontSize: 48,
+        marginVertical: 4,
+      },
+      andText: {
+        color: "white",
+        fontSize: 24,
+        marginBottom: 16,
+
+      },
     hebrewText: {
         color: "#82CBFF",
         fontSize: 38,
