@@ -27,9 +27,10 @@ AppMitzvah offers the following key features:
 - **User Settings**: Provides options for users to customize their experience, such as choosing between Gregorian and Hebrew calendar displays.
 - **Location Services**: Utilizes the Expo Location API to access the user's device location for accurate holiday and Shabbat information.
 
-## Screenshots
+## Screenshot
 
-[Screenshots coming soon]
+![AppMitzvah Screenshot](./assets/screenshot.png)
+
 
 ## Support
 
