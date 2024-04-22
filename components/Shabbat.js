@@ -56,7 +56,7 @@ const calculateTimeUntilMidnight = () => {
 
 function getShabbatInfo(events, candleLightingTime) {
     const shabbatInfo = {};
-
+    console.log(events);
     for (const event of events) {
         if (event instanceof CandleLightingEvent) {
             shabbatInfo.candleDesc = event.renderBrief("he-x-NoNikud");
@@ -84,6 +84,7 @@ function getShabbatInfo(events, candleLightingTime) {
             shabbatInfo.havdalahTime = event.fmtTime || null;
         }
     }
+    console.log(shabbatInfo);
     return shabbatInfo;
 }
 
@@ -172,10 +173,16 @@ export default function Shabbat() {
 
     const fetchShabbatInfo = async () => {
         try {
+            const today = new Date();
             const friday = new Date(today);
-            friday.setDate(friday.getDate() + (5 - friday.getDay()));
-            const saturday = new Date(friday);
-            saturday.setDate(friday.getDate() + 1);
+            const saturday = new Date(today);
+
+            if (today.getDay() === 6) {
+                friday.setDate(today.getDate() - 1);
+            } else {
+                friday.setDate(friday.getDate() + (5 - friday.getDay()));
+                saturday.setDate(friday.getDate() + 1);
+            }
 
             const erevShabbatDate = dateFormatter.format(friday);
             const yomShabbatDate = dateFormatter.format(saturday);
@@ -366,10 +373,11 @@ export default function Shabbat() {
                                     </View>
                                 )}
                                 <View style={styles.spacer} />
-
-                                <Text style={styles.mediumBoldText}>
-                                    Parasha
-                                </Text>
+                                {shabbatInfo.parashaEnglish && (
+                                    <Text style={styles.mediumBoldText}>
+                                        Parasha
+                                    </Text>
+                                )}
                                 <View style={styles.list}>
                                     {shabbatInfo.parshaEnglish && (
                                         <Text style={styles.paragraphText}>
