@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+
 import {
     View,
     Text,
@@ -22,16 +23,14 @@ import { useFonts } from "expo-font";
 import * as ExpoLocation from "expo-location";
 import { useSelector } from "react-redux";
 
+
+
 function formatTime(date) {
-    return timeFormatter
-        .formatToParts(date)
-        .map(({ type, value }) => {
-            if (type === "dayPeriod") {
-                return value.toLowerCase();
-            }
-            return value;
-        })
-        .join("");
+    const hours = date.getHours();
+    const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+    const amPm = hours >= 12 ? 'pm' : 'am';
+    const formattedHour = hours % 12 === 0 ? 12 : hours % 12;
+    return `${formattedHour}:${minutes} ${amPm}`;
 }
 
 const dateFormatter = new Intl.DateTimeFormat("en-GB", {
@@ -373,7 +372,7 @@ export default function Shabbat() {
                                     </View>
                                 )}
                                 <View style={styles.spacer} />
-                                {shabbatInfo.parashaEnglish && (
+                                {shabbatInfo.parshaEnglish && (
                                     <Text style={styles.mediumBoldText}>
                                         Parasha
                                     </Text>
