@@ -1,5 +1,5 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import settingsReducer from "./reducers/settingsReducer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     persistStore,
     persistReducer,
@@ -10,7 +10,8 @@ import {
     PURGE,
     REGISTER,
 } from "redux-persist";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import settingsReducer from "./reducers/settingsReducer";
 
 const rootReducer = combineReducers({
     settings: settingsReducer,
@@ -18,13 +19,16 @@ const rootReducer = combineReducers({
 
 const persistConfig = {
     key: "root",
+    version: 1,
     storage: AsyncStorage,
+    whitelist: ["settings"], // only persist what you intend
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
     reducer: persistedReducer,
+    devTools: process.env.NODE_ENV !== "production",
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {
