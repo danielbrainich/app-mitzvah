@@ -1,8 +1,9 @@
 import React from "react";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { StyleSheet } from "react-native";
-import Shabbat from "./Shabbat";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+
 import Holidays from "./Holidays";
+import Shabbat from "./Shabbat";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -14,11 +15,7 @@ export default function TabBarTabs() {
                 tabBarIndicatorStyle: styles.tabBarIndicator,
                 tabBarActiveTintColor: "#82CBFF",
                 tabBarInactiveTintColor: "white",
-                tabBarLabelStyle: {
-                    fontSize: 16,
-                    fontWeight: "bold",
-                    textTransform: "none",
-                },
+                tabBarLabelStyle: styles.tabBarLabel,
             }}
         >
             <Tab.Screen name="Holidays" component={Holidays} />
@@ -34,5 +31,10 @@ const styles = StyleSheet.create({
     tabBarIndicator: {
         backgroundColor: "#82CBFF",
         height: 3,
+    },
+    tabBarLabel: {
+        fontSize: 16,
+        fontWeight: "bold",
+        textTransform: "none",
     },
 });
