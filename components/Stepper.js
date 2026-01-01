@@ -1,56 +1,91 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 
-const Stepper = ({ value, onIncrement, onDecrement, message }) => {
+export default function Stepper({
+    value,
+    onIncrement,
+    onDecrement,
+    message,
+    disableIncrement = false,
+    disableDecrement = false,
+}) {
     return (
         <View style={styles.stepperFrame}>
             <View style={styles.stepperContainer}>
-                <TouchableOpacity onPress={onDecrement} style={styles.button}>
+                <Pressable
+                    onPress={onDecrement}
+                    disabled={disableDecrement}
+                    accessibilityRole="button"
+                    accessibilityLabel="Decrease"
+                    hitSlop={10}
+                    style={({ pressed }) => [
+                        styles.button,
+                        disableDecrement && styles.buttonDisabled,
+                        pressed && !disableDecrement && styles.buttonPressed,
+                    ]}
+                >
                     <Text style={styles.buttonText}>-</Text>
-                </TouchableOpacity>
+                </Pressable>
+
                 <Text style={styles.valueText}>{value}</Text>
-                <TouchableOpacity onPress={onIncrement} style={styles.button}>
+
+                <Pressable
+                    onPress={onIncrement}
+                    disabled={disableIncrement}
+                    accessibilityRole="button"
+                    accessibilityLabel="Increase"
+                    hitSlop={10}
+                    style={({ pressed }) => [
+                        styles.button,
+                        disableIncrement && styles.buttonDisabled,
+                        pressed && !disableIncrement && styles.buttonPressed,
+                    ]}
+                >
                     <Text style={styles.buttonText}>+</Text>
-                </TouchableOpacity>
+                </Pressable>
             </View>
+
             <Text style={styles.messageText}>{message}</Text>
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    stepperContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        width: 65,
-    },
     stepperFrame: {
         flexDirection: "row",
         alignItems: "center",
+        marginBottom: 22, 
+    },
+    stepperContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        width: 80,
     },
     button: {
         justifyContent: "center",
-        width: 24,
         alignItems: "center",
+        minWidth: 32,
+        minHeight: 32,
         backgroundColor: "black",
+    },
+    buttonPressed: {
+        opacity: 0.6,
+    },
+    buttonDisabled: {
+        opacity: 0.3,
     },
     buttonText: {
         fontSize: 16,
         color: "white",
-        marginBottom: 22,
     },
     valueText: {
-        marginHorizontal: 4,
+        marginHorizontal: 6,
         fontSize: 16,
         color: "#82CBFF",
-        marginBottom: 22,
     },
     messageText: {
         marginStart: 8,
         fontSize: 16,
         color: "#82CBFF",
-        marginBottom: 22,
     },
 });
-
-export default Stepper;
