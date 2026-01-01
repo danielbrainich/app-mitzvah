@@ -1,30 +1,61 @@
 import React, { useEffect, useState } from "react";
+import { Pressable, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { StatusBar } from "expo-status-bar";
-import Settings from "./components/Settings";
-import Information from "./components/Information";
-import { StyleSheet } from "react-native";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import TabBarTabs from "./components/TabBarTabs";
 import { Provider } from "react-redux";
-import { store, persistor } from "./store/store";
+import { PersistGate } from "redux-persist/integration/react";
 import * as Font from "expo-font";
 
-import { PersistGate } from "redux-persist/integration/react";
+import TabBarTabs from "./components/TabBarTabs";
+import Settings from "./components/Settings";
+import Information from "./components/Information";
+import { store, persistor } from "./store/store";
+
+const Stack = createNativeStackNavigator();
+
+const screenOptions = {
+    headerStyle: { backgroundColor: "black" },
+    headerTintColor: "white",
+    title: "",
+};
+
+function HeaderIconButton({ name, onPress, label, style }) {
+    return (
+        <Pressable
+            onPress={onPress}
+            accessibilityRole="button"
+            accessibilityLabel={label}
+            hitSlop={10}
+            style={style}
+        >
+            <MaterialCommunityIcons name={name} size={30} color="white" />
+        </Pressable>
+    );
+}
 
 export default function App() {
-    const Stack = createNativeStackNavigator();
-    const Tab = createMaterialTopTabNavigator();
     const [fontLoaded, setFontLoaded] = useState(false);
 
     useEffect(() => {
+        let isMounted = true;
+
         Font.loadAsync({
             Nayuki: require("./assets/fonts/NayukiRegular.otf"),
-        }).then(() => {
-            setFontLoaded(true);
-        });
+        })
+            .then(() => {
+                if (isMounted) setFontLoaded(true);
+            })
+            .catch((err) => {
+                // Don’t hard-brick the app if the font fails to load.
+                console.warn("Failed to load font:", err);
+                if (isMounted) setFontLoaded(true);
+            });
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     if (!fontLoaded) return null;
@@ -36,43 +67,37 @@ export default function App() {
                     <StatusBar style="light" />
                     <Stack.Navigator
                         initialRouteName="Tabs"
-                        screenOptions={{
-                            headerStyle: {
-                                backgroundColor: "black",
-                            },
-                            headerTintColor: "white",
-                            title: "",
-                        }}
+                        screenOptions={screenOptions}
                     >
                         <Stack.Screen
                             name="Tabs"
                             component={TabBarTabs}
                             options={({ navigation }) => ({
                                 headerRight: () => (
-                                    <>
-                                        <MaterialCommunityIcons
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            gap: 12,
+                                        }}
+                                    >
+                                        <HeaderIconButton
                                             name="information"
-                                            size={30}
+                                            label="Information"
                                             onPress={() =>
                                                 navigation.navigate(
                                                     "Information"
                                                 )
                                             }
-                                            color="white"
-                                            marginRight={10}
                                         />
-                                        <MaterialCommunityIcons
+                                        <HeaderIconButton
                                             name="cog"
-                                            size={30}
+                                            label="Settings"
                                             onPress={() =>
                                                 navigation.navigate("Settings")
                                             }
-                                            color="white"
                                         />
-                                    </>
+                                    </View>
                                 ),
-                                title: "",
-
                                 headerTitleStyle: {
                                     color: "#82CBFF",
                                     fontSize: 20,
@@ -96,16 +121,3 @@ export default function App() {
         </Provider>
     );
 }
-
-const styles = StyleSheet.create({
-    headerTitleContainer: {
-        flexDirection: "row",
-    },
-    tabFont: {
-        color: "white",
-        fontSize: 16,
-        fontWeight: "bold",
-        marginLeft: 12,
-        marginRight: 12,
-    },
-});
