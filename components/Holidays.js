@@ -46,18 +46,37 @@ const MONTHS_SHORT = [
     "Dec",
 ];
 
+// DEV ONLY: set to "YYYY-MM-DD" to simulate a date. Set to null for real today.
+const DEBUG_TODAY_ISO = null; // e.g. "2026-09-12"
+
+function localIsoDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+}
+
+function localIsoToday() {
+    const d = new Date();
+    return localIsoDate(d);
+}
+
+// Parse YYYY-MM-DD as a LOCAL date (avoids UTC shifting)
+function parseLocalIso(iso) {
+    const [y, m, d] = iso.split("-").map(Number);
+    return new Date(y, m - 1, d, 0, 0, 0, 0);
+}
+
 function formatDate(isoDate) {
-    const date = new Date(isoDate);
-    return `${date.getUTCDate()} ${
-        MONTHS[date.getUTCMonth()]
-    } ${date.getUTCFullYear()}`;
+    const date = parseLocalIso(isoDate);
+    return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 function formatShortDate(isoDate) {
-    const date = new Date(isoDate);
-    return `${date.getUTCDate()} ${
-        MONTHS_SHORT[date.getUTCMonth()]
-    } ${date.getUTCFullYear()}`;
+    const date = parseLocalIso(isoDate);
+    return `${date.getDate()} ${
+        MONTHS_SHORT[date.getMonth()]
+    } ${date.getFullYear()}`;
 }
 
 function removeParentheses(text) {
@@ -72,19 +91,24 @@ function msUntilNextLocalMidnight() {
     return next.getTime() - now.getTime();
 }
 
-function collectUniqueHolidays(events) {
-    const seen = new Set();
-    const out = [];
-    for (const ev of events) {
-        if (ev instanceof Event) {
-            const desc = ev.getDesc();
-            if (!seen.has(desc)) {
-                seen.add(desc);
-                out.push(ev);
-            }
-        }
-    }
-    return out;
+// End at: day before the same Hebrew month/day next year
+function endOfHebrewYearFromTodayExclusive(todayIso) {
+    const [y, m, d] = todayIso.split("-").map(Number);
+    const todayLocal = new Date(y, m - 1, d, 0, 0, 0, 0);
+
+    const h = new HDate(todayLocal);
+
+    // Same Hebrew day/month next Hebrew year
+    const sameHebDateNextYear = new HDate(
+        h.getDate(),
+        h.getMonth(),
+        h.getFullYear() + 1
+    ).greg();
+
+    const end = new Date(sameHebDateNextYear);
+    end.setDate(end.getDate() - 1);
+    end.setHours(23, 59, 59, 999);
+    return end;
 }
 
 export default function Holidays() {
@@ -99,14 +123,18 @@ export default function Holidays() {
     const timeoutIdRef = useRef(null);
     const intervalIdRef = useRef(null);
 
-    const todayIso = useMemo(() => new Date().toISOString().split("T")[0], []);
+    // Determines "today" using the local calendar date.
+    // In development, DEBUG_TODAY_ISO can override this to simulate specific dates
+    // (e.g. holidays) without changing the device clock.
+    // In production, this always resolves to the user's real local day.
+    const todayIso = useMemo(() => DEBUG_TODAY_ISO ?? localIsoToday(), []);
 
     const fetchHolidays = useCallback(() => {
-        const startDate = new Date(todayIso);
-        startDate.setDate(startDate.getDate() + 1);
+        // Include today so "Today is" can work
+        const startDate = parseLocalIso(todayIso);
 
-        const endDate = new Date(todayIso);
-        endDate.setMonth(endDate.getMonth() + 15);
+        // Cut off after one full Hebrew year from today (prevents “wraparound” repeats)
+        const endDate = endOfHebrewYearFromTodayExclusive(todayIso);
 
         const options = {
             start: startDate,
@@ -126,29 +154,42 @@ export default function Holidays() {
         };
 
         const events = HebrewCalendar.calendar(options);
-        const unique = collectUniqueHolidays(events);
 
-        const formatted = unique.map((ev) => {
-            const gregIso = ev.getDate().greg().toISOString().split("T")[0];
-            return {
-                id: `${ev.getDesc()}-${gregIso}`,
-                title: ev.getDesc(),
-                hebrewTitle: ev.renderBrief("he-x-NoNikud"),
-                date: gregIso,
-                hebrewDate: ev.getDate().toString(),
-                categories: ev.getCategories(),
-            };
-        });
+        const formatted = events
+            .filter((ev) => ev instanceof Event)
+            .map((ev) => {
+                const gregIso = localIsoDate(ev.getDate().greg());
+                return {
+                    id: `${ev.getDesc()}-${gregIso}`,
+                    title: ev.getDesc(),
+                    hebrewTitle: ev.renderBrief("he-x-NoNikud"),
+                    date: gregIso,
+                    hebrewDate: ev.getDate().toString(),
+                    categories: ev.getCategories(),
+                };
+            });
+
+        if (__DEV__) {
+            console.group(
+                `[Holidays] ${formatted.length} holidays starting ${todayIso} (1 Hebrew year window)`
+            );
+            formatted.forEach((h, i) => {
+                console.log(
+                    `${String(i + 1).padStart(2, "0")}. ${h.title} — ${
+                        h.date
+                    } (${h.hebrewDate})`
+                );
+            });
+            console.groupEnd();
+        }
 
         setHolidays(formatted);
         setTodayHolidays(formatted.filter((h) => h.date === todayIso));
     }, [todayIso, minorFasts, modernHolidays, rosheiChodesh]);
 
     useEffect(() => {
-        // initial fetch
         fetchHolidays();
 
-        // midnight refresh scheduling
         const schedule = () => {
             if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
             timeoutIdRef.current = setTimeout(() => {
@@ -173,10 +214,10 @@ export default function Holidays() {
         setRefreshing(true);
         setDisplayCount(4);
         fetchHolidays();
-        // small delay for UX so the spinner is visible
         setTimeout(() => setRefreshing(false), 400);
     }, [fetchHolidays]);
 
+    // Coming up should NOT include today
     const upcoming = useMemo(
         () => holidays.filter((h) => h.date > todayIso),
         [holidays, todayIso]
