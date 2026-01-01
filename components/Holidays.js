@@ -1,4 +1,11 @@
-import { useState, useEffect, useRef, Fragment } from "react";
+import React, {
+    Fragment,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import {
     StyleSheet,
     Text,
@@ -7,185 +14,175 @@ import {
     ScrollView,
     RefreshControl,
 } from "react-native";
-import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 
-function formatDate(inputDate) {
-    const date = new Date(inputDate);
-    const day = date.getUTCDate();
-    const month = getMonthName(date.getUTCMonth());
-    const year = date.getUTCFullYear();
+const MONTHS = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+];
+const MONTHS_SHORT = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+];
 
-    return `${day} ${month} ${year}`;
+function formatDate(isoDate) {
+    const date = new Date(isoDate);
+    return `${date.getUTCDate()} ${
+        MONTHS[date.getUTCMonth()]
+    } ${date.getUTCFullYear()}`;
 }
 
-function formatShortDate(inputDate) {
-    const date = new Date(inputDate);
-    const day = date.getUTCDate();
-    const month = getShortMonthName(date.getUTCMonth());
-    const year = date.getUTCFullYear();
-
-    return `${day} ${month} ${year}`;
-}
-
-function getMonthName(monthIndex) {
-    const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
-
-    return monthNames[monthIndex];
-}
-
-function getShortMonthName(monthIndex) {
-    const monthNames = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-    ];
-
-    return monthNames[monthIndex];
+function formatShortDate(isoDate) {
+    const date = new Date(isoDate);
+    return `${date.getUTCDate()} ${
+        MONTHS_SHORT[date.getUTCMonth()]
+    } ${date.getUTCFullYear()}`;
 }
 
 function removeParentheses(text) {
     return text.replace(/\s*\([^)]*\)/g, "");
 }
 
-const calculateTimeUntilMidnight = () => {
+function msUntilNextLocalMidnight() {
     const now = new Date();
-    const midnight = new Date(now);
-    midnight.setDate(now.getDate() + 1);
-    midnight.setHours(0, 0, 0, 0);
-    return midnight.getTime() - now.getTime();
-};
+    const next = new Date(now);
+    next.setDate(now.getDate() + 1);
+    next.setHours(0, 0, 0, 0);
+    return next.getTime() - now.getTime();
+}
 
 function collectUniqueHolidays(events) {
-    const seenHolidays = new Set();
-    const collectedHolidays = [];
-
-    for (const event of events) {
-        if (event instanceof Event && !seenHolidays.has(event.getDesc())) {
-            seenHolidays.add(event.getDesc());
-            collectedHolidays.push(event);
+    const seen = new Set();
+    const out = [];
+    for (const ev of events) {
+        if (ev instanceof Event) {
+            const desc = ev.getDesc();
+            if (!seen.has(desc)) {
+                seen.add(desc);
+                out.push(ev);
+            }
         }
     }
-    return collectedHolidays;
+    return out;
 }
 
 export default function Holidays() {
-    const [holidays, setHolidays] = useState([]);
-    const [fontsLoaded] = useFonts({
-        Nayuki: require("../assets/fonts/NayukiRegular.otf"),
-    });
     const { dateDisplay, minorFasts, rosheiChodesh, modernHolidays } =
         useSelector((state) => state.settings);
+
+    const [holidays, setHolidays] = useState([]);
     const [todayHolidays, setTodayHolidays] = useState([]);
-    const today = new Date().toISOString().split("T")[0];
-    // const today = "2024-12-31";
     const [displayCount, setDisplayCount] = useState(4);
     const [refreshing, setRefreshing] = useState(false);
+
     const timeoutIdRef = useRef(null);
     const intervalIdRef = useRef(null);
 
-    function checkIfTodayIsHoliday(holidays) {
-        const todayHolidays = holidays.filter(
-            (holiday) => holiday.date === today
-        );
-        setTodayHolidays(todayHolidays);
-    }
+    const todayIso = useMemo(() => new Date().toISOString().split("T")[0], []);
 
-    useEffect(() => {
-        const fetchHolidays = () => {
-            const startDate = new Date(today);
-            startDate.setDate(startDate.getDate() + 1);
-            let endDate = new Date(today);
-            endDate.setMonth(endDate.getMonth() + 15);
+    const fetchHolidays = useCallback(() => {
+        const startDate = new Date(todayIso);
+        startDate.setDate(startDate.getDate() + 1);
 
-            const options = {
-                start: startDate,
-                end: endDate,
-                isHebrewYear: false,
-                candlelighting: false,
-                noMinorFast: !minorFasts,
-                noSpecialShabbat: true,
-                noModern: !modernHolidays,
-                noRoshChodesh: !rosheiChodesh,
-                sedrot: false,
-                omer: false,
-                shabbatMevarchim: false,
-                molad: false,
-                yomKippurKatan: false,
-                locale: "he",
-            };
+        const endDate = new Date(todayIso);
+        endDate.setMonth(endDate.getMonth() + 15);
 
-            const events = HebrewCalendar.calendar(options);
-            const uniqueHolidays = collectUniqueHolidays(events);
-
-            const formattedEvents = uniqueHolidays.map((ev) => ({
-                title: ev.getDesc(),
-                hebrewTitle: ev.renderBrief("he-x-NoNikud"),
-                date: ev.getDate().greg().toISOString().split("T")[0],
-                hebrewDate: ev.getDate().toString(),
-                categories: ev.getCategories(),
-            }));
-
-            setHolidays(formattedEvents);
-            checkIfTodayIsHoliday(formattedEvents);
+        const options = {
+            start: startDate,
+            end: endDate,
+            isHebrewYear: false,
+            candlelighting: false,
+            noMinorFast: !minorFasts,
+            noSpecialShabbat: true,
+            noModern: !modernHolidays,
+            noRoshChodesh: !rosheiChodesh,
+            sedrot: false,
+            omer: false,
+            shabbatMevarchim: false,
+            molad: false,
+            yomKippurKatan: false,
+            locale: "he",
         };
 
-        const setupDailyRefresh = () => {
-            const timeoutDuration = calculateTimeUntilMidnight();
+        const events = HebrewCalendar.calendar(options);
+        const unique = collectUniqueHolidays(events);
+
+        const formatted = unique.map((ev) => {
+            const gregIso = ev.getDate().greg().toISOString().split("T")[0];
+            return {
+                id: `${ev.getDesc()}-${gregIso}`,
+                title: ev.getDesc(),
+                hebrewTitle: ev.renderBrief("he-x-NoNikud"),
+                date: gregIso,
+                hebrewDate: ev.getDate().toString(),
+                categories: ev.getCategories(),
+            };
+        });
+
+        setHolidays(formatted);
+        setTodayHolidays(formatted.filter((h) => h.date === todayIso));
+    }, [todayIso, minorFasts, modernHolidays, rosheiChodesh]);
+
+    useEffect(() => {
+        // initial fetch
+        fetchHolidays();
+
+        // midnight refresh scheduling
+        const schedule = () => {
             if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
             timeoutIdRef.current = setTimeout(() => {
                 fetchHolidays();
                 if (intervalIdRef.current) clearInterval(intervalIdRef.current);
-                intervalIdRef.current = setInterval(fetchHolidays, 86400000);
-            }, timeoutDuration);
+                intervalIdRef.current = setInterval(
+                    fetchHolidays,
+                    24 * 60 * 60 * 1000
+                );
+            }, msUntilNextLocalMidnight());
         };
 
-        const cleanup = () => {
+        schedule();
+
+        return () => {
             if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
             if (intervalIdRef.current) clearInterval(intervalIdRef.current);
         };
+    }, [fetchHolidays]);
 
-        cleanup();
-        fetchHolidays();
-        setupDailyRefresh();
-
-        return cleanup;
-    }, [refreshing, minorFasts, rosheiChodesh, modernHolidays]);
-
-    function handleShowMore() {
-        setDisplayCount((prevCount) => prevCount + 4);
-    }
-
-    const handleRefresh = () => {
+    const handleRefresh = useCallback(() => {
         setRefreshing(true);
         setDisplayCount(4);
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 1000);
-    };
+        fetchHolidays();
+        // small delay for UX so the spinner is visible
+        setTimeout(() => setRefreshing(false), 400);
+    }, [fetchHolidays]);
+
+    const upcoming = useMemo(
+        () => holidays.filter((h) => h.date > todayIso),
+        [holidays, todayIso]
+    );
+
+    const showMore = () => setDisplayCount((n) => n + 4);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -198,90 +195,75 @@ export default function Holidays() {
                     />
                 }
             >
-                {fontsLoaded ? (
-                    <>
-                        {todayHolidays.length > 0 ? (
-                            <View style={styles.frame}>
-                                <Text style={styles.headerText}>Today is</Text>
-                                {todayHolidays.map((holiday, index) => (
-                                    <Fragment key={index}>
-                                        {index > 0 && (
-                                            <Text style={styles.andText}>
-                                                and
-                                            </Text>
-                                        )}
-                                        <Text
-                                            style={
-                                                todayHolidays.length > 1
-                                                    ? styles.smallBoldText
-                                                    : styles.bigBoldText
-                                            }
-                                        >
-                                            {removeParentheses(holiday.title)}
-                                        </Text>
-                                        <Text style={styles.hebrewText}>
-                                            {holiday.hebrewTitle}
-                                        </Text>
-                                    </Fragment>
-                                ))}
-                                <Text style={styles.dateText}>
-                                    {dateDisplay === "gregorian"
-                                        ? formatDate(todayHolidays[0].date)
-                                        : new HDate().toString()}
-                                </Text>
-                            </View>
-                        ) : (
-                            <View style={styles.frame}>
-                                <Text style={styles.headerText}>Today is</Text>
-                                <Text style={styles.bigBoldText}>
-                                    not a Jewish holiday
-                                </Text>
-                                <Text style={styles.dateText}>
-                                    {dateDisplay === "gregorian"
-                                        ? formatDate(today)
-                                        : new HDate().toString()}
-                                </Text>
-                            </View>
-                        )}
-                        <View style={styles.frame}>
-                            <Text style={styles.secondHeaderText}>
-                                Coming up
-                            </Text>
-                            {holidays
-                                .filter((holiday) => {
-                                    return holiday.date > today;
-                                })
-                                .slice(0, displayCount)
-                                .map((holiday, index) => (
-                                    <View key={`holiday-${index}`}>
-                                        <View style={styles.list}>
-                                            <Text style={styles.listText}>
-                                                {removeParentheses(
-                                                    holiday.title
-                                                )}
-                                            </Text>
-                                            <Text style={styles.listText}>
-                                                {dateDisplay === "gregorian"
-                                                    ? formatShortDate(
-                                                          holiday.date
-                                                      )
-                                                    : holiday.hebrewDate}
-                                            </Text>
-                                        </View>
-                                        <View style={styles.blueLine}></View>
-                                    </View>
-                                ))}
-                            {displayCount < holidays.length && (
+                {todayHolidays.length > 0 ? (
+                    <View style={styles.frame}>
+                        <Text style={styles.headerText}>Today is</Text>
+
+                        {todayHolidays.map((holiday, index) => (
+                            <Fragment key={holiday.id}>
+                                {index > 0 && (
+                                    <Text style={styles.andText}>and</Text>
+                                )}
                                 <Text
-                                    style={styles.showMoreText}
-                                    onPress={handleShowMore}
+                                    style={
+                                        todayHolidays.length > 1
+                                            ? styles.smallBoldText
+                                            : styles.bigBoldText
+                                    }
                                 >
-                                    Show More
+                                    {removeParentheses(holiday.title)}
                                 </Text>
-                            )}
+                                <Text style={styles.hebrewText}>
+                                    {holiday.hebrewTitle}
+                                </Text>
+                            </Fragment>
+                        ))}
+
+                        <Text style={styles.dateText}>
+                            {dateDisplay === "gregorian"
+                                ? formatDate(todayIso)
+                                : new HDate().toString()}
+                        </Text>
+                    </View>
+                ) : (
+                    <View style={styles.frame}>
+                        <Text style={styles.headerText}>Today is</Text>
+                        <Text style={styles.bigBoldText}>
+                            not a Jewish holiday
+                        </Text>
+                        <Text style={styles.dateText}>
+                            {dateDisplay === "gregorian"
+                                ? formatDate(todayIso)
+                                : new HDate().toString()}
+                        </Text>
+                    </View>
+                )}
+
+                <View style={styles.frame}>
+                    <Text style={styles.secondHeaderText}>Coming up</Text>
+
+                    {upcoming.slice(0, displayCount).map((holiday) => (
+                        <View key={holiday.id}>
+                            <View style={styles.list}>
+                                <Text style={styles.listText}>
+                                    {removeParentheses(holiday.title)}
+                                </Text>
+                                <Text style={styles.listText}>
+                                    {dateDisplay === "gregorian"
+                                        ? formatShortDate(holiday.date)
+                                        : holiday.hebrewDate}
+                                </Text>
+                            </View>
+                            <View style={styles.blueLine} />
                         </View>
-                    </>
-                ) : null}
+                    ))}
+
+                    {displayCount < upcoming.length && (
+                        <Text style={styles.showMoreText} onPress={showMore}>
+                            Show More
+                        </Text>
+                    )}
+                </View>
             </ScrollView>
         </SafeAreaView>
     );
@@ -348,10 +330,6 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 22,
         marginBottom: 16,
-    },
-    paragraphText: {
-        color: "white",
-        fontSize: 24,
     },
     listText: {
         color: "white",
