@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from "react";
-
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     View,
     Text,
@@ -10,6 +9,9 @@ import {
     Linking,
     TouchableOpacity,
     AppState,
+    Alert,
+    Modal,
+    Pressable,
 } from "react-native";
 import {
     HebrewCalendar,
@@ -18,17 +20,55 @@ import {
     ParshaEvent,
     HavdalahEvent,
     HDate,
+    Zmanim,
 } from "@hebcal/core";
 import { useFonts } from "expo-font";
 import * as ExpoLocation from "expo-location";
 import { useSelector } from "react-redux";
 
+// Dev-only override for testing specific dates.
+// Example: set TEST_TODAY_ISO = "2026-09-26" to simulate that local day.
+const TEST_TODAY_ISO = __DEV__ ? null : null; // set to null when done
 
+function addMinutes(date, mins) {
+    const d = new Date(date);
+    d.setMinutes(d.getMinutes() + mins);
+    return d;
+}
+
+function ceilToMinute(date) {
+    const d = new Date(date);
+    const hadSeconds = d.getSeconds() > 0 || d.getMilliseconds() > 0;
+    d.setSeconds(0, 0);
+    if (hadSeconds) d.setMinutes(d.getMinutes() + 1);
+    return d;
+}
+
+// Local YYYY-MM-DD (not UTC) to avoid date drifting around midnight/timezones.
+function localIsoToday() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+}
+
+function getTodayIso() {
+    if (__DEV__ && TEST_TODAY_ISO) return TEST_TODAY_ISO;
+    return localIsoToday();
+}
+
+// Parse YYYY-MM-DD into a local Date at midnight.
+function localDateFromIso(iso) {
+    const [y, m, d] = iso.split("-").map(Number);
+    return new Date(y, m - 1, d, 0, 0, 0, 0);
+}
 
 function formatTime(date) {
     const hours = date.getHours();
-    const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-    const amPm = hours >= 12 ? 'pm' : 'am';
+    const minutes =
+        date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+    const amPm = hours >= 12 ? "pm" : "am";
     const formattedHour = hours % 12 === 0 ? 12 : hours % 12;
     return `${formattedHour}:${minutes} ${amPm}`;
 }
@@ -39,51 +79,187 @@ const dateFormatter = new Intl.DateTimeFormat("en-GB", {
     year: "numeric",
 });
 
-const timeFormatter = new Intl.DateTimeFormat("en-GB", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-});
-
-const calculateTimeUntilMidnight = () => {
+function msUntilNextLocalMidnight() {
     const now = new Date();
-    const midnight = new Date(now);
-    midnight.setDate(now.getDate() + 1);
-    midnight.setHours(0, 0, 0, 0);
-    return midnight.getTime() - now.getTime();
-};
+    const next = new Date(now);
+    next.setDate(now.getDate() + 1);
+    next.setHours(0, 0, 0, 0);
+    return next.getTime() - now.getTime();
+}
 
-function getShabbatInfo(events, candleLightingTime) {
-    const shabbatInfo = {};
-    console.log(events);
-    for (const event of events) {
+// Compare two Date objects by local calendar day only.
+function isSameLocalDate(a, b) {
+    return (
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate()
+    );
+}
+
+/**
+ * Compute Friday times from Zmanim:
+ * - sunset is rounded up to a minute (ceil)
+ * - candle lighting = sundown - (user setting, default 18)
+ */
+function getFridayTimesFromZmanim({
+    location,
+    timezone,
+    friday,
+    candleOffsetMins,
+}) {
+    if (!location) return {};
+
+    const elevation = Number.isFinite(location.elevation)
+        ? location.elevation
+        : undefined;
+
+    const hebcalLocation = new Location(
+        location.latitude,
+        location.longitude,
+        false,
+        timezone,
+        undefined,
+        "US",
+        undefined,
+        elevation
+    );
+
+    const zmanim = new Zmanim(hebcalLocation, friday);
+
+    const sunsetRaw = zmanim.sunset();
+    if (!(sunsetRaw instanceof Date)) return {};
+
+    const sunset = ceilToMinute(sunsetRaw);
+
+    const offset =
+        candleOffsetMins !== null && candleOffsetMins !== undefined
+            ? candleOffsetMins
+            : 18;
+
+    const candleDateTime = addMinutes(sunset, -offset);
+
+    return {
+        sundownFriday: formatTime(sunset),
+        candleTime: formatTime(candleDateTime),
+    };
+}
+
+/**
+ * Compute Saturday times from Zmanim:
+ * - sunset is rounded up to a minute (ceil)
+ * - shabbat ends = sunset + havdalah mins
+ */
+function getSaturdayTimesFromZmanim({
+    location,
+    timezone,
+    saturday,
+    havdalahMins,
+}) {
+    if (!location) return {};
+
+    const elevation = Number.isFinite(location.elevation)
+        ? location.elevation
+        : undefined;
+
+    const hebcalLocation = new Location(
+        location.latitude,
+        location.longitude,
+        false,
+        timezone,
+        undefined,
+        "US",
+        undefined,
+        elevation
+    );
+
+    const zmanim = new Zmanim(hebcalLocation, saturday);
+
+    const sunsetRaw = zmanim.sunset();
+    if (!(sunsetRaw instanceof Date)) return {};
+
+    const sunset = ceilToMinute(sunsetRaw);
+    const ends = addMinutes(sunset, havdalahMins ?? 42);
+
+    return {
+        sundownSaturday: formatTime(sunset),
+        shabbatEnds: formatTime(ends),
+    };
+}
+
+function getShabbatInfo(events, friday, saturday) {
+    const shabbatInfo = {
+        endsIntoYomTov: false,
+        yomTovCandleTime: null,
+    };
+
+    // Dev-only, structured logging
+    if (__DEV__) {
+        console.group(`[Shabbat] Hebcal events (${events?.length ?? 0})`);
+        (events || []).forEach((e, i) => {
+            const desc =
+                typeof e?.getDesc === "function"
+                    ? e.getDesc()
+                    : typeof e?.render === "function"
+                    ? e.render("en")
+                    : String(e);
+
+            const when =
+                e?.eventTime instanceof Date
+                    ? ` @ ${e.eventTime.toLocaleString()}`
+                    : "";
+            console.log(`${String(i + 1).padStart(2, "0")}. ${desc}${when}`);
+        });
+        console.groupEnd();
+    }
+
+    const fridayCandleEvents = [];
+    const saturdayCandleEvents = [];
+
+    for (const event of events || []) {
         if (event instanceof CandleLightingEvent) {
-            shabbatInfo.candleDesc = event.renderBrief("he-x-NoNikud");
-            shabbatInfo.candleHDate = event.date ? event.date.toString() : null;
+            if (!(event.eventTime instanceof Date)) continue;
 
-            const sundownTime = new Date(event.eventTime);
-            sundownTime.setMinutes(sundownTime.getMinutes() + 1);
-            shabbatInfo.sundownFriday = formatTime(sundownTime);
+            if (isSameLocalDate(event.eventTime, friday)) {
+                fridayCandleEvents.push(event);
+                continue;
+            }
+            if (isSameLocalDate(event.eventTime, saturday)) {
+                saturdayCandleEvents.push(event);
+                continue;
+            }
+        }
 
-            const adjustmentTime =
-                candleLightingTime !== null && candleLightingTime !== undefined
-                    ? candleLightingTime
-                    : 18;
-            const candleDateTime = new Date(sundownTime);
-            candleDateTime.setMinutes(
-                candleDateTime.getMinutes() - adjustmentTime
-            );
-            shabbatInfo.candleTime = formatTime(candleDateTime);
-        } else if (event instanceof ParshaEvent) {
+        if (event instanceof HavdalahEvent) {
+            if (!(event.eventTime instanceof Date)) continue;
+            if (!isSameLocalDate(event.eventTime, saturday)) continue;
+
+            shabbatInfo.havdalahDesc = event.renderBrief("he-x-NoNikud");
+            shabbatInfo.havdalahTime = event.fmtTime || null;
+            continue;
+        }
+
+        if (event instanceof ParshaEvent) {
             shabbatInfo.parshaEnglish = event.render("en");
             shabbatInfo.parshaHebrew = event.renderBrief("he-x-NoNikud");
             shabbatInfo.parshaHDate = event.date ? event.date.toString() : null;
-        } else if (event instanceof HavdalahEvent) {
-            shabbatInfo.havdalahDesc = event.renderBrief("he-x-NoNikud");
-            shabbatInfo.havdalahTime = event.fmtTime || null;
+            continue;
         }
     }
-    console.log(shabbatInfo);
+
+    // If we have a Saturday candle lighting, Shabbat is ending into Yom Tov.
+    shabbatInfo.endsIntoYomTov = saturdayCandleEvents.length > 0;
+
+    // Choose Friday candle lighting (for descriptive text + Hebrew date only)
+    const chosenFridayCandle =
+        fridayCandleEvents.find((e) => !e.linkedEvent) || fridayCandleEvents[0];
+
+    if (chosenFridayCandle) {
+        shabbatInfo.candleDesc = chosenFridayCandle.renderBrief("he-x-NoNikud");
+        shabbatInfo.candleHDate = chosenFridayCandle.date
+            ? chosenFridayCandle.date.toString()
+            : null;
+    }
+
     return shabbatInfo;
 }
 
@@ -91,95 +267,88 @@ export default function Shabbat() {
     const [fontsLoaded] = useFonts({
         Nayuki: require("../assets/fonts/NayukiRegular.otf"),
     });
+
     const [location, setLocation] = useState(null);
+    const [locationStatus, setLocationStatus] = useState("unknown"); // "granted" | "denied" | "unknown"
     const [refreshing, setRefreshing] = useState(false);
-    const [shabbatInfo, setShabbatInfo] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [shabbatInfo, setShabbatInfo] = useState(null);
+    const [showLocationDetails, setShowLocationDetails] = useState(false);
+
     const { dateDisplay, candleLightingTime, havdalahTime } = useSelector(
         (state) => state.settings
     );
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const [appState, setAppState] = useState(AppState.currentState);
-    const today = new Date().toISOString().split("T")[0];
-    // const today = "2024-12-29";
-    const timeoutIdRef = useRef(null);
-    const intervalIdRef = useRef(null);
 
-    const checkPermissionsAndFetchLocation = async () => {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const timeoutIdRef = useRef(null);
+
+    const openSettings = useCallback(() => {
+        Linking.openSettings().catch(() => {
+            Alert.alert("Unable to open settings");
+        });
+    }, []);
+
+    const checkPermissionsAndFetchLocation = useCallback(async () => {
         try {
-            let { status } =
+            const { status } =
                 await ExpoLocation.requestForegroundPermissionsAsync();
+
             if (status !== "granted") {
-                console.log("Location permission not granted");
+                setLocationStatus("denied");
+                setLocation(null);
+                if (__DEV__)
+                    console.log("[Shabbat] Location permission not granted");
                 return;
             }
 
-            const location = await ExpoLocation.getCurrentPositionAsync({});
+            setLocationStatus("granted");
+            const pos = await ExpoLocation.getCurrentPositionAsync({});
             setLocation({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-                elevation: location.coords.altitude,
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+                elevation: pos.coords.altitude,
             });
         } catch (error) {
-            console.error("Error fetching location:", error);
+            console.error("[Shabbat] Error fetching location:", error);
+            setLocationStatus("denied");
+            setLocation(null);
         }
-    };
+    }, []);
 
     useEffect(() => {
         checkPermissionsAndFetchLocation();
 
-        const handleAppStateChange = (nextAppState) => {
-            if (
-                appState.match(/inactive|background/) &&
-                nextAppState === "active"
-            ) {
-                checkPermissionsAndFetchLocation();
-            }
-            setAppState(nextAppState);
-        };
-
         const subscription = AppState.addEventListener(
             "change",
-            handleAppStateChange
+            (nextState) => {
+                if (nextState === "active") {
+                    checkPermissionsAndFetchLocation();
+                }
+            }
         );
+
         return () => subscription.remove();
-    }, [appState]);
+    }, [checkPermissionsAndFetchLocation]);
 
-    useEffect(() => {
-        fetchShabbatInfo();
-    }, [location, havdalahTime, candleLightingTime]);
-
-    useEffect(() => {
-        const setupDailyRefresh = () => {
-            const timeoutDuration = calculateTimeUntilMidnight();
-
-            if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
-            timeoutIdRef.current = setTimeout(() => {
-                fetchShabbatInfo();
-                if (intervalIdRef.current) clearInterval(intervalIdRef.current);
-                intervalIdRef.current = setInterval(() => {
-                    fetchShabbatInfo();
-                }, 86400000);
-            }, timeoutDuration);
-        };
-
-        setupDailyRefresh();
-
-        return () => {
-            if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
-            if (intervalIdRef.current) clearInterval(intervalIdRef.current);
-        };
-    }, []);
-
-    const fetchShabbatInfo = async () => {
+    const fetchShabbatInfo = useCallback(async () => {
         try {
-            const today = new Date();
+            setLoading(true);
+
+            const todayIso = getTodayIso();
+            const today = localDateFromIso(todayIso);
+
             const friday = new Date(today);
             const saturday = new Date(today);
 
             if (today.getDay() === 6) {
+                // Saturday: current Shabbat
                 friday.setDate(today.getDate() - 1);
+                saturday.setDate(today.getDate());
             } else {
-                friday.setDate(friday.getDate() + (5 - friday.getDay()));
+                // Upcoming Shabbat
+                friday.setDate(today.getDate() + (5 - today.getDay()));
+                saturday.setTime(friday.getTime());
                 saturday.setDate(friday.getDate() + 1);
             }
 
@@ -189,8 +358,17 @@ export default function Shabbat() {
             const erevShabbatHebrewDate = new HDate(friday).toString();
             const yomShabbatHebrewDate = new HDate(saturday).toString();
 
+            // IMPORTANT: include Saturday night (use Sunday 00:00 local)
+            const end = new Date(saturday);
+            end.setDate(end.getDate() + 1);
+            end.setHours(0, 0, 0, 0);
+
             let events;
             if (location) {
+                const elevation = Number.isFinite(location.elevation)
+                    ? location.elevation
+                    : undefined;
+
                 const hebcalLocation = new Location(
                     location.latitude,
                     location.longitude,
@@ -199,12 +377,12 @@ export default function Shabbat() {
                     undefined,
                     "US",
                     undefined,
-                    location.elevation
+                    elevation
                 );
 
                 events = HebrewCalendar.calendar({
                     start: friday,
-                    end: saturday,
+                    end,
                     location: hebcalLocation,
                     candlelighting: true,
                     havdalahMins: havdalahTime,
@@ -214,67 +392,84 @@ export default function Shabbat() {
             } else {
                 events = HebrewCalendar.calendar({
                     start: friday,
-                    end: saturday,
+                    end,
                     sedrot: true,
                 });
             }
 
-            const newShabbatInfo = getShabbatInfo(events, candleLightingTime);
+            const parsed = getShabbatInfo(events, friday, saturday);
 
-            // Additional fetch for sundown time on Saturday
-            if (location) {
-                const dummyEvents = HebrewCalendar.calendar({
-                    start: saturday,
-                    end: saturday,
-                    location: new Location(
-                        location.latitude,
-                        location.longitude,
-                        false,
-                        timezone,
-                        undefined,
-                        "US",
-                        undefined,
-                        location.elevation
-                    ),
-                    candlelighting: true,
-                    havdalahMins: 1,
-                });
+            const friTimes = getFridayTimesFromZmanim({
+                location,
+                timezone,
+                friday,
+                candleOffsetMins: candleLightingTime,
+            });
 
-                const dummyHavdalahEvent = dummyEvents.find(
-                    (event) => event instanceof HavdalahEvent
-                );
-                if (dummyHavdalahEvent) {
-                    const sundownTime = new Date(dummyHavdalahEvent.eventTime);
-                    sundownTime.setMinutes(sundownTime.getMinutes() - 1);
-                    newShabbatInfo.sundownSaturday = formatTime(sundownTime);
-                }
-            }
+            const satTimes = getSaturdayTimesFromZmanim({
+                location,
+                timezone,
+                saturday,
+                havdalahMins: havdalahTime,
+            });
+
+            const yomTovCandleTime =
+                parsed?.endsIntoYomTov && satTimes?.shabbatEnds
+                    ? satTimes.shabbatEnds
+                    : null;
 
             setShabbatInfo({
-                ...newShabbatInfo,
-                erevShabbatDate: erevShabbatDate,
-                erevShabbatHebrewDate: erevShabbatHebrewDate,
-                yomShabbatDate: yomShabbatDate,
-                yomShabbatHebrewDate: yomShabbatHebrewDate,
+                ...parsed,
+
+                sundownFriday: friTimes?.sundownFriday ?? null,
+                candleTime: friTimes?.candleTime ?? null,
+
+                sundownSaturday: satTimes?.sundownSaturday ?? null,
+                shabbatEnds: satTimes?.shabbatEnds ?? null,
+
+                yomTovCandleTime: yomTovCandleTime ?? null,
+
+                erevShabbatDate,
+                erevShabbatHebrewDate,
+                yomShabbatDate,
+                yomShabbatHebrewDate,
+                todayIso,
             });
         } catch (error) {
-            console.error("Error fetching Shabbat info:", error);
+            console.error("[Shabbat] Error fetching Shabbat info:", error);
+        } finally {
+            setLoading(false);
         }
-    };
+    }, [location, timezone, havdalahTime, candleLightingTime]);
 
-    const handleRefresh = () => {
-        setRefreshing(true);
+    useEffect(() => {
         fetchShabbatInfo();
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 1000);
-    };
+    }, [fetchShabbatInfo]);
 
-    const openSettings = () => {
-        Linking.openSettings().catch(() => {
-            Alert.alert("Unable to open settings");
-        });
-    };
+    useEffect(() => {
+        const schedule = () => {
+            if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+
+            timeoutIdRef.current = setTimeout(() => {
+                fetchShabbatInfo();
+                schedule(); // reschedule next midnight
+            }, msUntilNextLocalMidnight());
+        };
+
+        schedule();
+
+        return () => {
+            if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+        };
+    }, [fetchShabbatInfo]);
+
+    const handleRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await fetchShabbatInfo();
+        setRefreshing(false);
+    }, [fetchShabbatInfo]);
+
+    const hasLocation = !!location && locationStatus === "granted";
 
     return (
         <SafeAreaView style={styles.container}>
@@ -292,21 +487,20 @@ export default function Shabbat() {
                         {shabbatInfo ? (
                             <>
                                 <Text style={styles.headerText}>This week</Text>
+
                                 <Text style={styles.mediumBoldText}>
                                     Erev Shabbat
                                 </Text>
+
                                 <View style={styles.list}>
                                     <Text style={styles.paragraphText}>
                                         Date
                                     </Text>
-                                    {shabbatInfo.erevShabbatDate &&
-                                        shabbatInfo.erevShabbatHebrewDate && (
-                                            <Text style={styles.paragraphText}>
-                                                {dateDisplay === "gregorian"
-                                                    ? shabbatInfo.erevShabbatDate
-                                                    : shabbatInfo.erevShabbatHebrewDate}
-                                            </Text>
-                                        )}
+                                    <Text style={styles.paragraphText}>
+                                        {dateDisplay === "gregorian"
+                                            ? shabbatInfo.erevShabbatDate
+                                            : shabbatInfo.erevShabbatHebrewDate}
+                                    </Text>
                                 </View>
 
                                 {shabbatInfo.candleTime && (
@@ -332,6 +526,7 @@ export default function Shabbat() {
                                 )}
 
                                 <View style={styles.spacer} />
+
                                 <Text style={styles.mediumBoldText}>
                                     Yom Shabbat
                                 </Text>
@@ -340,26 +535,12 @@ export default function Shabbat() {
                                     <Text style={styles.paragraphText}>
                                         Date
                                     </Text>
-                                    {shabbatInfo.yomShabbatDate &&
-                                        shabbatInfo.yomShabbatHebrewDate && (
-                                            <Text style={styles.paragraphText}>
-                                                {dateDisplay === "gregorian"
-                                                    ? shabbatInfo.yomShabbatDate
-                                                    : shabbatInfo.yomShabbatHebrewDate}
-                                            </Text>
-                                        )}
+                                    <Text style={styles.paragraphText}>
+                                        {dateDisplay === "gregorian"
+                                            ? shabbatInfo.yomShabbatDate
+                                            : shabbatInfo.yomShabbatHebrewDate}
+                                    </Text>
                                 </View>
-
-                                {shabbatInfo.havdalahTime && (
-                                    <View style={styles.list}>
-                                        <Text style={styles.paragraphText}>
-                                            Havdalah
-                                        </Text>
-                                        <Text style={styles.paragraphText}>
-                                            {shabbatInfo.havdalahTime}
-                                        </Text>
-                                    </View>
-                                )}
 
                                 {shabbatInfo.sundownSaturday && (
                                     <View style={styles.list}>
@@ -371,76 +552,173 @@ export default function Shabbat() {
                                         </Text>
                                     </View>
                                 )}
-                                <View style={styles.spacer} />
-                                {shabbatInfo.parshaEnglish && (
-                                    <Text style={styles.mediumBoldText}>
-                                        Parasha
-                                    </Text>
+
+                                {shabbatInfo.shabbatEnds &&
+                                    !shabbatInfo.endsIntoYomTov && (
+                                        <View style={styles.list}>
+                                            <Text style={styles.paragraphText}>
+                                                Havdalah
+                                            </Text>
+                                            <Text style={styles.paragraphText}>
+                                                {shabbatInfo.shabbatEnds}
+                                            </Text>
+                                        </View>
+                                    )}
+
+                                {shabbatInfo.endsIntoYomTov && (
+                                    <>
+                                        {shabbatInfo.yomTovCandleTime && (
+                                            <View style={styles.list}>
+                                                <Text
+                                                    style={styles.paragraphText}
+                                                >
+                                                    Yom Tov Candles
+                                                </Text>
+                                                <Text
+                                                    style={styles.paragraphText}
+                                                >
+                                                    {
+                                                        shabbatInfo.yomTovCandleTime
+                                                    }
+                                                </Text>
+                                            </View>
+                                        )}
+
+                                        <Text style={styles.noteText}>
+                                            This week Shabbat ends into Yom Tov.
+                                            Havdalah is included in Kiddush, and
+                                            the holiday Torah reading replaces
+                                            the weekly parsha.
+                                        </Text>
+                                    </>
                                 )}
-                                <View style={styles.list}>
-                                    {shabbatInfo.parshaEnglish && (
-                                        <Text style={styles.paragraphText}>
-                                            {shabbatInfo.parshaEnglish}
+
+                                <View style={styles.spacer} />
+
+                                {shabbatInfo.parshaEnglish &&
+                                    !shabbatInfo.endsIntoYomTov && (
+                                        <Text style={styles.mediumBoldText}>
+                                            Parasha
                                         </Text>
                                     )}
-                                    {shabbatInfo.parshaHebrew && (
-                                        <Text style={styles.paragraphText}>
-                                            {shabbatInfo.parshaHebrew}
-                                        </Text>
-                                    )}
-                                </View>
+
+                                {!shabbatInfo.endsIntoYomTov && (
+                                    <View style={styles.listColumn}>
+                                        {shabbatInfo.parshaEnglish && (
+                                            <Text style={styles.paragraphText}>
+                                                {shabbatInfo.parshaEnglish}
+                                            </Text>
+                                        )}
+                                        {shabbatInfo.parshaHebrew && (
+                                            <Text style={styles.paragraphText}>
+                                                {shabbatInfo.parshaHebrew}
+                                            </Text>
+                                        )}
+                                    </View>
+                                )}
                             </>
                         ) : (
                             <Text style={styles.paragraphText}>
-                                Loading Shabbat info...
+                                {loading
+                                    ? "Loading Shabbat info..."
+                                    : "No Shabbat info."}
                             </Text>
                         )}
+
                         <View style={styles.spacer} />
                         <View style={styles.spacer} />
-                        <View style={styles.spacer} />
-                        {location ? (
-                            <>
-                                <View style={styles.footerList}>
-                                    <Text style={styles.footerText}>
-                                        Elevation {""}
-                                    </Text>
-                                    <Text style={styles.footerSubText}>
-                                        {location.elevation.toFixed(1)} meters
-                                    </Text>
-                                </View>
-                                <View style={styles.footerList}>
-                                    <Text style={styles.footerText}>
-                                        Coordinates {""}
-                                    </Text>
-                                    <Text style={styles.footerSubText}>
-                                        {location.latitude.toFixed(3)},{" "}
-                                        {location.longitude.toFixed(3)}
-                                    </Text>
-                                </View>
-                                <View style={styles.footerList}>
-                                    <Text style={styles.footerWhiteSubText}>
-                                        Timezone {""}
-                                    </Text>
-                                    <Text style={styles.footerSubText}>
-                                        {timezone.replace(/_/g, " ")}
-                                    </Text>
-                                </View>
-                            </>
-                        ) : (
-                            <View style={styles.footerList}>
-                                <Text style={styles.footerText}>
-                                    For candle lighting and havdalah times,
-                                    please
+                        {!hasLocation && (
+                            <View style={styles.locationNotice}>
+                                <Text style={styles.locationNoticeTitle}>
+                                    Location is off
                                 </Text>
+                                <Text style={styles.locationNoticeBody}>
+                                    Candle lighting, sundown, and havdalah times
+                                    use your device’s location. Turn on location
+                                    services to see those times.
+                                </Text>
+
                                 <TouchableOpacity
-                                    onPress={() => Linking.openSettings()}
+                                    onPress={openSettings}
+                                    style={styles.cta}
                                 >
-                                    <Text style={styles.blueFooterText}>
-                                        enable location services.
+                                    <Text style={styles.ctaText}>
+                                        Open Settings
                                     </Text>
                                 </TouchableOpacity>
                             </View>
                         )}
+                        {hasLocation && (
+                            <View style={styles.debugRow}>
+                                <Pressable
+                                    onPress={() => setShowLocationDetails(true)}
+                                    style={styles.debugPill}
+                                >
+                                    <Text style={styles.debugPillText}>
+                                        Location
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        )}
+
+                        <Modal
+                            transparent
+                            visible={showLocationDetails}
+                            animationType="fade"
+                            onRequestClose={() => setShowLocationDetails(false)}
+                        >
+                            <Pressable
+                                style={styles.modalBackdrop}
+                                onPress={() => setShowLocationDetails(false)}
+                            >
+                                <Pressable
+                                    style={styles.modalCard}
+                                    onPress={() => {}}
+                                >
+                                    <Text style={styles.modalTitle}>
+                                        Your Location
+                                    </Text>
+
+                                    <View style={styles.modalLine}>
+                                        <Text style={styles.modalLabel}>
+                                            Timezone
+                                        </Text>
+                                        <Text style={styles.modalValue}>
+                                            {timezone.replace(/_/g, " ")}
+                                        </Text>
+                                    </View>
+
+                                    <View style={styles.modalLine}>
+                                        <Text style={styles.modalLabel}>
+                                            Coordinates
+                                        </Text>
+                                        <Text style={styles.modalValue}>
+                                            {hasLocation
+                                                ? `${location.latitude.toFixed(
+                                                      3
+                                                  )}, ${location.longitude.toFixed(
+                                                      3
+                                                  )}`
+                                                : "Unavailable"}
+                                        </Text>
+                                    </View>
+
+                                    <View style={styles.modalLine}>
+                                        <Text style={styles.modalLabel}>
+                                            Elevation
+                                        </Text>
+                                        <Text style={styles.modalValue}>
+                                            {hasLocation &&
+                                            Number.isFinite(location.elevation)
+                                                ? `${location.elevation.toFixed(
+                                                      1
+                                                  )} meters`
+                                                : "Unknown"}
+                                        </Text>
+                                    </View>
+                                </Pressable>
+                            </Pressable>
+                        </Modal>
                     </View>
                 ) : null}
             </ScrollView>
@@ -477,36 +755,134 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         marginBottom: 16,
     },
-    footerList: {
-        flexDirection: "row",
+    listColumn: {
+        flexDirection: "column",
         justifyContent: "flex-start",
-        alignItems: "flex-start",
-        flexWrap: "wrap",
+        marginBottom: 16,
     },
     paragraphText: {
         color: "white",
         fontSize: 20,
         marginBottom: 8,
     },
-    footerText: {
+    noteText: {
         color: "white",
-        fontSize: 16,
-    },
-    blueFooterText: {
-        color: "#82CBFF",
-        fontSize: 16,
-    },
-    footerSubText: {
-        color: "#82CBFF",
-        fontSize: 16,
-    },
-    footerWhiteSubText: {
-        color: "white",
-        fontSize: 16,
+        fontSize: 14,
+        marginBottom: 8,
+        opacity: 0.85,
+        lineHeight: 18,
     },
     headerText: {
         color: "white",
         fontSize: 30,
-        marginBottom: 36,
+        marginBottom: 22,
+    },
+
+    locationNotice: {
+        borderWidth: 1,
+        borderColor: "rgba(255,255,255,0.25)",
+        borderRadius: 12,
+        padding: 14,
+        marginBottom: 22,
+        backgroundColor: "black",
+    },
+    locationNoticeTitle: {
+        color: "white",
+        fontSize: 16,
+        marginBottom: 6,
+        fontWeight: "500",
+    },
+    locationNoticeBody: {
+        color: "white",
+        opacity: 0.9,
+        fontSize: 14,
+        lineHeight: 18,
+        marginBottom: 10,
+    },
+    locationNoticeSmall: {
+        color: "white",
+        opacity: 0.7,
+        fontSize: 12,
+        marginTop: 10,
+    },
+    cta: {
+        borderWidth: 0.5,
+        borderColor: "#82CBFF",
+        borderRadius: 10,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        alignSelf: "flex-start",
+    },
+    ctaText: {
+        color: "#82CBFF",
+        fontSize: 12,
+        fontWeight: "600",
+    },
+
+    debugRow: {
+        flexDirection: "row",
+        gap: 10,
+        alignItems: "center",
+    },
+    debugPill: {
+        flexDirection: "row",
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: "rgba(255,255,255,0.20)",
+        borderRadius: 999,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+    },
+    debugPillText: {
+        color: "white",
+        fontSize: 14,
+        opacity: 0.9,
+    },
+
+    modalBackdrop: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.65)",
+        justifyContent: "center",
+        padding: 18,
+    },
+    modalCard: {
+        borderWidth: 1,
+        borderColor: "rgba(130,203,255,0.35)",
+        backgroundColor: "rgba(0,0,0,0.92)",
+        borderRadius: 14,
+        padding: 16,
+    },
+    modalTitle: {
+        color: "white",
+        fontSize: 18,
+        fontWeight: "700",
+        marginBottom: 14,
+    },
+    modalLine: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 10,
+    },
+    modalLabel: {
+        color: "white",
+        opacity: 0.75,
+        fontSize: 14,
+    },
+    modalValue: {
+        color: "#82CBFF",
+        fontSize: 14,
+        maxWidth: "60%",
+        textAlign: "right",
+    },
+    modalClose: {
+        marginTop: 16,
+        alignSelf: "flex-end",
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+    },
+    modalCloseText: {
+        color: "#82CBFF",
+        fontSize: 14,
+        fontWeight: "600",
     },
 });
