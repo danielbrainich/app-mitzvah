@@ -654,7 +654,7 @@ export default function Shabbat() {
                                     style={styles.debugPill}
                                 >
                                     <Text style={styles.debugPillText}>
-                                        Location
+                                        Location Enabled
                                     </Text>
                                 </Pressable>
                             </View>

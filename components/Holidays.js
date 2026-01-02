@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
+import { getHolidayDetailsByName } from "../utils/getHolidayDetails";
 
 const MONTHS = [
     "January",
@@ -47,7 +48,7 @@ const MONTHS_SHORT = [
 ];
 
 // DEV ONLY: set to "YYYY-MM-DD" to simulate a date. Set to null for real today.
-const DEBUG_TODAY_ISO = "2026-09-26"; // e.g. "2026-09-12"
+const DEBUG_TODAY_ISO = "2026-12-10"; // e.g. "2026-09-12"
 
 function localIsoDate(date) {
     const y = date.getFullYear();
@@ -169,6 +170,28 @@ export default function Holidays() {
                 };
             });
 
+        // checks that each holiday name is matched with a descriptiojn
+        if (__DEV__) {
+            const uniqueTitles = [...new Set(formatted.map((h) => h.title))];
+
+            const missing = uniqueTitles.filter((title) => {
+                const details = getHolidayDetailsByName(title);
+                return !details?.description;
+            });
+
+            console.group(`[ONE-TIME CHECK] Holiday description coverage`);
+            console.log(`Total unique titles: ${uniqueTitles.length}`);
+
+            if (missing.length === 0) {
+                console.log("✅ All holidays have descriptions");
+            } else {
+                console.warn(`❌ Missing ${missing.length} descriptions:`);
+                missing.forEach((t) => console.warn("•", t));
+            }
+
+            console.groupEnd();
+        }
+
         if (__DEV__) {
             console.group(
                 `[Holidays] ${formatted.length} holidays starting ${todayIso} (1 Hebrew year window)`
@@ -240,25 +263,39 @@ export default function Holidays() {
                     <View style={styles.frame}>
                         <Text style={styles.headerText}>Today is</Text>
 
-                        {todayHolidays.map((holiday, index) => (
-                            <Fragment key={holiday.id}>
-                                {index > 0 && (
-                                    <Text style={styles.andText}>and</Text>
-                                )}
-                                <Text
-                                    style={
-                                        todayHolidays.length > 1
-                                            ? styles.smallBoldText
-                                            : styles.bigBoldText
-                                    }
-                                >
-                                    {removeParentheses(holiday.title)}
-                                </Text>
-                                <Text style={styles.hebrewText}>
-                                    {holiday.hebrewTitle}
-                                </Text>
-                            </Fragment>
-                        ))}
+                        {todayHolidays.map((holiday, index) => {
+                            const details = getHolidayDetailsByName(
+                                holiday.title
+                            );
+
+                            return (
+                                <Fragment key={holiday.id}>
+                                    {index > 0 && (
+                                        <Text style={styles.andText}>and</Text>
+                                    )}
+
+                                    <Text
+                                        style={
+                                            todayHolidays.length > 1
+                                                ? styles.smallBoldText
+                                                : styles.bigBoldText
+                                        }
+                                    >
+                                        {removeParentheses(holiday.title)}
+                                    </Text>
+
+                                    <Text style={styles.hebrewText}>
+                                        {holiday.hebrewTitle}
+                                    </Text>
+
+                                    {!!details?.description && (
+                                        <Text style={styles.descriptionText}>
+                                            {details.description}
+                                        </Text>
+                                    )}
+                                </Fragment>
+                            );
+                        })}
 
                         <Text style={styles.dateText}>
                             {dateDisplay === "gregorian"
@@ -381,5 +418,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginTop: 6,
         fontWeight: "bold",
+    },
+    descriptionText: {
+        color: "white",
+        opacity: 0.85,
+        fontSize: 14,
+        lineHeight: 18,
+        marginTop: 10,
     },
 });
