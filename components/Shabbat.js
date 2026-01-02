@@ -626,7 +626,6 @@ export default function Shabbat() {
                         )}
 
                         <View style={styles.spacer} />
-                        <View style={styles.spacer} />
                         {!hasLocation && (
                             <View style={styles.locationNotice}>
                                 <Text style={styles.locationNoticeTitle}>

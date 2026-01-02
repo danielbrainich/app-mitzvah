@@ -47,7 +47,7 @@ const MONTHS_SHORT = [
 ];
 
 // DEV ONLY: set to "YYYY-MM-DD" to simulate a date. Set to null for real today.
-const DEBUG_TODAY_ISO = null; // e.g. "2026-09-12"
+const DEBUG_TODAY_ISO = "2026-09-26"; // e.g. "2026-09-12"
 
 function localIsoDate(date) {
     const y = date.getFullYear();

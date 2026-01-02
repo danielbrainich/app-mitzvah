@@ -241,8 +241,8 @@ export default function Settings() {
                                 </View>
                             </>
                         ) : (
-                            <Text style={[styles.tinyText, styles.rightMargin]}>
-                                Default is 18 min. before sundown
+                            <Text style={[styles.settingsSubText, styles.rightMargin]}>
+                                Default is 18 minutes before sundown
                             </Text>
                         )}
                         <View style={styles.optionContainer}>
@@ -274,9 +274,8 @@ export default function Settings() {
                                 </View>
                             </>
                         ) : (
-                            <Text style={[styles.tinyText, styles.rightMargin]}>
-                                Default is when the sun is 8.5 degrees below the
-                                horizon
+                            <Text style={[styles.settingsSubText, styles.rightMargin]}>
+                                Default is 42 minutes after sundown
                             </Text>
                         )}
                     </View>
@@ -329,9 +328,9 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginBottom: 12,
     },
-    tinyText: {
-        color: "#82CBFF",
-        fontSize: 16,
+    settingsSubText: {
+        color: "rgba(255,255,255,0.72)",
+        fontSize: 14,
         marginBottom: 22,
     },
     radioHeaderText: {
