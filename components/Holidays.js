@@ -17,6 +17,10 @@ import {
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 import { getHolidayDetailsByName } from "../utils/getHolidayDetails";
+import HolidayPager from "../components/HolidayPager";
+import TodayHolidayCard from "../components/TodayHolidayCard";
+import UpcomingHolidayCard from "../components/UpcomingHolidayCard";
+import UpcomingHolidaysCarousel from "./UpcomingHolidaysCarousel";
 
 const MONTHS = [
     "January",
@@ -118,7 +122,6 @@ export default function Holidays() {
 
     const [holidays, setHolidays] = useState([]);
     const [todayHolidays, setTodayHolidays] = useState([]);
-    const [displayCount, setDisplayCount] = useState(4);
     const [refreshing, setRefreshing] = useState(false);
 
     const timeoutIdRef = useRef(null);
@@ -235,7 +238,6 @@ export default function Holidays() {
 
     const handleRefresh = useCallback(() => {
         setRefreshing(true);
-        setDisplayCount(4);
         fetchHolidays();
         setTimeout(() => setRefreshing(false), 400);
     }, [fetchHolidays]);
@@ -245,8 +247,6 @@ export default function Holidays() {
         () => holidays.filter((h) => h.date > todayIso),
         [holidays, todayIso]
     );
-
-    const showMore = () => setDisplayCount((n) => n + 4);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -263,39 +263,13 @@ export default function Holidays() {
                     <View style={styles.frame}>
                         <Text style={styles.headerText}>Today is</Text>
 
-                        {todayHolidays.map((holiday, index) => {
-                            const details = getHolidayDetailsByName(
-                                holiday.title
-                            );
-
-                            return (
-                                <Fragment key={holiday.id}>
-                                    {index > 0 && (
-                                        <Text style={styles.andText}>and</Text>
-                                    )}
-
-                                    <Text
-                                        style={
-                                            todayHolidays.length > 1
-                                                ? styles.smallBoldText
-                                                : styles.bigBoldText
-                                        }
-                                    >
-                                        {removeParentheses(holiday.title)}
-                                    </Text>
-
-                                    <Text style={styles.hebrewText}>
-                                        {holiday.hebrewTitle}
-                                    </Text>
-
-                                    {!!details?.description && (
-                                        <Text style={styles.descriptionText}>
-                                            {details.description}
-                                        </Text>
-                                    )}
-                                </Fragment>
-                            );
-                        })}
+                        <HolidayPager
+                            data={todayHolidays}
+                            dateDisplay={dateDisplay}
+                            height={300}
+                            peek={0}
+                            CardComponent={TodayHolidayCard}
+                        />
 
                         <Text style={styles.dateText}>
                             {dateDisplay === "gregorian"
@@ -319,28 +293,12 @@ export default function Holidays() {
 
                 <View style={styles.frame}>
                     <Text style={styles.secondHeaderText}>Coming up</Text>
-
-                    {upcoming.slice(0, displayCount).map((holiday) => (
-                        <View key={holiday.id}>
-                            <View style={styles.list}>
-                                <Text style={styles.listText}>
-                                    {removeParentheses(holiday.title)}
-                                </Text>
-                                <Text style={styles.listText}>
-                                    {dateDisplay === "gregorian"
-                                        ? formatShortDate(holiday.date)
-                                        : holiday.hebrewDate}
-                                </Text>
-                            </View>
-                            <View style={styles.blueLine} />
-                        </View>
-                    ))}
-
-                    {displayCount < upcoming.length && (
-                        <Text style={styles.showMoreText} onPress={showMore}>
-                            Show More
-                        </Text>
-                    )}
+                    <UpcomingHolidaysCarousel
+                        holidays={upcoming}
+                        dateDisplay={dateDisplay}
+                        height={200}
+                        peek={50}
+                    />
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -353,17 +311,6 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
         justifyContent: "flex-start",
         backgroundColor: "black",
-    },
-    list: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 16,
-    },
-    blueLine: {
-        height: 1,
-        backgroundColor: "#82CBFF",
-        marginTop: 2,
-        marginBottom: 18,
     },
     scrollViewContent: {
         flex: 1,
@@ -379,9 +326,9 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     secondHeaderText: {
-        color: "#82CBFF",
-        fontSize: 24,
-        marginBottom: 30,
+        color: "white",
+        fontSize: 20,
+        marginBottom: 18,
     },
     bigBoldText: {
         color: "#82CBFF",
@@ -389,7 +336,7 @@ const styles = StyleSheet.create({
         fontSize: 72,
     },
     smallBoldText: {
-        color: "#82CBFF",
+        color: "white",
         fontFamily: "Nayuki",
         fontSize: 48,
         marginVertical: 4,
@@ -408,16 +355,6 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 22,
         marginBottom: 16,
-    },
-    listText: {
-        color: "white",
-        fontSize: 16,
-    },
-    showMoreText: {
-        color: "#82CBFF",
-        fontSize: 16,
-        marginTop: 6,
-        fontWeight: "bold",
     },
     descriptionText: {
         color: "white",

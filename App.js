@@ -1,3 +1,5 @@
+import 'react-native-gesture-handler';
+import 'react-native-reanimated';
 import React, { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
