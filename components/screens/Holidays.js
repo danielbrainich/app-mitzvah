@@ -264,20 +264,16 @@ export default function Holidays() {
                 {todayHolidays.length > 0 ? (
                     <View style={styles.todaySection}>
                         <Text style={styles.headerText}>Today is</Text>
-
                         <HolidayPager
                             data={todayHolidays}
                             dateDisplay={dateDisplay}
                             height={340}
                             peek={0} // <-- no peeking for Today
-                            showDots={todayHolidays.length > 1} // <-- dots only if multiple
+                            showDots
                             CardComponent={TodayHolidayCard}
+                            todayIso={todayIso}
+                            formatDate={formatDate}
                         />
-                        <Text style={styles.todayFooterDate}>
-                            {dateDisplay === "gregorian"
-                                ? formatDate(todayIso)
-                                : new HDate().toString()}
-                        </Text>
                     </View>
                 ) : (
                     <View style={styles.frame}>

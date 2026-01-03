@@ -9,6 +9,7 @@ export default function HolidayPager({
     peek = 0,
     CardComponent,
     showDots = false, // only show dots if true AND data.length > 1
+    ...cardProps
 }) {
     const { width } = useWindowDimensions();
     const [page, setPage] = useState(0);
@@ -33,16 +34,16 @@ export default function HolidayPager({
                 {data.map((holiday) => (
                     <View
                         key={holiday.id}
-                        // IMPORTANT: left align + consistent padding
                         style={[
                             styles.page,
-                            { paddingLeft: peek, paddingRight: peek },
+                            { paddingLeft: peek, paddingRight: 0 },
                         ]}
                     >
                         <CardComponent
                             holiday={holiday}
                             dateDisplay={dateDisplay}
                             cardWidth={cardWidth}
+                            {...cardProps}
                         />
                     </View>
                 ))}
@@ -69,7 +70,7 @@ export default function HolidayPager({
 }
 
 const styles = StyleSheet.create({
-    wrapper: { width: "100%" },
+    wrapper: { width: "100%", paddingBottom: 16 },
     pager: { flex: 1 },
 
     // Left align instead of centered

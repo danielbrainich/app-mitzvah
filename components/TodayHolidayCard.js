@@ -1,13 +1,25 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, StyleSheet, Pressable, Modal } from "react-native";
 import { getHolidayDetailsByName } from "../utils/getHolidayDetails";
+import { HDate } from "@hebcal/core";
 
 function removeParentheses(text) {
     return (text || "").replace(/\s*\([^)]*\)/g, "");
 }
 
-export default function TodayHolidayCard({ holiday, cardWidth }) {
+export default function TodayHolidayCard({
+    holiday,
+    dateDisplay,
+    cardWidth,
+    todayIso,
+    formatDate,
+}) {
     const [open, setOpen] = useState(false);
+
+    const todayLabel =
+        dateDisplay === "gregorian"
+            ? formatDate(todayIso)
+            : new HDate().toString();
 
     const details = useMemo(
         () => getHolidayDetailsByName(holiday?.title),
@@ -19,6 +31,7 @@ export default function TodayHolidayCard({ holiday, cardWidth }) {
 
     return (
         <View style={[styles.wrap, cardWidth ? { width: cardWidth } : null]}>
+            <Text style={styles.todayDate}>{todayLabel}</Text>
             <View style={styles.titleRow}>
                 <Text style={styles.title}>{title}</Text>
             </View>
@@ -146,5 +159,10 @@ const styles = StyleSheet.create({
         color: "#82CBFF",
         fontSize: 14,
         fontWeight: "600",
+    },
+    todayDate: {
+        color: "rgba(255,255,255,0.9)",
+        fontSize: 16,
+        marginBottom: 10,
     },
 });

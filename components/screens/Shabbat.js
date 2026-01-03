@@ -28,8 +28,10 @@ import { useSelector } from "react-redux";
 import InfoModal from "../InfoModal";
 
 // Dev-only override for testing specific dates.
-// Example: set TEST_TODAY_ISO = "2026-09-26" to simulate that local day.
-const TEST_TODAY_ISO = __DEV__ ? null : null; // set to null when done
+// Examples:
+//   • Normal Shabbat (with Havdalah): 2026-09-18
+//   • Shabbat → Yom Tov (no Havdalah): 2026-09-25  // Erev Sukkot
+const TEST_TODAY_ISO = __DEV__ ? "2026-09-25" : null; // set to null when done
 
 function addMinutes(date, mins) {
     const d = new Date(date);
@@ -266,7 +268,7 @@ function getShabbatInfo(events, friday, saturday) {
 
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
-        Nayuki: require("../../assets/fonts/NayukiRegular.otf")
+        Nayuki: require("../../assets/fonts/NayukiRegular.otf"),
     });
 
     const [location, setLocation] = useState(null);
@@ -489,104 +491,100 @@ export default function Shabbat() {
                             <>
                                 <Text style={styles.headerText}>This week</Text>
 
+                                {/* Erev Shabbat */}
                                 <Text style={styles.mediumBoldText}>
                                     Erev Shabbat
                                 </Text>
 
-                                <View style={styles.list}>
-                                    <Text style={styles.paragraphText}>
-                                        Date
-                                    </Text>
-                                    <Text style={styles.paragraphText}>
+                                <Text style={styles.sentence}>
+                                    Erev Shabbat is{" "}
+                                    <Text style={styles.highlight}>
                                         {dateDisplay === "gregorian"
                                             ? shabbatInfo.erevShabbatDate
                                             : shabbatInfo.erevShabbatHebrewDate}
                                     </Text>
-                                </View>
+                                    .
+                                </Text>
 
                                 {shabbatInfo.candleTime && (
-                                    <View style={styles.list}>
-                                        <Text style={styles.paragraphText}>
-                                            Candle Lighting
-                                        </Text>
-                                        <Text style={styles.paragraphText}>
+                                    <Text style={styles.sentence}>
+                                        Candle lighting is at{" "}
+                                        <Text style={styles.highlight}>
                                             {shabbatInfo.candleTime}
                                         </Text>
-                                    </View>
+                                        .
+                                    </Text>
                                 )}
 
                                 {shabbatInfo.sundownFriday && (
-                                    <View style={styles.list}>
-                                        <Text style={styles.paragraphText}>
-                                            Sundown
-                                        </Text>
-                                        <Text style={styles.paragraphText}>
+                                    <Text style={styles.sentence}>
+                                        Sundown is{" "}
+                                        <Text style={styles.highlight}>
                                             {shabbatInfo.sundownFriday}
                                         </Text>
-                                    </View>
+                                        .
+                                    </Text>
                                 )}
 
                                 <View style={styles.spacer} />
 
+                                {/* Yom Shabbat */}
                                 <Text style={styles.mediumBoldText}>
                                     Yom Shabbat
                                 </Text>
 
-                                <View style={styles.list}>
-                                    <Text style={styles.paragraphText}>
-                                        Date
-                                    </Text>
-                                    <Text style={styles.paragraphText}>
+                                <Text style={styles.sentence}>
+                                    Yom Shabbat is{" "}
+                                    <Text style={styles.highlight}>
                                         {dateDisplay === "gregorian"
                                             ? shabbatInfo.yomShabbatDate
                                             : shabbatInfo.yomShabbatHebrewDate}
                                     </Text>
-                                </View>
+                                    .
+                                </Text>
 
                                 {shabbatInfo.sundownSaturday && (
-                                    <View style={styles.list}>
-                                        <Text style={styles.paragraphText}>
-                                            Sundown
-                                        </Text>
-                                        <Text style={styles.paragraphText}>
+                                    <Text style={styles.sentence}>
+                                        Sundown is{" "}
+                                        <Text style={styles.highlight}>
                                             {shabbatInfo.sundownSaturday}
                                         </Text>
-                                    </View>
+                                        .
+                                    </Text>
                                 )}
 
                                 {shabbatInfo.shabbatEnds &&
                                     !shabbatInfo.endsIntoYomTov && (
-                                        <View style={styles.list}>
-                                            <Text style={styles.paragraphText}>
-                                                Havdalah
-                                            </Text>
-                                            <Text style={styles.paragraphText}>
+                                        <Text style={styles.sentence}>
+                                            Havdalah is{" "}
+                                            <Text style={styles.highlight}>
                                                 {shabbatInfo.shabbatEnds}
                                             </Text>
-                                        </View>
+                                            .
+                                        </Text>
                                     )}
 
                                 {shabbatInfo.endsIntoYomTov && (
                                     <>
                                         {shabbatInfo.yomTovCandleTime && (
-                                            <View style={styles.list}>
-                                                <Text
-                                                    style={styles.paragraphText}
-                                                >
-                                                    Yom Tov Candles
-                                                </Text>
-                                                <Text
-                                                    style={styles.paragraphText}
-                                                >
+                                            <Text style={styles.sentence}>
+                                                Shabbat ends into Yom Tov. Light
+                                                candles at{" "}
+                                                <Text style={styles.highlight}>
                                                     {
                                                         shabbatInfo.yomTovCandleTime
                                                     }
                                                 </Text>
-                                            </View>
+                                                .
+                                            </Text>
                                         )}
 
-                                        <Text style={styles.noteText}>
-                                            This week Shabbat ends into Yom Tov.
+                                        <Text
+                                            style={[
+                                                styles.sentence,
+                                                styles.muted,
+                                            ]}
+                                        >
                                             Havdalah is included in Kiddush, and
                                             the holiday Torah reading replaces
                                             the weekly parsha.
@@ -594,29 +592,41 @@ export default function Shabbat() {
                                     </>
                                 )}
 
-                                <View style={styles.spacer} />
-
+                                {/* Parasha (only if not ending into Yom Tov) */}
                                 {shabbatInfo.parshaEnglish &&
                                     !shabbatInfo.endsIntoYomTov && (
-                                        <Text style={styles.mediumBoldText}>
-                                            Parasha
-                                        </Text>
-                                    )}
+                                        <>
+                                            <View style={styles.spacer} />
 
-                                {!shabbatInfo.endsIntoYomTov && (
-                                    <View style={styles.listColumn}>
-                                        {shabbatInfo.parshaEnglish && (
-                                            <Text style={styles.paragraphText}>
-                                                {shabbatInfo.parshaEnglish}
+                                            <Text style={styles.mediumBoldText}>
+                                                Parasha
                                             </Text>
-                                        )}
-                                        {shabbatInfo.parshaHebrew && (
-                                            <Text style={styles.paragraphText}>
-                                                {shabbatInfo.parshaHebrew}
+
+                                            <Text style={styles.sentence}>
+                                                This week is{" "}
+                                                <Text style={styles.highlight}>
+                                                    {shabbatInfo.parshaEnglish}
+                                                </Text>
+                                                {shabbatInfo.parshaHebrew ? (
+                                                    <>
+                                                        {" "}
+                                                        (
+                                                        <Text
+                                                            style={
+                                                                styles.highlight
+                                                            }
+                                                        >
+                                                            {
+                                                                shabbatInfo.parshaHebrew
+                                                            }
+                                                        </Text>
+                                                        )
+                                                    </>
+                                                ) : null}
+                                                .
                                             </Text>
-                                        )}
-                                    </View>
-                                )}
+                                        </>
+                                    )}
                             </>
                         ) : (
                             <Text style={styles.paragraphText}>
@@ -627,6 +637,8 @@ export default function Shabbat() {
                         )}
 
                         <View style={styles.spacer} />
+
+                        {/* Location notice / pill */}
                         {!hasLocation && (
                             <View style={styles.locationNotice}>
                                 <Text style={styles.locationNoticeTitle}>
@@ -648,6 +660,7 @@ export default function Shabbat() {
                                 </TouchableOpacity>
                             </View>
                         )}
+
                         {hasLocation && (
                             <View style={styles.debugRow}>
                                 <Pressable
@@ -661,6 +674,7 @@ export default function Shabbat() {
                             </View>
                         )}
 
+                        {/* Location modal */}
                         <InfoModal
                             visible={showLocationDetails}
                             onClose={() => setShowLocationDetails(false)}
@@ -863,5 +877,18 @@ const styles = StyleSheet.create({
         color: "#82CBFF",
         fontSize: 14,
         fontWeight: "600",
+    },
+    sentence: {
+        color: "rgba(255,255,255,0.92)",
+        fontSize: 18,
+        lineHeight: 26,
+        marginBottom: 10,
+    },
+    highlight: {
+        color: "#82CBFF",
+        fontWeight: "600",
+    },
+    muted: {
+        color: "rgba(255,255,255,0.75)",
     },
 });
