@@ -16,11 +16,10 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
-import { getHolidayDetailsByName } from "../utils/getHolidayDetails";
-import HolidayPager from "../components/HolidayPager";
-import TodayHolidayCard from "../components/TodayHolidayCard";
-import UpcomingHolidayCard from "../components/UpcomingHolidayCard";
-import UpcomingHolidaysCarousel from "./UpcomingHolidaysCarousel";
+import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
+import HolidayPager from "../HolidayPager";
+import TodayHolidayCard from "../TodayHolidayCard";
+import UpcomingHolidaysCarousel from "../UpcomingHolidaysCarousel";
 
 const MONTHS = [
     "January",
@@ -52,7 +51,10 @@ const MONTHS_SHORT = [
 ];
 
 // DEV ONLY: set to "YYYY-MM-DD" to simulate a date. Set to null for real today.
-const DEBUG_TODAY_ISO = "2026-12-10"; // e.g. "2026-09-12"
+//   • 1 holiday day: "2026-09-12"
+//   • 2 holidays day: "2026-03-02"
+//   • 3 holidays day: "2026-12-10"
+const DEBUG_TODAY_ISO = __DEV__ ? "2026-12-10" : null;
 
 function localIsoDate(date) {
     const y = date.getFullYear();
@@ -260,18 +262,18 @@ export default function Holidays() {
                 }
             >
                 {todayHolidays.length > 0 ? (
-                    <View style={styles.frame}>
+                    <View style={styles.todaySection}>
                         <Text style={styles.headerText}>Today is</Text>
 
                         <HolidayPager
                             data={todayHolidays}
                             dateDisplay={dateDisplay}
-                            height={300}
-                            peek={0}
+                            height={340}
+                            peek={0} // <-- no peeking for Today
+                            showDots={todayHolidays.length > 1} // <-- dots only if multiple
                             CardComponent={TodayHolidayCard}
                         />
-
-                        <Text style={styles.dateText}>
+                        <Text style={styles.todayFooterDate}>
                             {dateDisplay === "gregorian"
                                 ? formatDate(todayIso)
                                 : new HDate().toString()}
@@ -318,7 +320,7 @@ const styles = StyleSheet.create({
     },
     frame: {
         padding: 20,
-        paddingTop: 40,
+        paddingTop: 66,
     },
     headerText: {
         color: "white",
@@ -333,7 +335,7 @@ const styles = StyleSheet.create({
     bigBoldText: {
         color: "#82CBFF",
         fontFamily: "Nayuki",
-        fontSize: 72,
+        fontSize: 86,
     },
     smallBoldText: {
         color: "white",
@@ -355,6 +357,7 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 22,
         marginBottom: 16,
+        marginTop: 12,
     },
     descriptionText: {
         color: "white",
@@ -362,5 +365,21 @@ const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 18,
         marginTop: 10,
+    },
+    todaySection: {
+        paddingHorizontal: 20,
+        paddingTop: 66,
+        paddingBottom: 24,
+      },
+    todayHeader: {
+        color: "white",
+        fontSize: 32,
+        marginBottom: 14,
+    },
+
+    todayFooterDate: {
+        color: "rgba(255,255,255,0.9)",
+        fontSize: 18,
+        marginTop: 14,
     },
 });

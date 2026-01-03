@@ -5,8 +5,8 @@ import UpcomingHolidayCard from "./UpcomingHolidayCard";
 export default function UpcomingHolidaysCarousel({
     holidays = [],
     dateDisplay,
-    peek = 24, // how much of next card shows
-    gap = 16, // space between cards
+    peek = 24,
+    gap = 16,
     height = 200,
 }) {
     const { width } = useWindowDimensions();
@@ -34,7 +34,7 @@ export default function UpcomingHolidaysCarousel({
                 disableIntervalMomentum
                 contentContainerStyle={{
                     paddingLeft: 0, // left align more
-                    paddingRight: peek, // breathing room at the end
+                    paddingRight: peek, // space at the the end
                 }}
                 ItemSeparatorComponent={() => <View style={{ width: gap }} />}
                 renderItem={({ item }) => (

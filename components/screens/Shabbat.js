@@ -25,6 +25,7 @@ import {
 import { useFonts } from "expo-font";
 import * as ExpoLocation from "expo-location";
 import { useSelector } from "react-redux";
+import InfoModal from "../InfoModal";
 
 // Dev-only override for testing specific dates.
 // Example: set TEST_TODAY_ISO = "2026-09-26" to simulate that local day.
@@ -265,7 +266,7 @@ function getShabbatInfo(events, friday, saturday) {
 
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
-        Nayuki: require("../assets/fonts/NayukiRegular.otf"),
+        Nayuki: require("../../assets/fonts/NayukiRegular.otf")
     });
 
     const [location, setLocation] = useState(null);
@@ -660,64 +661,43 @@ export default function Shabbat() {
                             </View>
                         )}
 
-                        <Modal
-                            transparent
+                        <InfoModal
                             visible={showLocationDetails}
-                            animationType="fade"
-                            onRequestClose={() => setShowLocationDetails(false)}
+                            onClose={() => setShowLocationDetails(false)}
+                            title="Your Location"
                         >
-                            <Pressable
-                                style={styles.modalBackdrop}
-                                onPress={() => setShowLocationDetails(false)}
-                            >
-                                <Pressable
-                                    style={styles.modalCard}
-                                    onPress={() => {}}
-                                >
-                                    <Text style={styles.modalTitle}>
-                                        Your Location
-                                    </Text>
+                            <View style={styles.modalLine}>
+                                <Text style={styles.modalLabel}>Timezone</Text>
+                                <Text style={styles.modalValue}>
+                                    {timezone.replace(/_/g, " ")}
+                                </Text>
+                            </View>
 
-                                    <View style={styles.modalLine}>
-                                        <Text style={styles.modalLabel}>
-                                            Timezone
-                                        </Text>
-                                        <Text style={styles.modalValue}>
-                                            {timezone.replace(/_/g, " ")}
-                                        </Text>
-                                    </View>
+                            <View style={styles.modalLine}>
+                                <Text style={styles.modalLabel}>
+                                    Coordinates
+                                </Text>
+                                <Text style={styles.modalValue}>
+                                    {hasLocation
+                                        ? `${location.latitude.toFixed(
+                                              3
+                                          )}, ${location.longitude.toFixed(3)}`
+                                        : "Unavailable"}
+                                </Text>
+                            </View>
 
-                                    <View style={styles.modalLine}>
-                                        <Text style={styles.modalLabel}>
-                                            Coordinates
-                                        </Text>
-                                        <Text style={styles.modalValue}>
-                                            {hasLocation
-                                                ? `${location.latitude.toFixed(
-                                                      3
-                                                  )}, ${location.longitude.toFixed(
-                                                      3
-                                                  )}`
-                                                : "Unavailable"}
-                                        </Text>
-                                    </View>
-
-                                    <View style={styles.modalLine}>
-                                        <Text style={styles.modalLabel}>
-                                            Elevation
-                                        </Text>
-                                        <Text style={styles.modalValue}>
-                                            {hasLocation &&
-                                            Number.isFinite(location.elevation)
-                                                ? `${location.elevation.toFixed(
-                                                      1
-                                                  )} meters`
-                                                : "Unknown"}
-                                        </Text>
-                                    </View>
-                                </Pressable>
-                            </Pressable>
-                        </Modal>
+                            <View style={styles.modalLine}>
+                                <Text style={styles.modalLabel}>Elevation</Text>
+                                <Text style={styles.modalValue}>
+                                    {hasLocation &&
+                                    Number.isFinite(location.elevation)
+                                        ? `${location.elevation.toFixed(
+                                              1
+                                          )} meters`
+                                        : "Unknown"}
+                                </Text>
+                            </View>
+                        </InfoModal>
                     </View>
                 ) : null}
             </ScrollView>

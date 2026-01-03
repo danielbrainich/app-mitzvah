@@ -7,7 +7,7 @@ import {
     Switch,
     ScrollView,
 } from "react-native";
-import Stepper from "./Stepper";
+import Stepper from "../Stepper";
 import { RadioButton } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
 import React, { useState, useEffect } from "react";
@@ -20,10 +20,11 @@ import {
     setHavdalahTime,
     setCandleLightingToggle,
     setHavdalahTimeToggle,
-} from "../store/actions";
+} from "../../store/actions";
+import InfoFooter from "../InfoFooter";
 export default function Settings() {
     const [fontsLoaded] = useFonts({
-        Nayuki: require("../assets/fonts/NayukiRegular.otf"),
+        Nayuki: require("../../assets/fonts/NayukiRegular.otf"),
     });
 
     const {
@@ -127,7 +128,7 @@ export default function Settings() {
             <ScrollView>
                 {fontsLoaded ? (
                     <View style={styles.frame}>
-                        <Text style={styles.radioHeaderText}>Date Format</Text>
+                        <Text style={styles.headerText}>Date Format</Text>
                         <View style={styles.radioContainer}>
                             <RadioButton
                                 color="#82CBFF"
@@ -141,7 +142,7 @@ export default function Settings() {
                                     handleDateDisplayChange("gregorian")
                                 }
                             />
-                            <Text style={styles.radioText}>Gregorian</Text>
+                            <Text style={styles.smallText}>Gregorian</Text>
                         </View>
                         <View style={styles.radioContainer}>
                             <RadioButton
@@ -156,7 +157,7 @@ export default function Settings() {
                                     handleDateDisplayChange("hebrew")
                                 }
                             />
-                            <Text style={styles.radioText}>Hebrew</Text>
+                            <Text style={styles.smallText}>Hebrew</Text>
                         </View>
                         <Text style={styles.headerText}>Holiday Options</Text>
                         <View style={styles.optionContainer}>
@@ -241,7 +242,12 @@ export default function Settings() {
                                 </View>
                             </>
                         ) : (
-                            <Text style={[styles.settingsSubText, styles.rightMargin]}>
+                            <Text
+                                style={[
+                                    styles.settingsSubText,
+                                    styles.rightMargin,
+                                ]}
+                            >
                                 Default is 18 minutes before sundown
                             </Text>
                         )}
@@ -274,10 +280,16 @@ export default function Settings() {
                                 </View>
                             </>
                         ) : (
-                            <Text style={[styles.settingsSubText, styles.rightMargin]}>
+                            <Text
+                                style={[
+                                    styles.settingsSubText,
+                                    styles.rightMargin,
+                                ]}
+                            >
                                 Default is 42 minutes after sundown
                             </Text>
                         )}
+                        <InfoFooter />
                     </View>
                 ) : null}
             </ScrollView>
@@ -315,13 +327,13 @@ const styles = StyleSheet.create({
     },
     headerText: {
         color: "#82CBFF",
-        fontSize: 30,
-        marginBottom: 22,
+        fontSize: 22,
+        marginBottom: 12,
     },
     smallText: {
         color: "white",
-        fontSize: 20,
-        marginBottom: 22,
+        fontSize: 18,
+        marginBottom: 18,
     },
     smallTopText: {
         color: "white",
@@ -333,24 +345,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginBottom: 22,
     },
-    radioHeaderText: {
-        color: "#82CBFF",
-        fontSize: 30,
-        marginBottom: 16,
-    },
-    radioText: {
-        color: "white",
-        fontSize: 20,
-        marginLeft: 6,
-        marginTop: 6,
-        marginBottom: 22,
-    },
-    lastRadioText: {
-        color: "white",
-        fontSize: 20,
-        marginLeft: 6,
-        marginBottom: 22,
-    },
+
     flexBox: {
         flexDirection: "row",
         justifyContent: "start",
