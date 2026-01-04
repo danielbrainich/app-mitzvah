@@ -4,13 +4,10 @@ import {
     Text,
     StyleSheet,
     SafeAreaView,
-    ScrollView,
-    RefreshControl,
     Linking,
     TouchableOpacity,
     AppState,
     Alert,
-    Modal,
     Pressable,
 } from "react-native";
 import {
@@ -21,6 +18,7 @@ import {
     HavdalahEvent,
     HDate,
     Zmanim,
+    Event, // needed to detect holidays on Shabbat even when location is off
 } from "@hebcal/core";
 import { useFonts } from "expo-font";
 import * as ExpoLocation from "expo-location";
@@ -31,7 +29,7 @@ import BottomSheetDrawer from "../BottomSheetDrawer";
 // Examples:
 //   • Normal Shabbat (with Havdalah): "2026-09-18"
 //   • Shabbat → Yom Tov (no Havdalah): "2026-09-25"  // Erev Sukkot
-const TEST_TODAY_ISO = __DEV__ ? null : null; // set to null when done
+const TEST_TODAY_ISO = __DEV__ ? "2026-09-25" : null; // set to null when done
 
 function addMinutes(date, mins) {
     const d = new Date(date);
@@ -193,6 +191,9 @@ function getShabbatInfo(events, friday, saturday) {
     const shabbatInfo = {
         endsIntoYomTov: false,
         yomTovCandleTime: null,
+
+        // lets us show "Note" even when location is OFF and Hebcal omits ParshaEvent
+        parshaReplacedByHoliday: false,
     };
 
     // Dev-only, structured logging
@@ -217,6 +218,9 @@ function getShabbatInfo(events, friday, saturday) {
 
     const fridayCandleEvents = [];
     const saturdayCandleEvents = [];
+
+    // track “holiday on Shabbat day” events (does not require location)
+    let foundHolidayOnSaturday = false;
 
     for (const event of events || []) {
         if (event instanceof CandleLightingEvent) {
@@ -247,10 +251,34 @@ function getShabbatInfo(events, friday, saturday) {
             shabbatInfo.parshaHDate = event.date ? event.date.toString() : null;
             continue;
         }
+
+        // detect a holiday/CH"M event that falls on the Saturday date
+        // This is the key fix for "location off" + "no parsha" weeks.
+        if (!foundHolidayOnSaturday && event instanceof Event) {
+            const d =
+                typeof event.getDate === "function" ? event.getDate() : null;
+            const g = d && typeof d.greg === "function" ? d.greg() : null;
+
+            if (g instanceof Date && isSameLocalDate(g, saturday)) {
+                const cats =
+                    typeof event.getCategories === "function"
+                        ? event.getCategories()
+                        : [];
+
+                // Heuristic: treat major + chol_hamoed as “parsha replaced”
+                if (cats.includes("major") || cats.includes("chol_hamoed")) {
+                    foundHolidayOnSaturday = true;
+                }
+            }
+        }
     }
 
     // If we have a Saturday candle lighting, Shabbat is ending into Yom Tov.
     shabbatInfo.endsIntoYomTov = saturdayCandleEvents.length > 0;
+
+    // if no parsha event and we detected a holiday on Shabbat day, treat it like a "Note" week
+    shabbatInfo.parshaReplacedByHoliday =
+        !shabbatInfo.parshaEnglish && foundHolidayOnSaturday;
 
     // Choose Friday candle lighting (for descriptive text + Hebrew date only)
     const chosenFridayCandle =
@@ -576,16 +604,17 @@ export default function Shabbat() {
 
                                 {/* Parasha card */}
                                 <View style={styles.card}>
-                                    {shabbatInfo.endsIntoYomTov ? (
+                                    {shabbatInfo.endsIntoYomTov ||
+                                    shabbatInfo.parshaReplacedByHoliday ? (
                                         <>
                                             <Text style={styles.cardTitle}>
                                                 Note
                                             </Text>
                                             <Text style={[styles.sentence]}>
-                                                Yom Tov candle
-                                                lighting replaces Havdalah and
-                                                Yom Tov Torah reading replaces
-                                                Parasha this week
+                                                Yom Tov candle lighting replaces
+                                                Havdalah and Yom Tov Torah
+                                                reading replaces Parasha this
+                                                week
                                             </Text>
                                         </>
                                     ) : shabbatInfo.parshaEnglish ? (
@@ -594,20 +623,12 @@ export default function Shabbat() {
                                                 Parasha
                                             </Text>
                                             <Text style={styles.sentence}>
-                                                <Text style={styles.sentence}>
-                                                    {shabbatInfo.parshaEnglish}
-                                                </Text>
+                                                {shabbatInfo.parshaEnglish}
                                             </Text>
 
                                             {shabbatInfo.parshaHebrew ? (
                                                 <Text style={styles.sentence}>
-                                                    <Text
-                                                        style={styles.sentence}
-                                                    >
-                                                        {
-                                                            shabbatInfo.parshaHebrew
-                                                        }
-                                                    </Text>
+                                                    {shabbatInfo.parshaHebrew}
                                                 </Text>
                                             ) : null}
                                         </>
@@ -634,42 +655,6 @@ export default function Shabbat() {
                         )}
 
                         {/* Footer area: Location notice / pill */}
-                        <View style={styles.footer}>
-                            {!hasLocation ? (
-                                <View style={styles.locationNotice}>
-                                    <Text style={styles.locationNoticeTitle}>
-                                        Location is off
-                                    </Text>
-                                    <Text style={styles.locationNoticeBody}>
-                                        Candle lighting, sundown, and havdalah
-                                        times use your device’s location. Turn
-                                        on location services to see those times
-                                    </Text>
-
-                                    <TouchableOpacity
-                                        onPress={openSettings}
-                                        style={styles.cta}
-                                    >
-                                        <Text style={styles.ctaText}>
-                                            Open Settings
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            ) : (
-                                <View style={styles.debugRow}>
-                                    <Pressable
-                                        onPress={() =>
-                                            setShowLocationDetails(true)
-                                        }
-                                        style={styles.debugPill}
-                                    >
-                                        <Text style={styles.debugPillText}>
-                                            Location Enabled
-                                        </Text>
-                                    </Pressable>
-                                </View>
-                            )}
-                        </View>
 
                         {/* Bottom sheet for location details */}
                         <BottomSheetDrawer
@@ -713,6 +698,37 @@ export default function Shabbat() {
                     </>
                 )}
             </View>
+            <View style={styles.footer}>
+                {!hasLocation && (
+                    <View style={styles.locationNotice}>
+                        <Text style={styles.locationNoticeTitle}>
+                            Location is off
+                        </Text>
+                        <Text style={styles.locationNoticeBody}>
+                            Candle lighting, sundown, and havdalah times use
+                            your device’s location. Turn on location services to
+                            see those times
+                        </Text>
+
+                        <TouchableOpacity
+                            onPress={openSettings}
+                            style={styles.cta}
+                        >
+                            <Text style={styles.ctaText}>Open Settings</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+            </View>
+            {hasLocation && (
+                <Pressable
+                    onPress={() => setShowLocationDetails(true)}
+                    style={styles.locationChip}
+                    hitSlop={12}
+                >
+                    <View style={styles.greenDot} />
+                    <Text style={styles.locationChipText}>Location</Text>
+                </Pressable>
+            )}
         </SafeAreaView>
     );
 }
@@ -721,6 +737,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#121212",
+        position: "relative",
     },
     scrollViewContent: {
         flex: 1,
@@ -728,6 +745,7 @@ const styles = StyleSheet.create({
     },
 
     screen: {
+        flex: 1,
         paddingHorizontal: 20,
         paddingTop: 66,
         paddingBottom: 24,
@@ -749,7 +767,7 @@ const styles = StyleSheet.create({
     cardTitle: {
         color: "#82CBFF",
         fontFamily: "Nayuki",
-        fontSize: 32,
+        fontSize: 30,
         marginBottom: 6,
     },
 
@@ -788,11 +806,11 @@ const styles = StyleSheet.create({
     },
 
     locationNotice: {
-        borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.25)",
         borderRadius: 12,
         padding: 14,
         backgroundColor: "black",
+        marginBottom: 18,
+        marginHorizontal: 18,
     },
     locationNoticeTitle: {
         color: "white",
@@ -840,5 +858,36 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 14,
         opacity: 0.9,
+    },
+    locationChip: {
+        position: "absolute",
+        left: 20,
+        bottom: 14,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 999,
+        borderWidth: 1,
+        borderColor: "rgba(255,255,255,0.18)",
+        backgroundColor: "rgba(0,0,0,0.35)",
+    },
+    greenDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 99,
+        backgroundColor: "#35D07F",
+    },
+
+    locationChipText: {
+        color: "white",
+        fontSize: 14,
+        opacity: 0.9,
+    },
+    locationFloating: {
+        position: "absolute",
+        left: 18,
+        bottom: 4,
     },
 });

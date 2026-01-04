@@ -1,5 +1,4 @@
 import React, {
-    Fragment,
     useCallback,
     useEffect,
     useMemo,
@@ -47,7 +46,7 @@ const MONTHS_SHORT = [
 //   • 1 holiday day: "2026-09-12"
 //   • 2 holidays day: "2026-03-02"
 //   • 3 holidays day: "2026-12-10"
-const DEBUG_TODAY_ISO = __DEV__ ? "2026-12-10" : null;
+const DEBUG_TODAY_ISO = __DEV__ ? "2026-03-02" : null;
 
 function localIsoDate(date) {
     const y = date.getFullYear();
