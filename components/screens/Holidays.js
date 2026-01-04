@@ -6,14 +6,7 @@ import React, {
     useRef,
     useState,
 } from "react";
-import {
-    StyleSheet,
-    Text,
-    SafeAreaView,
-    View,
-    ScrollView,
-    RefreshControl,
-} from "react-native";
+import { StyleSheet, Text, SafeAreaView, View } from "react-native";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
@@ -252,130 +245,112 @@ export default function Holidays() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView
-                style={styles.scrollViewContent}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={handleRefresh}
-                    />
-                }
-            >
+            <View style={styles.screen}>
+                {/* TODAY */}
                 {todayHolidays.length > 0 ? (
                     <View style={styles.todaySection}>
                         <Text style={styles.headerText}>Today is</Text>
-                        <HolidayPager
-                            data={todayHolidays}
-                            dateDisplay={dateDisplay}
-                            height={340}
-                            peek={0} // <-- no peeking for Today
-                            showDots
-                            CardComponent={TodayHolidayCard}
-                            todayIso={todayIso}
-                            formatDate={formatDate}
-                        />
+
+                        <View style={styles.todayPagerSlot}>
+                            <HolidayPager
+                                data={todayHolidays}
+                                dateDisplay={dateDisplay}
+                                height={TODAY_PAGER_HEIGHT}
+                                peek={0} // no peeking for Today
+                                showDots // only shows dots if > 1
+                                CardComponent={TodayHolidayCard}
+                                todayIso={todayIso}
+                                formatDate={formatDate}
+                            />
+                        </View>
                     </View>
                 ) : (
-                    <View style={styles.frame}>
+                    <View style={styles.todaySection}>
                         <Text style={styles.headerText}>Today is</Text>
-                        <Text style={styles.bigBoldText}>
-                            not a Jewish holiday
-                        </Text>
-                        <Text style={styles.dateText}>
-                            {dateDisplay === "gregorian"
-                                ? formatDate(todayIso)
-                                : new HDate().toString()}
-                        </Text>
+
+                        <View style={styles.todayPagerSlot}>
+                            <View style={styles.noHolidayWrap}>
+                                <Text style={styles.bigBoldText}>
+                                    not a Jewish holiday
+                                </Text>
+                            </View>
+                        </View>
                     </View>
                 )}
 
-                <View style={styles.frame}>
+                {/* COMING UP (pinned to bottom) */}
+                <View style={styles.comingUpSection}>
                     <Text style={styles.secondHeaderText}>Coming up</Text>
-                    <UpcomingHolidaysCarousel
-                        holidays={upcoming}
-                        dateDisplay={dateDisplay}
-                        height={200}
-                        peek={50}
-                    />
+
+                    <View style={styles.upcomingCarouselSlot}>
+                        <UpcomingHolidaysCarousel
+                            holidays={upcoming}
+                            dateDisplay={dateDisplay}
+                            height={UPCOMING_HEIGHT}
+                            peek={50}
+                        />
+                    </View>
                 </View>
-            </ScrollView>
+            </View>
         </SafeAreaView>
     );
 }
 
+const TODAY_PAGER_HEIGHT = 340;
+const UPCOMING_HEIGHT = 120;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: "flex-start",
-        justifyContent: "flex-start",
         backgroundColor: "black",
     },
-    scrollViewContent: {
+
+    screen: {
         flex: 1,
-        alignSelf: "stretch",
-    },
-    frame: {
-        padding: 20,
+        paddingHorizontal: 20,
         paddingTop: 66,
+        paddingBottom: 16,
     },
+
     headerText: {
         color: "white",
         fontSize: 30,
-        marginBottom: 16,
+        marginBottom: 12,
     },
-    secondHeaderText: {
-        color: "white",
-        fontSize: 20,
-        marginBottom: 18,
+
+    todaySection: {
+        flexShrink: 1,
     },
+
+    todayPagerSlot: {
+        height: TODAY_PAGER_HEIGHT,
+        justifyContent: "center",
+    },
+
+    noHolidayWrap: {
+        justifyContent: "center",
+        alignItems: "flex-start",
+    },
+
     bigBoldText: {
         color: "#82CBFF",
         fontFamily: "Nayuki",
         fontSize: 86,
+        lineHeight: 90,
     },
-    smallBoldText: {
+
+    comingUpSection: {
+        marginTop: "auto",
+        paddingTop: 14,
+    },
+
+    secondHeaderText: {
         color: "white",
-        fontFamily: "Nayuki",
-        fontSize: 48,
-        marginVertical: 4,
-    },
-    andText: {
-        color: "white",
-        fontSize: 24,
-        marginBottom: 16,
-    },
-    hebrewText: {
-        color: "#82CBFF",
-        fontSize: 38,
-        marginBottom: 12,
-    },
-    dateText: {
-        color: "white",
-        fontSize: 22,
-        marginBottom: 16,
-        marginTop: 12,
-    },
-    descriptionText: {
-        color: "white",
-        opacity: 0.85,
-        fontSize: 14,
-        lineHeight: 18,
-        marginTop: 10,
-    },
-    todaySection: {
-        paddingHorizontal: 20,
-        paddingTop: 66,
-        paddingBottom: 24,
-      },
-    todayHeader: {
-        color: "white",
-        fontSize: 32,
+        fontSize: 20,
         marginBottom: 14,
     },
 
-    todayFooterDate: {
-        color: "rgba(255,255,255,0.9)",
-        fontSize: 18,
-        marginTop: 14,
+    upcomingCarouselSlot: {
+        height: UPCOMING_HEIGHT,
     },
 });
