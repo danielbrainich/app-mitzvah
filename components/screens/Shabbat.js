@@ -29,7 +29,7 @@ import BottomSheetDrawer from "../BottomSheetDrawer";
 // Examples:
 //   • Normal Shabbat (with Havdalah): "2026-09-18"
 //   • Shabbat → Yom Tov (no Havdalah): "2026-09-25"  // Erev Sukkot
-const TEST_TODAY_ISO = __DEV__ ? "2026-09-25" : null; // set to null when done
+const TEST_TODAY_ISO = __DEV__ ? "2026-09-18" : null; // set to null when done
 
 function addMinutes(date, mins) {
     const d = new Date(date);
@@ -554,15 +554,6 @@ export default function Shabbat() {
                                             : shabbatInfo.yomShabbatHebrewDate}
                                     </Text>
 
-                                    {shabbatInfo.sundownSaturday ? (
-                                        <Text style={styles.sentence}>
-                                            Sundown at{" "}
-                                            <Text style={styles.highlight}>
-                                                {shabbatInfo.sundownSaturday}
-                                            </Text>
-                                        </Text>
-                                    ) : null}
-
                                     {/* Normal week: Havdalah */}
                                     {shabbatInfo.shabbatEnds &&
                                     !shabbatInfo.endsIntoYomTov ? (
@@ -579,7 +570,7 @@ export default function Shabbat() {
                                         <>
                                             {shabbatInfo.yomTovCandleTime ? (
                                                 <Text style={styles.sentence}>
-                                                    Yom Tov candle lighting at{" "}
+                                                    Holiday candle lighting at{" "}
                                                     <Text
                                                         style={styles.highlight}
                                                     >
@@ -600,6 +591,14 @@ export default function Shabbat() {
                                             )}
                                         </>
                                     ) : null}
+                                    {shabbatInfo.sundownSaturday ? (
+                                        <Text style={styles.sentence}>
+                                            Sundown at{" "}
+                                            <Text style={styles.highlight}>
+                                                {shabbatInfo.sundownSaturday}
+                                            </Text>
+                                        </Text>
+                                    ) : null}
                                 </View>
 
                                 {/* Parasha card */}
@@ -607,14 +606,14 @@ export default function Shabbat() {
                                     {shabbatInfo.endsIntoYomTov ||
                                     shabbatInfo.parshaReplacedByHoliday ? (
                                         <>
-                                            <Text style={styles.cardTitle}>
-                                                Note
-                                            </Text>
-                                            <Text style={[styles.sentence]}>
-                                                Yom Tov candle lighting replaces
-                                                Havdalah and Yom Tov Torah
-                                                reading replaces Parasha this
-                                                week
+                                            <Text
+                                                style={[styles.sentenceSmall]}
+                                            >
+                                                Because a holiday begins
+                                                Saturday evening, holiday candle
+                                                lighting replaces Havdalah and
+                                                the holiday Torah reading
+                                                replaces the Parasha.{" "}
                                             </Text>
                                         </>
                                     ) : shabbatInfo.parshaEnglish ? (
@@ -697,7 +696,6 @@ export default function Shabbat() {
                         </BottomSheetDrawer>
                     </>
                 )}
-            </View>
             <View style={styles.footer}>
                 {!hasLocation && (
                     <View style={styles.locationNotice}>
@@ -718,6 +716,7 @@ export default function Shabbat() {
                         </TouchableOpacity>
                     </View>
                 )}
+            </View>
             </View>
             {hasLocation && (
                 <Pressable
@@ -777,6 +776,12 @@ const styles = StyleSheet.create({
         lineHeight: 26,
         marginBottom: 6,
     },
+    sentenceSmall: {
+        color: "rgba(255,255,255,0.92)",
+        fontSize: 16,
+        lineHeight: 22,
+        marginBottom: 6,
+    },
     highlight: {
         color: "#82CBFF",
         fontWeight: "600",
@@ -809,8 +814,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 14,
         backgroundColor: "black",
-        marginBottom: 18,
-        marginHorizontal: 18,
     },
     locationNoticeTitle: {
         color: "white",
@@ -862,7 +865,7 @@ const styles = StyleSheet.create({
     locationChip: {
         position: "absolute",
         left: 20,
-        bottom: 14,
+        bottom: 18,
         flexDirection: "row",
         alignItems: "center",
         gap: 8,
