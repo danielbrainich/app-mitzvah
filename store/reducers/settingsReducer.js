@@ -1,7 +1,7 @@
 import * as actionTypes from "../actions.js";
 
 const initialState = {
-    dateDisplay: "gregorian",
+    hebrewDate: false,
     minorFasts: true,
     rosheiChodesh: true,
     modernHolidays: true,
@@ -17,12 +17,8 @@ const initialState = {
 
 const settingsReducer = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.SET_DATE_DISPLAY:
-            return {
-                ...state,
-                dateDisplay: action.payload ?? state.dateDisplay,
-            };
-
+        case actionTypes.TOGGLE_HEBREW_DATE:
+            return { ...state, hebrewDate: !state.hebrewDate };
         case actionTypes.TOGGLE_MINOR_FASTS:
             return { ...state, minorFasts: !state.minorFasts };
 

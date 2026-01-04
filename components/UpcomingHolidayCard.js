@@ -21,7 +21,7 @@ export default function UpcomingHolidayCard({
             )}
 
             <Text style={styles.date}>
-                {dateDisplay === "gregorian"
+                {dateDisplay === false
                     ? holiday?.date
                     : holiday?.hebrewDate}
             </Text>

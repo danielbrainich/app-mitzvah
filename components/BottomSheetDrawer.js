@@ -44,7 +44,6 @@ export default function BottomSheetDrawer({
                         accessibilityLabel="Close"
                         style={styles.closeBtn}
                     >
-                        <Text style={styles.closeIcon}>✕</Text>
                     </Pressable>
                 </View>
 
@@ -67,7 +66,7 @@ const styles = StyleSheet.create({
     content: {
         paddingHorizontal: 16,
         paddingBottom: 22,
-        minHeight: 260
+        minHeight: 240
     },
     headerRow: {
         flexDirection: "row",
@@ -82,14 +81,5 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "700",
         paddingRight: 12,
-    },
-    closeBtn: {
-        padding: 6,
-        marginTop: -2,
-    },
-    closeIcon: {
-        color: "rgba(255,255,255,0.9)",
-        fontSize: 18,
-        fontWeight: "800",
-    },
+    }
 });

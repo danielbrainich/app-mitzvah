@@ -12,7 +12,7 @@ import { RadioButton } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
 import React, { useState, useEffect } from "react";
 import {
-    setDateDisplay,
+    toggleHebrewDate,
     toggleMinorFasts,
     toggleRosheiChodesh,
     toggleModernHolidays,
@@ -28,7 +28,7 @@ export default function Settings() {
     });
 
     const {
-        dateDisplay,
+        hebrewDate,
         minorFasts,
         rosheiChodesh,
         modernHolidays,
@@ -52,8 +52,8 @@ export default function Settings() {
 
     const dispatch = useDispatch();
 
-    const handleDateDisplayChange = (newValue) => {
-        dispatch(setDateDisplay(newValue));
+    const handleToggleHebrewDate = (newValue) => {
+        dispatch(toggleHebrewDate(newValue));
     };
 
     const handleToggleMinorFasts = () => {
@@ -128,37 +128,7 @@ export default function Settings() {
             <ScrollView>
                 {fontsLoaded ? (
                     <View style={styles.frame}>
-                        <Text style={styles.headerText}>Date Format</Text>
-                        <View style={styles.radioContainer}>
-                            <RadioButton
-                                color="#82CBFF"
-                                value="gregorian"
-                                status={
-                                    dateDisplay === "gregorian"
-                                        ? "checked"
-                                        : "unchecked"
-                                }
-                                onPress={() =>
-                                    handleDateDisplayChange("gregorian")
-                                }
-                            />
-                            <Text style={styles.smallText}>Gregorian</Text>
-                        </View>
-                        <View style={styles.radioContainer}>
-                            <RadioButton
-                                color="#82CBFF"
-                                value="hebrew"
-                                status={
-                                    dateDisplay === "hebrew"
-                                        ? "checked"
-                                        : "unchecked"
-                                }
-                                onPress={() =>
-                                    handleDateDisplayChange("hebrew")
-                                }
-                            />
-                            <Text style={styles.smallText}>Hebrew</Text>
-                        </View>
+                       
                         <Text style={styles.headerText}>Holiday Options</Text>
                         <View style={styles.optionContainer}>
                             <View>
@@ -209,6 +179,23 @@ export default function Settings() {
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={handleToggleRosheiChodesh}
                                 value={rosheiChodesh}
+                            />
+                        </View>
+                        <View style={styles.optionContainer}>
+                            <View>
+                                <Text style={styles.smallText}>
+                                    Display Hebrew date
+                                </Text>
+                            </View>
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor={hebrewDate ? "white" : "#f4f3f4"}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={handleToggleHebrewDate}
+                                value={hebrewDate}
                             />
                         </View>
                         <Text style={styles.headerText}>Shabbat Options</Text>

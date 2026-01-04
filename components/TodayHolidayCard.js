@@ -43,18 +43,6 @@ export default function TodayHolidayCard({
                     >
                         {title}
                     </Text>
-
-                    {hasDescription ? (
-                        <Pressable
-                            onPress={() => setOpen(true)}
-                            hitSlop={12}
-                            style={styles.infoButton}
-                            accessibilityRole="button"
-                            accessibilityLabel="More info"
-                        >
-                            <Text style={styles.infoIcon}>ⓘ</Text>
-                        </Pressable>
-                    ) : null}
                 </View>
 
                 {!!holiday?.hebrewTitle && (
@@ -66,9 +54,20 @@ export default function TodayHolidayCard({
                         {holiday.hebrewTitle}
                     </Text>
                 )}
+                {hasDescription ? (
+                    <Pressable
+                        onPress={() => setOpen(true)}
+                        hitSlop={12}
+                        style={styles.infoButton}
+                        accessibilityRole="button"
+                        accessibilityLabel="More info"
+                    >
+                        <Text style={styles.moreInfo}>More info</Text>
+                    </Pressable>
+                ) : null}
             </View>
 
-            {/* ✅ keeps the date pinned consistently */}
+            {/* keeps the date pinned consistently */}
             <Text style={styles.todayDate} numberOfLines={1}>
                 {todayLabel}
             </Text>
@@ -96,8 +95,6 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         padding: 18,
         paddingTop: 16,
-
-        // ✅ makes a fixed-height card behave nicely
         justifyContent: "space-between",
     },
 
@@ -124,7 +121,7 @@ const styles = StyleSheet.create({
         paddingTop: 10,
         marginLeft: 6,
     },
-    infoIcon: {
+    moreInfo: {
         color: "white",
         opacity: 0.9,
         fontSize: 18,
