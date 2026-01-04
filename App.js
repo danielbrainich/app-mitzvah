@@ -15,7 +15,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 const Stack = createNativeStackNavigator();
 
 const screenOptions = {
-    headerStyle: { backgroundColor: "black" },
+    headerStyle: { backgroundColor: "#181818" },
     headerTintColor: "white",
     title: "",
 };

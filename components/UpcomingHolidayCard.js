@@ -31,7 +31,7 @@ export default function UpcomingHolidayCard({
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: "#1A1A1A",
+        backgroundColor: "#202020",
         borderRadius: 18,
         padding: 18,
     },

@@ -29,7 +29,6 @@ export default function BottomSheetDrawer({
             enablePanDownToClose
             backgroundStyle={styles.sheetBg}
             handleIndicatorStyle={styles.handle}
-            // If you don't want dimming:
             backdropComponent={null}
         >
             <BottomSheetView style={styles.content}>
@@ -57,7 +56,7 @@ export default function BottomSheetDrawer({
 
 const styles = StyleSheet.create({
     sheetBg: {
-        backgroundColor: "#1A1A1A",
+        backgroundColor: "#202020",
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
     },

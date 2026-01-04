@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     stepperFrame: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 22, 
+        marginBottom: 22,
     },
     stepperContainer: {
         flexDirection: "row",
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         minWidth: 32,
         minHeight: 32,
-        backgroundColor: "black",
+        backgroundColor: "#121212",
     },
     buttonPressed: {
         opacity: 0.6,

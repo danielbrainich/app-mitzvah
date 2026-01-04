@@ -12,8 +12,8 @@ export default function AppNavigator() {
                 screenOptions={{
                     headerShown: false,
                     tabBarStyle: {
-                        backgroundColor: "black",
-                        borderTopColor: "rgba(255,255,255,0.12)",
+                        backgroundColor: "#202020",
+                        borderTopColor: "#202020",
                     },
                     tabBarActiveTintColor: "#82CBFF",
                     tabBarInactiveTintColor: "rgba(255,255,255,0.65)",

@@ -302,7 +302,7 @@ const UPCOMING_HEIGHT = 120;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "black",
+        backgroundColor: "#121212",
     },
 
     screen: {

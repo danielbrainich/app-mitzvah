@@ -300,7 +300,7 @@ export default function Settings() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "black",
+        backgroundColor: "#121212",
         alignItems: "flex-start",
         justifyContent: "flex-start",
     },

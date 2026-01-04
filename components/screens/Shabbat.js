@@ -25,7 +25,7 @@ import {
 import { useFonts } from "expo-font";
 import * as ExpoLocation from "expo-location";
 import { useSelector } from "react-redux";
-import InfoModal from "../InfoModal";
+import BottomSheetDrawer from "../BottomSheetDrawer";
 
 // Dev-only override for testing specific dates.
 // Examples:
@@ -674,24 +674,24 @@ export default function Shabbat() {
                             </View>
                         )}
 
-                        {/* Location modal */}
-                        <InfoModal
+                        <BottomSheetDrawer
                             visible={showLocationDetails}
                             onClose={() => setShowLocationDetails(false)}
                             title="Your Location"
+                            snapPoints={["30%", "45%"]}
                         >
-                            <View style={styles.modalLine}>
-                                <Text style={styles.modalLabel}>Timezone</Text>
-                                <Text style={styles.modalValue}>
+                            <View style={styles.sheetLine}>
+                                <Text style={styles.sheetLabel}>Timezone</Text>
+                                <Text style={styles.sheetValue}>
                                     {timezone.replace(/_/g, " ")}
                                 </Text>
                             </View>
 
-                            <View style={styles.modalLine}>
-                                <Text style={styles.modalLabel}>
+                            <View style={styles.sheetLine}>
+                                <Text style={styles.sheetLabel}>
                                     Coordinates
                                 </Text>
-                                <Text style={styles.modalValue}>
+                                <Text style={styles.sheetValue}>
                                     {hasLocation
                                         ? `${location.latitude.toFixed(
                                               3
@@ -700,9 +700,9 @@ export default function Shabbat() {
                                 </Text>
                             </View>
 
-                            <View style={styles.modalLine}>
-                                <Text style={styles.modalLabel}>Elevation</Text>
-                                <Text style={styles.modalValue}>
+                            <View style={styles.sheetLine}>
+                                <Text style={styles.sheetLabel}>Elevation</Text>
+                                <Text style={styles.sheetValue}>
                                     {hasLocation &&
                                     Number.isFinite(location.elevation)
                                         ? `${location.elevation.toFixed(
@@ -711,7 +711,7 @@ export default function Shabbat() {
                                         : "Unknown"}
                                 </Text>
                             </View>
-                        </InfoModal>
+                        </BottomSheetDrawer>
                     </View>
                 ) : null}
             </ScrollView>
@@ -724,7 +724,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "flex-start",
         justifyContent: "flex-start",
-        backgroundColor: "black",
+        backgroundColor: "#121212",
     },
     scrollViewContent: {
         flex: 1,
@@ -771,32 +771,20 @@ const styles = StyleSheet.create({
         marginBottom: 22,
     },
 
-    locationNotice: {
-        borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.25)",
-        borderRadius: 12,
-        padding: 14,
-        marginBottom: 22,
-        backgroundColor: "black",
+    sheetLine: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 12,
     },
-    locationNoticeTitle: {
-        color: "white",
-        fontSize: 16,
-        marginBottom: 6,
-        fontWeight: "500",
-    },
-    locationNoticeBody: {
-        color: "white",
-        opacity: 0.9,
+    sheetLabel: {
+        color: "rgba(255,255,255,0.75)",
         fontSize: 14,
-        lineHeight: 18,
-        marginBottom: 10,
     },
-    locationNoticeSmall: {
-        color: "white",
-        opacity: 0.7,
-        fontSize: 12,
-        marginTop: 10,
+    sheetValue: {
+        color: "#82CBFF",
+        fontSize: 14,
+        maxWidth: "60%",
+        textAlign: "right",
     },
     cta: {
         borderWidth: 0.5,
