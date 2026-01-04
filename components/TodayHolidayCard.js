@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, StyleSheet, Pressable, Modal } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { getHolidayDetailsByName } from "../utils/getHolidayDetails";
 import { HDate } from "@hebcal/core";
+import BottomSheetDrawer from "./BottomSheetDrawer";
 
 function removeParentheses(text) {
     return (text || "").replace(/\s*\([^)]*\)/g, "");
@@ -28,49 +29,45 @@ export default function TodayHolidayCard({
 
     const title = removeParentheses(holiday?.title);
     const description = details?.description || "";
+    const hasDescription = Boolean(description);
 
     return (
         <View style={[styles.wrap, cardWidth ? { width: cardWidth } : null]}>
-            <Text style={styles.todayDate}>{todayLabel}</Text>
             <View style={styles.titleRow}>
                 <Text style={styles.title}>{title}</Text>
-            </View>
 
+                {hasDescription ? (
+                    <Pressable
+                        onPress={() => setOpen(true)}
+                        hitSlop={12}
+                        style={styles.infoButton}
+                        accessibilityRole="button"
+                        accessibilityLabel="More info"
+                    >
+                        <Text style={styles.infoIcon}>hellooo</Text>
+                    </Pressable>
+                ) : null}
+            </View>
             {!!holiday?.hebrewTitle && (
                 <Text style={styles.hebrew}>{holiday.hebrewTitle}</Text>
             )}
-            {description ? (
-                <Pressable
-                    onPress={() => setOpen(true)}
-                    hitSlop={12}
-                    style={styles.infoButton}
-                    accessibilityRole="button"
-                    accessibilityLabel="More info"
-                >
-                    <Text style={styles.infoIcon}>ⓘ</Text>
-                </Pressable>
-            ) : null}
-            <Modal
-                transparent
+
+            <Text style={styles.todayDate}>{todayLabel}</Text>
+
+            <BottomSheetDrawer
                 visible={open}
-                animationType="fade"
-                onRequestClose={() => setOpen(false)}
+                onClose={() => setOpen(false)}
+                title={title}
+                snapPoints={["45%", "75%"]}
             >
-                <Pressable
-                    style={styles.modalBackdrop}
-                    onPress={() => setOpen(false)}
-                >
-                    <Pressable style={styles.modalCard} onPress={() => {}}>
-                        <Text style={styles.modalTitle}>{title}</Text>
-                        {!!holiday?.hebrewTitle && (
-                            <Text style={styles.modalHebrew}>
-                                {holiday.hebrewTitle}
-                            </Text>
-                        )}
-                        <Text style={styles.modalBody}>{description}</Text>
-                    </Pressable>
-                </Pressable>
-            </Modal>
+                {!!holiday?.hebrewTitle && (
+                    <Text style={styles.drawerHebrew}>
+                        {holiday.hebrewTitle}
+                    </Text>
+                )}
+
+                <Text style={styles.drawerBody}>{description}</Text>
+            </BottomSheetDrawer>
         </View>
     );
 }
@@ -81,14 +78,14 @@ const styles = StyleSheet.create({
     },
 
     titleRow: {
+        position: "relative",
         flexDirection: "row",
         alignItems: "flex-start",
-        justifyContent: "space-between",
-        gap: 10,
     },
 
     title: {
         flex: 1,
+        paddingRight: 34, // reserve space for the icon
         color: "#82CBFF",
         fontFamily: "Nayuki",
         fontSize: 64,
@@ -96,13 +93,18 @@ const styles = StyleSheet.create({
     },
 
     infoButton: {
-        paddingTop: 10,
+        position: "absolute",
+        top: 6,
+        right: 0,
+        padding: 8,
+        zIndex: 20,
     },
+
     infoIcon: {
         color: "white",
         opacity: 0.9,
         fontSize: 18,
-        fontWeight: "800", // <-- makes it bolder (works for Text)
+        fontWeight: "800",
     },
 
     hebrew: {
@@ -113,56 +115,22 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
 
-    preview: {
-        color: "rgba(255,255,255,0.82)",
-        fontSize: 14,
-        lineHeight: 18,
-    },
-
-    modalBackdrop: {
-        flex: 1,
-        backgroundColor: "rgba(0,0,0,0.65)",
-        justifyContent: "center",
-        padding: 18,
-    },
-    modalCard: {
-        borderWidth: 1,
-        borderColor: "rgba(130,203,255,0.35)",
-        backgroundColor: "rgba(0,0,0,0.92)",
-        borderRadius: 14,
-        padding: 16,
-    },
-    modalTitle: {
-        color: "white",
-        fontSize: 18,
-        fontWeight: "700",
-        marginBottom: 8,
-    },
-    modalHebrew: {
-        color: "#82CBFF",
-        fontSize: 16,
-        marginBottom: 12,
-        opacity: 0.95,
-    },
-    modalBody: {
-        color: "rgba(255,255,255,0.9)",
-        fontSize: 14,
-        lineHeight: 19,
-    },
-    modalClose: {
-        marginTop: 16,
-        alignSelf: "flex-end",
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-    },
-    modalCloseText: {
-        color: "#82CBFF",
-        fontSize: 14,
-        fontWeight: "600",
-    },
     todayDate: {
         color: "rgba(255,255,255,0.9)",
         fontSize: 16,
         marginBottom: 10,
+    },
+
+    drawerHebrew: {
+        color: "#82CBFF",
+        fontSize: 18,
+        fontWeight: "600",
+        marginBottom: 12,
+        opacity: 0.95,
+    },
+    drawerBody: {
+        color: "rgba(255,255,255,0.88)",
+        fontSize: 16,
+        lineHeight: 21,
     },
 });

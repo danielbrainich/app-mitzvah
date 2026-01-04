@@ -324,7 +324,8 @@ const styles = StyleSheet.create({
 
     todayPagerSlot: {
         height: TODAY_PAGER_HEIGHT,
-        justifyContent: "center",
+        justifyContent: "flex-start",
+        paddingTop: 6,
     },
 
     noHolidayWrap: {

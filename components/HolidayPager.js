@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
 
     // Left align instead of centered
     page: {
-        justifyContent: "center",
+        justifyContent: "start",
         alignItems: "flex-start",
     },
 
@@ -89,8 +89,8 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     dot: {
-        width: 6,
-        height: 6,
+        width: 8,
+        height: 8,
         borderRadius: 99,
         backgroundColor: "rgba(255,255,255,0.35)",
     },
