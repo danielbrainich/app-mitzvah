@@ -29,7 +29,7 @@ import BottomSheetDrawer from "../BottomSheetDrawer";
 // Examples:
 //   • Normal Shabbat (with Havdalah): "2026-09-18"
 //   • Shabbat → Yom Tov (no Havdalah): "2026-09-25"  // Erev Sukkot
-const TEST_TODAY_ISO = __DEV__ ? "2026-09-18" : null; // set to null when done
+const TEST_TODAY_ISO = __DEV__ ? null : null; // set to null when done
 
 function addMinutes(date, mins) {
     const d = new Date(date);
@@ -301,12 +301,11 @@ export default function Shabbat() {
 
     const [location, setLocation] = useState(null);
     const [locationStatus, setLocationStatus] = useState("unknown"); // "granted" | "denied" | "unknown"
-    const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [shabbatInfo, setShabbatInfo] = useState(null);
     const [showLocationDetails, setShowLocationDetails] = useState(false);
 
-    const { dateDisplay, candleLightingTime, havdalahTime } = useSelector(
+    const {candleLightingTime, havdalahTime } = useSelector(
         (state) => state.settings
     );
 
@@ -494,12 +493,6 @@ export default function Shabbat() {
         };
     }, [fetchShabbatInfo]);
 
-    const handleRefresh = useCallback(async () => {
-        setRefreshing(true);
-        await fetchShabbatInfo();
-        setRefreshing(false);
-    }, [fetchShabbatInfo]);
-
     const hasLocation = !!location && locationStatus === "granted";
 
     return (
@@ -518,9 +511,7 @@ export default function Shabbat() {
                                     </Text>
 
                                     <Text style={styles.sentence}>
-                                        {dateDisplay === "gregorian"
-                                            ? shabbatInfo.erevShabbatDate
-                                            : shabbatInfo.erevShabbatHebrewDate}
+                                        {shabbatInfo.erevShabbatDate}
                                     </Text>
 
                                     {shabbatInfo.candleTime ? (
@@ -549,9 +540,7 @@ export default function Shabbat() {
                                     </Text>
 
                                     <Text style={styles.sentence}>
-                                        {dateDisplay === "gregorian"
-                                            ? shabbatInfo.yomShabbatDate
-                                            : shabbatInfo.yomShabbatHebrewDate}
+                                        {shabbatInfo.yomShabbatDate}
                                     </Text>
 
                                     {/* Normal week: Havdalah */}
@@ -696,27 +685,29 @@ export default function Shabbat() {
                         </BottomSheetDrawer>
                     </>
                 )}
-            <View style={styles.footer}>
-                {!hasLocation && (
-                    <View style={styles.locationNotice}>
-                        <Text style={styles.locationNoticeTitle}>
-                            Location is off
-                        </Text>
-                        <Text style={styles.locationNoticeBody}>
-                            Candle lighting, sundown, and havdalah times use
-                            your device’s location. Turn on location services to
-                            see those times
-                        </Text>
+                <View style={styles.footer}>
+                    {!hasLocation && (
+                        <View style={styles.locationNotice}>
+                            <Text style={styles.locationNoticeTitle}>
+                                Location is off
+                            </Text>
+                            <Text style={styles.locationNoticeBody}>
+                                Candle lighting, sundown, and havdalah times use
+                                your device’s location. Turn on location
+                                services to see those times
+                            </Text>
 
-                        <TouchableOpacity
-                            onPress={openSettings}
-                            style={styles.cta}
-                        >
-                            <Text style={styles.ctaText}>Open Settings</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-            </View>
+                            <TouchableOpacity
+                                onPress={openSettings}
+                                style={styles.cta}
+                            >
+                                <Text style={styles.ctaText}>
+                                    Open Settings
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </View>
             </View>
             {hasLocation && (
                 <Pressable

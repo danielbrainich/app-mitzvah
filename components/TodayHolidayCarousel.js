@@ -7,7 +7,8 @@ export default function TodayHolidayCarousel({
     peek = 0,
     gap = 18,
     CardComponent,
-    dateDisplay,
+    formatDate,
+    hebrewDate,
     ...cardProps
 }) {
     const listRef = useRef(null);
@@ -69,7 +70,8 @@ export default function TodayHolidayCarousel({
                             >
                                 <CardComponent
                                     holiday={item}
-                                    dateDisplay={dateDisplay}
+                                    formatDate={formatDate}
+                                    hebrewDate={hebrewDate}
                                     cardWidth={
                                         isLast ? containerWidth : cardWidth
                                     }

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { HDate } from "@hebcal/core";
 
 function removeParentheses(text) {
     return (text || "").replace(/\s*\([^)]*\)/g, "");
@@ -7,8 +8,10 @@ function removeParentheses(text) {
 
 export default function UpcomingHolidayCard({
     holiday,
-    dateDisplay,
+    hebrewDate,
     cardWidth,
+    formatDate,
+    todayIso
 }) {
     return (
         <View style={[styles.card, cardWidth ? { width: cardWidth } : null]}>
@@ -21,9 +24,7 @@ export default function UpcomingHolidayCard({
             )}
 
             <Text style={styles.date}>
-                {dateDisplay === false
-                    ? holiday?.date
-                    : holiday?.hebrewDate}
+                {!hebrewDate ? formatDate(todayIso) : new HDate().toString()}
             </Text>
         </View>
     );

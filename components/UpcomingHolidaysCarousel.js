@@ -4,10 +4,12 @@ import UpcomingHolidayCard from "./UpcomingHolidayCard";
 
 export default function UpcomingHolidaysCarousel({
     holidays = [],
-    dateDisplay,
+    formatDate,
+    hebrewDate,
     peek = 24,
     gap = 16,
     height = 200,
+    todayIso
 }) {
     const { width } = useWindowDimensions();
 
@@ -40,8 +42,10 @@ export default function UpcomingHolidaysCarousel({
                     <View style={{ width: cardWidth }}>
                         <UpcomingHolidayCard
                             holiday={item}
-                            dateDisplay={dateDisplay}
+                            formatDate={formatDate}
+                            hebrewDate={hebrewDate}
                             cardWidth={cardWidth}
+                            todayIso={todayIso}
                         />
                     </View>
                 )}

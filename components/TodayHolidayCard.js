@@ -10,16 +10,15 @@ function removeParentheses(text) {
 
 export default function TodayHolidayCard({
     holiday,
-    dateDisplay,
     cardWidth,
     cardHeight,
     todayIso,
     formatDate,
+    hebrewDate,
 }) {
     const [open, setOpen] = useState(false);
-
     const todayLabel =
-        dateDisplay === "gregorian"
+        !hebrewDate
             ? formatDate(todayIso)
             : new HDate().toString();
 
@@ -44,12 +43,11 @@ export default function TodayHolidayCard({
                         {title}
                     </Text>
                 </View>
-
                 {!!holiday?.hebrewTitle && (
                     <Text
-                        style={styles.hebrew}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
+                    style={styles.hebrew}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
                     >
                         {holiday.hebrewTitle}
                     </Text>

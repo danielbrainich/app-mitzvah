@@ -46,7 +46,7 @@ const MONTHS_SHORT = [
 //   • 1 holiday day: "2026-09-12"
 //   • 2 holidays day: "2026-03-02"
 //   • 3 holidays day: "2026-12-10"
-const DEBUG_TODAY_ISO = __DEV__ ? "2026-03-02" : null;
+const DEBUG_TODAY_ISO = __DEV__ ? "2026-03-03" : null;
 
 function localIsoDate(date) {
     const y = date.getFullYear();
@@ -78,10 +78,6 @@ function formatShortDate(isoDate) {
     } ${date.getFullYear()}`;
 }
 
-function removeParentheses(text) {
-    return text.replace(/\s*\([^)]*\)/g, "");
-}
-
 function msUntilNextLocalMidnight() {
     const now = new Date();
     const next = new Date(now);
@@ -111,12 +107,11 @@ function endOfHebrewYearFromTodayExclusive(todayIso) {
 }
 
 export default function Holidays() {
-    const { dateDisplay, minorFasts, rosheiChodesh, modernHolidays } =
+    const { hebrewDate, dateDisplay, minorFasts, rosheiChodesh, modernHolidays } =
         useSelector((state) => state.settings);
 
     const [holidays, setHolidays] = useState([]);
     const [todayHolidays, setTodayHolidays] = useState([]);
-    const [refreshing, setRefreshing] = useState(false);
 
     const timeoutIdRef = useRef(null);
     const intervalIdRef = useRef(null);
@@ -167,7 +162,7 @@ export default function Holidays() {
                 };
             });
 
-        // checks that each holiday name is matched with a descriptiojn
+        // checks that each holiday name is matched with a description
         if (__DEV__) {
             const uniqueTitles = [...new Set(formatted.map((h) => h.title))];
 
@@ -230,12 +225,6 @@ export default function Holidays() {
         };
     }, [fetchHolidays]);
 
-    const handleRefresh = useCallback(() => {
-        setRefreshing(true);
-        fetchHolidays();
-        setTimeout(() => setRefreshing(false), 400);
-    }, [fetchHolidays]);
-
     // Coming up should NOT include today
     const upcoming = useMemo(
         () => holidays.filter((h) => h.date > todayIso),
@@ -255,7 +244,7 @@ export default function Holidays() {
                             peek={42}
                             gap={18}
                             CardComponent={TodayHolidayCard}
-                            dateDisplay={dateDisplay}
+                            hebrewDate={hebrewDate}
                             formatDate={formatDate}
                             todayIso={todayIso}
                             cardHeight={360}
@@ -281,9 +270,11 @@ export default function Holidays() {
                     <View style={styles.upcomingCarouselSlot}>
                         <UpcomingHolidaysCarousel
                             holidays={upcoming}
-                            dateDisplay={dateDisplay}
+                            hebrewDate={hebrewDate}
                             height={UPCOMING_HEIGHT}
                             peek={42}
+                            formatDate={formatDate}
+                            todayIso={todayIso}
                         />
                     </View>
                 </View>
