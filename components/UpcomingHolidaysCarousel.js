@@ -12,7 +12,6 @@ export default function UpcomingHolidaysCarousel({
     const { width } = useWindowDimensions();
 
     const cardWidth = useMemo(() => {
-        // card is narrower than screen so next one can peek
         return Math.max(0, width - peek * 2);
     }, [width, peek]);
 
@@ -27,14 +26,14 @@ export default function UpcomingHolidaysCarousel({
                 keyExtractor={(item) => item.id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                bounces={false}
+                bounces={true}
                 decelerationRate="fast"
                 snapToInterval={snapInterval}
                 snapToAlignment="start"
                 disableIntervalMomentum
                 contentContainerStyle={{
-                    paddingLeft: 0, // left align more
-                    paddingRight: peek, // space at the the end
+                    paddingLeft: 0,
+                    paddingRight: peek,
                 }}
                 ItemSeparatorComponent={() => <View style={{ width: gap }} />}
                 renderItem={({ item }) => (

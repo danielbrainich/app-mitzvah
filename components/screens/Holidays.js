@@ -10,7 +10,7 @@ import { StyleSheet, Text, SafeAreaView, View } from "react-native";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
-import HolidayPager from "../HolidayPager";
+import TodayHolidayCarousel from "../TodayHolidayCarousel";
 import TodayHolidayCard from "../TodayHolidayCard";
 import UpcomingHolidaysCarousel from "../UpcomingHolidaysCarousel";
 
@@ -250,24 +250,21 @@ export default function Holidays() {
                 {todayHolidays.length > 0 ? (
                     <View style={styles.todaySection}>
                         <Text style={styles.headerText}>Today is</Text>
-
-                        <View style={styles.todayPagerSlot}>
-                            <HolidayPager
-                                data={todayHolidays}
-                                dateDisplay={dateDisplay}
-                                height={TODAY_PAGER_HEIGHT}
-                                peek={0} // no peeking for Today
-                                showDots // only shows dots if > 1
-                                CardComponent={TodayHolidayCard}
-                                todayIso={todayIso}
-                                formatDate={formatDate}
-                            />
-                        </View>
+                        <TodayHolidayCarousel
+                            data={todayHolidays}
+                            height={360}
+                            peek={42}
+                            gap={18}
+                            CardComponent={TodayHolidayCard}
+                            dateDisplay={dateDisplay}
+                            formatDate={formatDate}
+                            todayIso={todayIso}
+                            cardHeight={360}
+                        />
                     </View>
                 ) : (
                     <View style={styles.todaySection}>
                         <Text style={styles.headerText}>Today is</Text>
-
                         <View style={styles.todayPagerSlot}>
                             <View style={styles.noHolidayWrap}>
                                 <Text style={styles.bigBoldText}>
@@ -287,7 +284,7 @@ export default function Holidays() {
                             holidays={upcoming}
                             dateDisplay={dateDisplay}
                             height={UPCOMING_HEIGHT}
-                            peek={50}
+                            peek={42}
                         />
                     </View>
                 </View>

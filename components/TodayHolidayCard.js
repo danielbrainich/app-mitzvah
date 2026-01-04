@@ -12,6 +12,7 @@ export default function TodayHolidayCard({
     holiday,
     dateDisplay,
     cardWidth,
+    cardHeight,
     todayIso,
     formatDate,
 }) {
@@ -32,40 +33,57 @@ export default function TodayHolidayCard({
     const hasDescription = Boolean(description);
 
     return (
-        <View style={[styles.wrap, cardWidth ? { width: cardWidth } : null]}>
-            <View style={styles.titleRow}>
-                <Text style={styles.title}>{title}</Text>
-
-                {hasDescription ? (
-                    <Pressable
-                        onPress={() => setOpen(true)}
-                        hitSlop={12}
-                        style={styles.infoButton}
-                        accessibilityRole="button"
-                        accessibilityLabel="More info"
+        <View style={[styles.card, { width: cardWidth, height: cardHeight }]}>
+            <View style={styles.top}>
+                <View style={styles.titleRow}>
+                    <Text
+                        style={styles.title}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
                     >
-                        <Text style={styles.infoIcon}>hellooo</Text>
-                    </Pressable>
-                ) : null}
-            </View>
-            {!!holiday?.hebrewTitle && (
-                <Text style={styles.hebrew}>{holiday.hebrewTitle}</Text>
-            )}
+                        {title}
+                    </Text>
 
-            <Text style={styles.todayDate}>{todayLabel}</Text>
+                    {hasDescription ? (
+                        <Pressable
+                            onPress={() => setOpen(true)}
+                            hitSlop={12}
+                            style={styles.infoButton}
+                            accessibilityRole="button"
+                            accessibilityLabel="More info"
+                        >
+                            <Text style={styles.infoIcon}>ⓘ</Text>
+                        </Pressable>
+                    ) : null}
+                </View>
+
+                {!!holiday?.hebrewTitle && (
+                    <Text
+                        style={styles.hebrew}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                    >
+                        {holiday.hebrewTitle}
+                    </Text>
+                )}
+            </View>
+
+            {/* ✅ keeps the date pinned consistently */}
+            <Text style={styles.todayDate} numberOfLines={1}>
+                {todayLabel}
+            </Text>
 
             <BottomSheetDrawer
                 visible={open}
                 onClose={() => setOpen(false)}
                 title={title}
-                snapPoints={["45%", "75%"]}
+                snapPoints={["45%", "55%"]}
             >
                 {!!holiday?.hebrewTitle && (
                     <Text style={styles.drawerHebrew}>
                         {holiday.hebrewTitle}
                     </Text>
                 )}
-
                 <Text style={styles.drawerBody}>{description}</Text>
             </BottomSheetDrawer>
         </View>
@@ -73,19 +91,29 @@ export default function TodayHolidayCard({
 }
 
 const styles = StyleSheet.create({
-    wrap: {
-        paddingVertical: 6,
+    card: {
+        backgroundColor: "#202020",
+        borderRadius: 18,
+        padding: 18,
+        paddingTop: 16,
+
+        // ✅ makes a fixed-height card behave nicely
+        justifyContent: "space-between",
+    },
+
+    top: {
+        // keeps title + hebrew grouped at top
     },
 
     titleRow: {
-        position: "relative",
         flexDirection: "row",
         alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: 10,
     },
 
     title: {
         flex: 1,
-        paddingRight: 34, // reserve space for the icon
         color: "#82CBFF",
         fontFamily: "Nayuki",
         fontSize: 64,
@@ -93,13 +121,9 @@ const styles = StyleSheet.create({
     },
 
     infoButton: {
-        position: "absolute",
-        top: 6,
-        right: 0,
-        padding: 8,
-        zIndex: 20,
+        paddingTop: 10,
+        marginLeft: 6,
     },
-
     infoIcon: {
         color: "white",
         opacity: 0.9,
@@ -112,13 +136,12 @@ const styles = StyleSheet.create({
         fontSize: 26,
         opacity: 0.95,
         marginTop: 8,
-        marginBottom: 10,
     },
 
     todayDate: {
         color: "rgba(255,255,255,0.9)",
         fontSize: 16,
-        marginBottom: 10,
+        marginTop: 12,
     },
 
     drawerHebrew: {
