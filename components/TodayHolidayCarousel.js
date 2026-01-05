@@ -45,7 +45,7 @@ export default function TodayHolidayCarousel({
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     decelerationRate="fast"
-                    bounces={true}
+                    bounces={data.length > 1}
                     snapToInterval={snapToInterval}
                     snapToAlignment="start"
                     disableIntervalMomentum

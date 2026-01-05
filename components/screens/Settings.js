@@ -1,15 +1,9 @@
 import { useFonts } from "expo-font";
-import {
-    StyleSheet,
-    Text,
-    SafeAreaView,
-    View,
-    Switch,
-    ScrollView,
-} from "react-native";
+import { StyleSheet, Text, View, Switch, ScrollView } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 import Slider from "@react-native-community/slider";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
     toggleHebrewDate,
@@ -21,7 +15,6 @@ import {
     setCandleLightingToggle,
     setHavdalahTimeToggle,
 } from "../../store/actions";
-import InfoFooter from "../InfoFooter";
 
 const DEFAULT_CANDLE = 18;
 const DEFAULT_HAVDALAH = 42;
@@ -93,6 +86,8 @@ export default function Settings() {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.screen}>
+                <Text style={styles.pageHeader}>Settings</Text>
+
                 {/* Holiday Options Card */}
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>Holiday Options</Text>
@@ -245,8 +240,6 @@ export default function Settings() {
                         </View>
                     ) : null}
                 </View>
-
-                <InfoFooter />
             </ScrollView>
         </SafeAreaView>
     );
@@ -262,8 +255,6 @@ const styles = StyleSheet.create({
         paddingTop: 66,
         paddingBottom: 24,
     },
-
-    // Match your Shabbat cards
     card: {
         backgroundColor: "#202020",
         borderRadius: 18,
@@ -272,11 +263,10 @@ const styles = StyleSheet.create({
     },
     cardTitle: {
         color: "#82CBFF",
-        fontFamily: "Nayuki",
-        fontSize: 30,
+        fontSize: 22,
         marginBottom: 10,
+        fontWeight: 700,
     },
-
     row: {
         flexDirection: "row",
         alignItems: "center",
@@ -319,4 +309,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "500",
     },
+    pageHeader: {
+        color: "white",
+        fontSize: 30,
+        marginBottom: 12,
+    }
 });

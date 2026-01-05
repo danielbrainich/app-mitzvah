@@ -1,7 +1,6 @@
 // screens/Info.js
 import React, { useMemo, useState } from "react";
 import {
-    SafeAreaView,
     View,
     Text,
     StyleSheet,
@@ -10,9 +9,9 @@ import {
     Linking,
     Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 
-// Tip tiers (IAP-friendly)
 const TIP_TIERS = [1, 2, 5, 10, 18];
 
 // TODO: replace
@@ -23,7 +22,7 @@ export default function Info() {
         Nayuki: require("../../assets/fonts/NayukiRegular.otf"),
     });
 
-    const [amount, setAmount] = useState(10); // default tier
+    const [amount, setAmount] = useState(5);
 
     const handleOpenUrl = async (url) => {
         try {
@@ -43,49 +42,6 @@ export default function Info() {
         );
     };
 
-    const SECTIONS = useMemo(
-        () => [
-            {
-                title: "About",
-                body: [
-                    "This app displays Jewish calendar information and daily zmanim based on your location and local timezone.",
-                    "It includes Shabbat and holiday times such as candle lighting and havdalah, along with other calendar details depending on your settings.",
-                ],
-            },
-            {
-                title: "How times are calculated",
-                body: [
-                    "Zmanim and calendar data are computed using the Hebcal calculation engine.",
-                    "Results depend on your device location, timezone, and the calculation settings you choose.",
-                ],
-            },
-            {
-                title: "Accuracy & important note",
-                body: [
-                    "Candle lighting and havdalah times can vary by community custom and halachic opinion.",
-                    "Please confirm times and practices with your local community/rabbi—especially for holidays and edge cases (travel, altitude, unusual latitudes, DST transitions, etc.).",
-                    "This app is an informational tool and is not a substitute for halachic guidance.",
-                ],
-            },
-            {
-                title: "Location & privacy",
-                body: [
-                    "Your location is used to calculate local times (zmanim, candle lighting, havdalah).",
-                    "This app does not require an account.",
-                    "If you deny location permission, the app may be unable to calculate accurate local times.",
-                ],
-            },
-            {
-                title: "Credits",
-                body: [
-                    "Calendar & zmanim calculations: Hebcal (via @hebcal/core).",
-                    "Thank you to the open-source community for making these tools available.",
-                ],
-            },
-        ],
-        []
-    );
-
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.screen}>
@@ -93,25 +49,17 @@ export default function Info() {
                     <>
                         <Text style={styles.pageHeader}>Info</Text>
 
-                        {SECTIONS.map((section) => (
-                            <View key={section.title} style={styles.card}>
-                                <Text style={styles.cardTitle}>
-                                    {section.title}
-                                </Text>
-                                {section.body.map((p, idx) => (
-                                    <Text
-                                        key={`${section.title}-${idx}`}
-                                        style={styles.paragraph}
-                                    >
-                                        {p}
-                                    </Text>
-                                ))}
-                            </View>
-                        ))}
-
-                        {/* Contact */}
                         <View style={styles.card}>
-                            <Text style={styles.cardTitle}>Contact</Text>
+                            <Text style={styles.cardTitle}>About </Text>
+                            <Text style={styles.paragraph}>
+                                AppMitzvah was created by Daniel Brainich and
+                                designed by Andrea Portillo.
+                            </Text>
+                            <Text style={styles.paragraph}>
+                                It was inspired by isitajewishholiday.com and
+                                uses @hebcal/core to calculate times and Hebrew
+                                dates.
+                            </Text>
                             <Text style={styles.paragraph}>
                                 For bugs, feedback, or questions:
                             </Text>
@@ -124,19 +72,13 @@ export default function Info() {
                                 <Text style={styles.link}>{SUPPORT_EMAIL}</Text>
                             </TouchableOpacity>
                         </View>
-
                         {/* Support */}
                         <View style={styles.card}>
                             <Text style={styles.cardTitle}>Support</Text>
                             <Text style={styles.paragraph}>
-                                If you find this helpful, you can leave an
-                                optional tip (via In-App Purchase).
+                                If you find this app fun and useful, please
+                                consider leaving a tip!
                             </Text>
-
-                            <View style={styles.tipHeader}>
-                                <Text style={styles.tipLabel}>Tip amount</Text>
-                                <Text style={styles.tipAmount}>${amount}</Text>
-                            </View>
 
                             <View style={styles.tiersRow}>
                                 {TIP_TIERS.map((v) => {
@@ -177,11 +119,6 @@ export default function Info() {
                                     Tip ${amount}
                                 </Text>
                             </TouchableOpacity>
-
-                            <Text style={styles.finePrint}>
-                                Tips are optional and do not affect app
-                                functionality.
-                            </Text>
                         </View>
 
                         <View style={{ height: 28 }} />
@@ -208,8 +145,6 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 30,
         marginBottom: 12,
-        // matches your app vibe (Nayuki used elsewhere)
-        fontFamily: "Nayuki",
     },
 
     card: {
@@ -221,9 +156,9 @@ const styles = StyleSheet.create({
 
     cardTitle: {
         color: "#82CBFF",
-        fontFamily: "Nayuki",
-        fontSize: 32,
+        fontSize: 22,
         marginBottom: 10,
+        fontWeight: 700,
     },
 
     paragraph: {
@@ -261,7 +196,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         gap: 10,
-        marginBottom: 14,
+        marginBottom: 18,
+        marginTop: 4,
     },
 
     tierPill: {
@@ -298,12 +234,5 @@ const styles = StyleSheet.create({
         color: "#82CBFF",
         fontSize: 16,
         fontWeight: "800",
-    },
-
-    finePrint: {
-        marginTop: 10,
-        color: "rgba(255,255,255,0.65)",
-        fontSize: 12,
-        lineHeight: 16,
     },
 });

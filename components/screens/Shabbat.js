@@ -3,12 +3,12 @@ import {
     View,
     Text,
     StyleSheet,
-    SafeAreaView,
     Linking,
     TouchableOpacity,
     AppState,
     Alert,
     Pressable,
+    ScrollView,
 } from "react-native";
 import {
     HebrewCalendar,
@@ -24,6 +24,7 @@ import { useFonts } from "expo-font";
 import * as ExpoLocation from "expo-location";
 import { useSelector } from "react-redux";
 import BottomSheetDrawer from "../BottomSheetDrawer";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Dev-only override for testing specific dates.
 // Examples:
@@ -305,7 +306,7 @@ export default function Shabbat() {
     const [shabbatInfo, setShabbatInfo] = useState(null);
     const [showLocationDetails, setShowLocationDetails] = useState(false);
 
-    const {candleLightingTime, havdalahTime } = useSelector(
+    const { candleLightingTime, havdalahTime } = useSelector(
         (state) => state.settings
     );
 
@@ -497,7 +498,7 @@ export default function Shabbat() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.screen}>
+            <ScrollView style={styles.screen}>
                 {!fontsLoaded ? null : (
                     <>
                         <Text style={styles.pageHeader}>Shabbat this week</Text>
@@ -708,7 +709,7 @@ export default function Shabbat() {
                         </View>
                     )}
                 </View>
-            </View>
+            </ScrollView>
             {hasLocation && (
                 <Pressable
                     onPress={() => setShowLocationDetails(true)}
@@ -756,9 +757,9 @@ const styles = StyleSheet.create({
 
     cardTitle: {
         color: "#82CBFF",
-        fontFamily: "Nayuki",
-        fontSize: 30,
-        marginBottom: 6,
+        fontSize: 22,
+        marginBottom: 10,
+        fontWeight: 700,
     },
 
     sentence: {
@@ -775,7 +776,7 @@ const styles = StyleSheet.create({
     },
     highlight: {
         color: "#82CBFF",
-        fontWeight: "600",
+        fontWeight: "500",
     },
     muted: {
         color: "rgba(255,255,255,0.75)",

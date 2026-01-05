@@ -5,7 +5,7 @@ import React, {
     useRef,
     useState,
 } from "react";
-import { StyleSheet, Text, SafeAreaView, View } from "react-native";
+import { StyleSheet, Text, View, ScrollView, SafeAreaView } from "react-native";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
@@ -107,7 +107,7 @@ function endOfHebrewYearFromTodayExclusive(todayIso) {
 }
 
 export default function Holidays() {
-    const { hebrewDate, dateDisplay, minorFasts, rosheiChodesh, modernHolidays } =
+    const { hebrewDate, minorFasts, rosheiChodesh, modernHolidays } =
         useSelector((state) => state.settings);
 
     const [holidays, setHolidays] = useState([]);
@@ -233,7 +233,11 @@ export default function Holidays() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.screen}>
+            <ScrollView
+                style={styles.screen}
+                contentContainerStyle={styles.scrollContent}
+            >
+                {" "}
                 {/* TODAY */}
                 {todayHolidays.length > 0 ? (
                     <View style={styles.todaySection}>
@@ -262,7 +266,6 @@ export default function Holidays() {
                         </View>
                     </View>
                 )}
-
                 {/* COMING UP (pinned to bottom) */}
                 <View style={styles.comingUpSection}>
                     <Text style={styles.secondHeaderText}>Coming up</Text>
@@ -278,7 +281,7 @@ export default function Holidays() {
                         />
                     </View>
                 </View>
-            </View>
+            </ScrollView>
         </SafeAreaView>
     );
 }
@@ -291,14 +294,15 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#121212",
     },
-
     screen: {
         flex: 1,
         paddingHorizontal: 20,
         paddingTop: 66,
         paddingBottom: 16,
     },
-
+    scrollContent: {
+        flexGrow: 1,
+    },
     headerText: {
         color: "white",
         fontSize: 30,
