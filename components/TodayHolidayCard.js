@@ -17,10 +17,9 @@ export default function TodayHolidayCard({
     hebrewDate,
 }) {
     const [open, setOpen] = useState(false);
-    const todayLabel =
-        !hebrewDate
-            ? formatDate(todayIso)
-            : new HDate().toString();
+    const todayLabel = !hebrewDate
+        ? formatDate(todayIso)
+        : new HDate().toString();
 
     const details = useMemo(
         () => getHolidayDetailsByName(holiday?.title),
@@ -34,6 +33,8 @@ export default function TodayHolidayCard({
     return (
         <View style={[styles.card, { width: cardWidth, height: cardHeight }]}>
             <View style={styles.top}>
+                <Text style={styles.headerText}>Today is</Text>
+
                 <View style={styles.titleRow}>
                     <Text
                         style={styles.title}
@@ -45,9 +46,9 @@ export default function TodayHolidayCard({
                 </View>
                 {!!holiday?.hebrewTitle && (
                     <Text
-                    style={styles.hebrew}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
+                        style={styles.hebrew}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
                     >
                         {holiday.hebrewTitle}
                     </Text>
@@ -56,16 +57,15 @@ export default function TodayHolidayCard({
                     <Pressable
                         onPress={() => setOpen(true)}
                         hitSlop={12}
-                        style={styles.infoButton}
                         accessibilityRole="button"
                         accessibilityLabel="More info"
+                        style={styles.primaryButton}
                     >
-                        <Text style={styles.moreInfo}>More info</Text>
+                        <Text style={styles.primaryButtonText}>More info</Text>
                     </Pressable>
                 ) : null}
             </View>
 
-            {/* keeps the date pinned consistently */}
             <Text style={styles.todayDate} numberOfLines={1}>
                 {todayLabel}
             </Text>
@@ -115,15 +115,20 @@ const styles = StyleSheet.create({
         lineHeight: 66,
     },
 
-    infoButton: {
-        paddingTop: 10,
-        marginLeft: 6,
+    primaryButton: {
+        marginTop: 16,
+        borderRadius: 18,
+        padding: 12,
+        alignItems: "center",
+        borderWidth: 0.5,
+        borderColor: "#82CBFF",
+        backgroundColor: "transparent",
+        alignSelf: "flex-start",
     },
-    moreInfo: {
-        color: "white",
-        opacity: 0.9,
-        fontSize: 18,
-        fontWeight: "800",
+    primaryButtonText: {
+        color: "#82CBFF",
+        fontSize: 16,
+        fontWeight: "700",
     },
 
     hebrew: {
@@ -150,5 +155,11 @@ const styles = StyleSheet.create({
         color: "rgba(255,255,255,0.88)",
         fontSize: 16,
         lineHeight: 21,
+    },
+    headerText: {
+        color: "white",
+        fontSize: 30,
+        marginTop: 0,
+        marginBottom: 12,
     },
 });

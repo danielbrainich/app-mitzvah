@@ -60,7 +60,6 @@ export default function App() {
                                 />
                             </Stack.Navigator>
                         </NavigationContainer>
-                        \{" "}
                     </BottomSheetModalProvider>
                 </PersistGate>
             </Provider>

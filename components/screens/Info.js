@@ -1,5 +1,5 @@
 // screens/Info.js
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -50,7 +50,7 @@ export default function Info() {
                         <Text style={styles.pageHeader}>Info</Text>
 
                         <View style={styles.card}>
-                            <Text style={styles.cardTitle}>About </Text>
+                            <Text style={styles.cardTitle}>About</Text>
                             <Text style={styles.paragraph}>
                                 AppMitzvah was created by Daniel Brainich and
                                 designed by Andrea Portillo.
@@ -60,6 +60,9 @@ export default function Info() {
                                 uses @hebcal/core to calculate times and Hebrew
                                 dates.
                             </Text>
+                        </View>
+                        <View style={styles.card}>
+                            <Text style={styles.cardTitle}>Contact</Text>
                             <Text style={styles.paragraph}>
                                 For bugs, feedback, or questions:
                             </Text>
@@ -137,14 +140,16 @@ const styles = StyleSheet.create({
 
     screen: {
         paddingHorizontal: 20,
-        paddingTop: 66,
+        paddingTop: 44,
         paddingBottom: 24,
     },
 
     pageHeader: {
         color: "white",
         fontSize: 30,
-        marginBottom: 12,
+        marginBottom: 22,
+        fontFamily: "Nayuki",
+        alignSelf: "center"
     },
 
     card: {
@@ -195,7 +200,6 @@ const styles = StyleSheet.create({
     tiersRow: {
         flexDirection: "row",
         flexWrap: "wrap",
-        gap: 10,
         marginBottom: 18,
         marginTop: 4,
     },
@@ -207,6 +211,7 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 12,
         backgroundColor: "transparent",
+        margin: 5
     },
     tierPillSelected: {
         borderColor: "rgba(130,203,255,0.65)",

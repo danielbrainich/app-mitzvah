@@ -501,7 +501,7 @@ export default function Shabbat() {
             <ScrollView style={styles.screen}>
                 {!fontsLoaded ? null : (
                     <>
-                        <Text style={styles.pageHeader}>Shabbat this week</Text>
+                        <Text style={styles.pageHeader}>Shabbat</Text>
 
                         {shabbatInfo ? (
                             <>
@@ -736,16 +736,17 @@ const styles = StyleSheet.create({
     },
 
     screen: {
-        flex: 1,
         paddingHorizontal: 20,
-        paddingTop: 66,
+        paddingTop: 44,
         paddingBottom: 24,
     },
 
     pageHeader: {
         color: "white",
         fontSize: 30,
-        marginBottom: 12,
+        marginBottom: 22,
+        fontFamily: "Nayuki",
+        alignSelf: "center",
     },
 
     card: {
@@ -866,7 +867,7 @@ const styles = StyleSheet.create({
         borderRadius: 999,
         borderWidth: 1,
         borderColor: "rgba(255,255,255,0.18)",
-        backgroundColor: "rgba(0,0,0,0.35)",
+        backgroundColor: "#121212",
     },
     greenDot: {
         width: 10,

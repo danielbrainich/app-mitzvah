@@ -46,7 +46,7 @@ const MONTHS_SHORT = [
 //   • 1 holiday day: "2026-09-12"
 //   • 2 holidays day: "2026-03-02"
 //   • 3 holidays day: "2026-12-10"
-const DEBUG_TODAY_ISO = __DEV__ ? "2026-03-03" : null;
+const DEBUG_TODAY_ISO = __DEV__ ? "2026-12-10" : null;
 
 function localIsoDate(date) {
     const y = date.getFullYear();
@@ -237,11 +237,10 @@ export default function Holidays() {
                 style={styles.screen}
                 contentContainerStyle={styles.scrollContent}
             >
-                {" "}
+                <Text style={styles.pageHeader}>Holidays</Text>
                 {/* TODAY */}
                 {todayHolidays.length > 0 ? (
                     <View style={styles.todaySection}>
-                        <Text style={styles.headerText}>Today is</Text>
                         <TodayHolidayCarousel
                             data={todayHolidays}
                             height={360}
@@ -294,19 +293,20 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#121212",
     },
+    pageHeader: {
+        color: "white",
+        fontSize: 30,
+        marginBottom: 22,
+        fontFamily: "Nayuki",
+        alignSelf: "center",
+    },
     screen: {
-        flex: 1,
         paddingHorizontal: 20,
-        paddingTop: 66,
-        paddingBottom: 16,
+        paddingTop: 44,
+        paddingBottom: 24,
     },
     scrollContent: {
         flexGrow: 1,
-    },
-    headerText: {
-        color: "white",
-        fontSize: 30,
-        marginBottom: 12,
     },
 
     todaySection: {
@@ -344,5 +344,11 @@ const styles = StyleSheet.create({
 
     upcomingCarouselSlot: {
         height: UPCOMING_HEIGHT,
+    },
+    headerText: {
+        color: "white",
+        fontSize: 30,
+        marginTop: 12,
+        marginBottom: 0,
     },
 });

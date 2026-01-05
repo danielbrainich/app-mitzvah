@@ -85,9 +85,11 @@ export default function Settings() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.screen}>
+            <ScrollView
+                style={styles.screen}
+                contentContainerStyle={styles.scrollContent}
+            >
                 <Text style={styles.pageHeader}>Settings</Text>
-
                 {/* Holiday Options Card */}
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>Holiday Options</Text>
@@ -144,7 +146,6 @@ export default function Settings() {
                         />
                     </View>
                 </View>
-
                 {/* Shabbat Options Card */}
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>Shabbat Options</Text>
@@ -252,8 +253,11 @@ const styles = StyleSheet.create({
     },
     screen: {
         paddingHorizontal: 20,
-        paddingTop: 66,
+        paddingTop: 44,
         paddingBottom: 24,
+    },
+    scrollContent: {
+        flexGrow: 1,
     },
     card: {
         backgroundColor: "#202020",
@@ -312,6 +316,8 @@ const styles = StyleSheet.create({
     pageHeader: {
         color: "white",
         fontSize: 30,
-        marginBottom: 12,
-    }
+        marginBottom: 22,
+        fontFamily: "Nayuki",
+        alignSelf: "center",
+    },
 });
