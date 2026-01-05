@@ -6,7 +6,6 @@ import Slider from "@react-native-community/slider";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
-    toggleHebrewDate,
     toggleMinorFasts,
     toggleRosheiChodesh,
     toggleModernHolidays,
@@ -27,7 +26,6 @@ export default function Settings() {
     });
 
     const {
-        hebrewDate,
         minorFasts,
         rosheiChodesh,
         modernHolidays,
@@ -132,17 +130,6 @@ export default function Settings() {
                                 dispatch(toggleRosheiChodesh())
                             }
                             value={rosheiChodesh}
-                        />
-                    </View>
-
-                    <View style={styles.row}>
-                        <Text style={styles.rowLabel}>Display Hebrew date</Text>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={"#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={(v) => dispatch(toggleHebrewDate(v))}
-                            value={hebrewDate}
                         />
                     </View>
                 </View>
