@@ -1,9 +1,7 @@
-// screens/Info.js
 import React, { useState } from "react";
 import {
     View,
     Text,
-    StyleSheet,
     ScrollView,
     TouchableOpacity,
     Linking,
@@ -11,10 +9,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
+import { ui } from "../../styles/theme";
 
 const TIP_TIERS = [1, 2, 5, 10, 18];
-
-// TODO: replace
 const SUPPORT_EMAIL = "support@example.com";
 
 export default function Info() {
@@ -34,7 +31,7 @@ export default function Info() {
         }
     };
 
-    // Placeholder until you wire IAP:
+    // Placeholder until I wire in IAP:
     const handleTip = () => {
         Alert.alert(
             "Tip (In-App Purchase)",
@@ -43,27 +40,35 @@ export default function Info() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.screen}>
+        <SafeAreaView style={ui.container}>
+            <ScrollView contentContainerStyle={ui.screen}>
                 {!fontsLoaded ? null : (
                     <>
-                        <Text style={styles.pageHeader}>Info</Text>
+                        <Text
+                            style={[
+                                ui.infoPageHeader,
+                                { fontFamily: "Nayuki" },
+                            ]}
+                        >
+                            Info
+                        </Text>
 
-                        <View style={styles.card}>
-                            <Text style={styles.cardTitle}>About</Text>
-                            <Text style={styles.paragraph}>
+                        <View style={ui.card}>
+                            <Text style={ui.cardTitle}>About</Text>
+                            <Text style={ui.paragraph}>
                                 AppMitzvah was created by Daniel Brainich and
                                 designed by Andrea Portillo.
                             </Text>
-                            <Text style={styles.paragraph}>
+                            <Text style={ui.paragraph}>
                                 It was inspired by isitajewishholiday.com and
                                 uses @hebcal/core to calculate times and Hebrew
                                 dates.
                             </Text>
                         </View>
-                        <View style={styles.card}>
-                            <Text style={styles.cardTitle}>Contact</Text>
-                            <Text style={styles.paragraph}>
+
+                        <View style={ui.card}>
+                            <Text style={ui.cardTitle}>Contact</Text>
+                            <Text style={ui.paragraph}>
                                 For bugs, feedback, or questions:
                             </Text>
                             <TouchableOpacity
@@ -72,18 +77,18 @@ export default function Info() {
                                 }
                                 activeOpacity={0.8}
                             >
-                                <Text style={styles.link}>{SUPPORT_EMAIL}</Text>
+                                <Text style={ui.link}>{SUPPORT_EMAIL}</Text>
                             </TouchableOpacity>
                         </View>
-                        {/* Support */}
-                        <View style={styles.card}>
-                            <Text style={styles.cardTitle}>Support</Text>
-                            <Text style={styles.paragraph}>
+
+                        <View style={ui.card}>
+                            <Text style={ui.cardTitle}>Support</Text>
+                            <Text style={ui.paragraph}>
                                 If you find this app fun and useful, please
                                 consider leaving a tip!
                             </Text>
 
-                            <View style={styles.tiersRow}>
+                            <View style={ui.infoTiersRow}>
                                 {TIP_TIERS.map((v) => {
                                     const selected = v === amount;
                                     return (
@@ -92,17 +97,17 @@ export default function Info() {
                                             onPress={() => setAmount(v)}
                                             activeOpacity={0.85}
                                             style={[
-                                                styles.tierPill,
+                                                ui.infoTierPill,
                                                 selected
-                                                    ? styles.tierPillSelected
+                                                    ? ui.infoTierPillSelected
                                                     : null,
                                             ]}
                                         >
                                             <Text
                                                 style={[
-                                                    styles.tierText,
+                                                    ui.infoTierText,
                                                     selected
-                                                        ? styles.tierTextSelected
+                                                        ? ui.infoTierTextSelected
                                                         : null,
                                                 ]}
                                             >
@@ -114,130 +119,20 @@ export default function Info() {
                             </View>
 
                             <TouchableOpacity
-                                style={styles.primaryButton}
+                                style={ui.primaryButton}
                                 onPress={handleTip}
                                 activeOpacity={0.85}
                             >
-                                <Text style={styles.primaryButtonText}>
+                                <Text style={ui.primaryButtonText}>
                                     Tip ${amount}
                                 </Text>
                             </TouchableOpacity>
                         </View>
 
-                        <View style={{ height: 28 }} />
+                        <View style={ui.infoBottomSpacer} />
                     </>
                 )}
             </ScrollView>
         </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#121212",
-    },
-
-    screen: {
-        paddingHorizontal: 20,
-        paddingTop: 44,
-        paddingBottom: 24,
-    },
-
-    pageHeader: {
-        color: "white",
-        fontSize: 30,
-        marginBottom: 22,
-        fontFamily: "Nayuki",
-        alignSelf: "center"
-    },
-
-    card: {
-        backgroundColor: "#202020",
-        borderRadius: 18,
-        padding: 18,
-        marginBottom: 18,
-    },
-
-    cardTitle: {
-        color: "#82CBFF",
-        fontSize: 22,
-        marginBottom: 10,
-        fontWeight: 700,
-    },
-
-    paragraph: {
-        color: "rgba(255,255,255,0.88)",
-        fontSize: 16,
-        lineHeight: 22,
-        marginBottom: 10,
-    },
-
-    link: {
-        color: "#82CBFF",
-        fontSize: 16,
-        fontWeight: "600",
-        textDecorationLine: "underline",
-    },
-
-    tipHeader: {
-        marginTop: 2,
-        marginBottom: 10,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "baseline",
-    },
-    tipLabel: {
-        color: "rgba(255,255,255,0.75)",
-        fontSize: 14,
-    },
-    tipAmount: {
-        color: "white",
-        fontSize: 18,
-        fontWeight: "700",
-    },
-
-    tiersRow: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        marginBottom: 18,
-        marginTop: 4,
-    },
-
-    tierPill: {
-        borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.22)",
-        borderRadius: 999,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        backgroundColor: "transparent",
-        margin: 5
-    },
-    tierPillSelected: {
-        borderColor: "rgba(130,203,255,0.65)",
-        backgroundColor: "rgba(130,203,255,0.14)",
-    },
-    tierText: {
-        color: "rgba(255,255,255,0.78)",
-        fontSize: 14,
-        fontWeight: "700",
-    },
-    tierTextSelected: {
-        color: "#82CBFF",
-    },
-
-    primaryButton: {
-        marginTop: 2,
-        borderRadius: 12,
-        paddingVertical: 12,
-        alignItems: "center",
-        borderWidth: 0.5,
-        borderColor: "#82CBFF",
-        backgroundColor: "transparent",
-    },
-    primaryButtonText: {
-        color: "#82CBFF",
-        fontSize: 16,
-        fontWeight: "800",
-    },
-});

@@ -1,9 +1,11 @@
 import { useFonts } from "expo-font";
-import { StyleSheet, Text, View, Switch, ScrollView } from "react-native";
+import { Text, View, Switch, ScrollView } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import React, { useMemo, useCallback } from "react";
 import Slider from "@react-native-community/slider";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { ui } from "../../styles/theme";
 
 import {
     toggleMinorFasts,
@@ -22,6 +24,7 @@ const MAX_MINS = 60;
 
 export default function Settings() {
     const [fontsLoaded] = useFonts({
+        // Settings.js is in components/screens, so assets is 3 levels up
         Nayuki: require("../../assets/fonts/NayukiRegular.otf"),
     });
 
@@ -82,18 +85,21 @@ export default function Settings() {
     if (!fontsLoaded) return null;
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={ui.container}>
             <ScrollView
-                style={styles.screen}
-                contentContainerStyle={styles.scrollContent}
+                style={ui.screen}
+                contentContainerStyle={ui.settingsScrollContent}
             >
-                <Text style={styles.pageHeader}>Settings</Text>
-                {/* Holiday Options Card */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Holiday Options</Text>
+                <Text style={[ui.settingsPageHeader, { fontFamily: "Nayuki" }]}>
+                    Settings
+                </Text>
 
-                    <View style={styles.row}>
-                        <Text style={styles.rowLabel}>
+                {/* Holiday Options Card */}
+                <View style={ui.card}>
+                    <Text style={ui.cardTitle}>Holiday Options</Text>
+
+                    <View style={ui.row}>
+                        <Text style={ui.settingsRowLabel}>
                             Include modern holidays
                         </Text>
                         <Switch
@@ -107,8 +113,10 @@ export default function Settings() {
                         />
                     </View>
 
-                    <View style={styles.row}>
-                        <Text style={styles.rowLabel}>Include minor fasts</Text>
+                    <View style={ui.row}>
+                        <Text style={ui.settingsRowLabel}>
+                            Include minor fasts
+                        </Text>
                         <Switch
                             trackColor={{ false: "#767577", true: "#82CBFF" }}
                             thumbColor={"#f4f3f4"}
@@ -118,8 +126,8 @@ export default function Settings() {
                         />
                     </View>
 
-                    <View style={styles.row}>
-                        <Text style={styles.rowLabel}>
+                    <View style={ui.row}>
+                        <Text style={ui.settingsRowLabel}>
                             Include roshei chodesh
                         </Text>
                         <Switch
@@ -133,17 +141,18 @@ export default function Settings() {
                         />
                     </View>
                 </View>
+
                 {/* Shabbat Options Card */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Shabbat Options</Text>
+                <View style={ui.card}>
+                    <Text style={ui.cardTitle}>Shabbat Options</Text>
 
                     {/* Candle Lighting */}
-                    <View style={styles.row}>
-                        <View style={styles.rowLeft}>
-                            <Text style={styles.rowLabel}>
+                    <View style={ui.row}>
+                        <View style={ui.rowLeft}>
+                            <Text style={ui.settingsRowLabel}>
                                 Custom candle lighting
                             </Text>
-                            <Text style={styles.subLabel}>
+                            <Text style={ui.settingsSubLabel}>
                                 Default is {DEFAULT_CANDLE} min before sundown
                             </Text>
                         </View>
@@ -158,12 +167,12 @@ export default function Settings() {
                     </View>
 
                     {candleLightingToggle ? (
-                        <View style={styles.sliderBlock}>
-                            <View style={styles.sliderHeader}>
-                                <Text style={styles.sliderValue}>
+                        <View style={ui.settingsSliderBlock}>
+                            <View style={ui.settingsSliderHeader}>
+                                <Text style={ui.settingsSliderValue}>
                                     {candleValue} min
                                 </Text>
-                                <Text style={styles.sliderHint}>
+                                <Text style={ui.settingsSliderHint}>
                                     before sundown
                                 </Text>
                             </View>
@@ -184,11 +193,14 @@ export default function Settings() {
                             />
                         </View>
                     ) : null}
+
                     {/* Havdalah */}
-                    <View style={styles.row}>
-                        <View style={styles.rowLeft}>
-                            <Text style={styles.rowLabel}>Custom Havdalah</Text>
-                            <Text style={styles.subLabel}>
+                    <View style={ui.row}>
+                        <View style={ui.rowLeft}>
+                            <Text style={ui.settingsRowLabel}>
+                                Custom Havdalah
+                            </Text>
+                            <Text style={ui.settingsSubLabel}>
                                 Default is {DEFAULT_HAVDALAH} min after sundown
                             </Text>
                         </View>
@@ -203,12 +215,12 @@ export default function Settings() {
                     </View>
 
                     {havdalahTimeToggle ? (
-                        <View style={styles.sliderBlock}>
-                            <View style={styles.sliderHeader}>
-                                <Text style={styles.sliderValue}>
+                        <View style={ui.settingsSliderBlock}>
+                            <View style={ui.settingsSliderHeader}>
+                                <Text style={ui.settingsSliderValue}>
                                     {havdalahValue} min
                                 </Text>
-                                <Text style={styles.sliderHint}>
+                                <Text style={ui.settingsSliderHint}>
                                     after sundown
                                 </Text>
                             </View>
@@ -232,79 +244,3 @@ export default function Settings() {
         </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#121212",
-    },
-    screen: {
-        paddingHorizontal: 20,
-        paddingTop: 44,
-        paddingBottom: 24,
-    },
-    scrollContent: {
-        flexGrow: 1,
-    },
-    card: {
-        backgroundColor: "#202020",
-        borderRadius: 18,
-        padding: 18,
-        marginBottom: 18,
-    },
-    cardTitle: {
-        color: "#82CBFF",
-        fontSize: 22,
-        marginBottom: 10,
-        fontWeight: 700,
-    },
-    row: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingVertical: 10,
-    },
-    rowLeft: {
-        flex: 1,
-        paddingRight: 12,
-    },
-    rowLabel: {
-        color: "white",
-        fontSize: 18,
-        lineHeight: 22,
-    },
-    subLabel: {
-        color: "rgba(255,255,255,0.72)",
-        fontSize: 13,
-        marginTop: 6,
-        lineHeight: 17,
-    },
-
-    sliderBlock: {
-        paddingTop: 6,
-        paddingBottom: 10,
-    },
-    sliderHeader: {
-        flexDirection: "row",
-        alignItems: "baseline",
-        justifyContent: "space-between",
-        marginBottom: 8,
-    },
-    sliderValue: {
-        color: "#82CBFF",
-        fontSize: 16,
-        fontWeight: "500",
-    },
-    sliderHint: {
-        color: "#82CBFF",
-        fontSize: 16,
-        fontWeight: "500",
-    },
-    pageHeader: {
-        color: "white",
-        fontSize: 30,
-        marginBottom: 22,
-        fontFamily: "Nayuki",
-        alignSelf: "center",
-    },
-});

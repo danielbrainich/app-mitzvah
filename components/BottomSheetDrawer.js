@@ -43,7 +43,7 @@ export default function BottomSheetDrawer({
                         accessibilityRole="button"
                         accessibilityLabel="Close"
                         style={styles.closeBtn}
-                    >
+                    ><Text>X</Text>
                     </Pressable>
                 </View>
 
@@ -81,5 +81,10 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "700",
         paddingRight: 12,
-    }
+    },
+    closeBtn: {
+        color: "white",
+        fontSize: 18,
+        fontWeight: "700",
+    },
 });

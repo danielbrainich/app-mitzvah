@@ -25,6 +25,14 @@ import * as ExpoLocation from "expo-location";
 import { useSelector } from "react-redux";
 import BottomSheetDrawer from "../BottomSheetDrawer";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ui } from "../../styles/theme";
+
+// -----------------------------------------------------------------------------
+// Notes:
+// - All date/time logic here is intentionally local time (not UTC) to avoid
+//   drifting around midnight or across timezones.
+// - We refresh Shabbat info on: mount, app foreground, and the next local midnight.
+// -----------------------------------------------------------------------------
 
 // Dev-only override for testing specific dates.
 // Examples:
@@ -32,12 +40,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 //   • Shabbat → Yom Tov (no Havdalah): "2026-09-25"  // Erev Sukkot
 const TEST_TODAY_ISO = __DEV__ ? null : null; // set to null when done
 
+// Add minutes to a Date without mutating the original Date.
+// Used for "candle lighting = sunset - offset" and "havdalah = sunset + mins".
 function addMinutes(date, mins) {
     const d = new Date(date);
     d.setMinutes(d.getMinutes() + mins);
     return d;
 }
 
+// Round up to the next whole minute.
+// Useful because zmanim can have seconds/millis and we want clean display times.
 function ceilToMinute(date) {
     const d = new Date(date);
     const hadSeconds = d.getSeconds() > 0 || d.getMilliseconds() > 0;
@@ -46,7 +58,7 @@ function ceilToMinute(date) {
     return d;
 }
 
-// Local YYYY-MM-DD (not UTC) to avoid date drifting around midnight/timezones.
+// Local YYYY-MM-DD (not UTC) so “today” matches the user’s timezone.
 function localIsoToday() {
     const d = new Date();
     const y = d.getFullYear();
@@ -55,17 +67,20 @@ function localIsoToday() {
     return `${y}-${m}-${day}`;
 }
 
+// Dev-friendly “today”: uses TEST_TODAY_ISO in development when set, otherwise local today.
 function getTodayIso() {
     if (__DEV__ && TEST_TODAY_ISO) return TEST_TODAY_ISO;
     return localIsoToday();
 }
 
-// Parse YYYY-MM-DD into a local Date at midnight.
+// Convert YYYY-MM-DD to a local Date at midnight.
+// Avoids timezone drift that can happen when parsing ISO strings directly.
 function localDateFromIso(iso) {
     const [y, m, d] = iso.split("-").map(Number);
     return new Date(y, m - 1, d, 0, 0, 0, 0);
 }
 
+// Format a Date for display (12h clock).
 function formatTime(date) {
     const hours = date.getHours();
     const minutes =
@@ -81,6 +96,8 @@ const dateFormatter = new Intl.DateTimeFormat("en-GB", {
     year: "numeric",
 });
 
+// Milliseconds until next local midnight.
+// We refresh at midnight so "today/upcoming Shabbat" flips correctly.
 function msUntilNextLocalMidnight() {
     const now = new Date();
     const next = new Date(now);
@@ -89,7 +106,7 @@ function msUntilNextLocalMidnight() {
     return next.getTime() - now.getTime();
 }
 
-// Compare two Date objects by local calendar day only.
+// Compare two Date objects by local calendar day only (ignores time of day).
 function isSameLocalDate(a, b) {
     return (
         a.getFullYear() === b.getFullYear() &&
@@ -99,9 +116,16 @@ function isSameLocalDate(a, b) {
 }
 
 /**
- * Compute Friday times from Zmanim:
- * - sunset is rounded up to a minute (ceil)
- * - candle lighting = sundown - (user setting, default 18)
+ * Compute Friday times from Zmanim.
+ * Used as a fallback display time when Hebcal candle-lighting events are missing.
+ *
+ * Inputs:
+ * - location/timezone: for accurate zmanim
+ * - friday: the Friday date
+ * - candleOffsetMins: user setting (defaults to 18 if null/undefined)
+ *
+ * Output:
+ * - sundownFriday + candleTime as formatted strings
  */
 function getFridayTimesFromZmanim({
     location,
@@ -147,9 +171,16 @@ function getFridayTimesFromZmanim({
 }
 
 /**
- * Compute Saturday times from Zmanim:
- * - sunset is rounded up to a minute (ceil)
- * - shabbat ends = sunset + havdalah mins
+ * Compute Saturday times from Zmanim.
+ * Used as a fallback display time when Hebcal havdalah events are missing.
+ *
+ * Inputs:
+ * - location/timezone: for accurate zmanim
+ * - saturday: the Saturday date
+ * - havdalahMins: user setting (defaults to 42 if null/undefined)
+ *
+ * Output:
+ * - sundownSaturday + shabbatEnds as formatted strings
  */
 function getSaturdayTimesFromZmanim({
     location,
@@ -188,6 +219,15 @@ function getSaturdayTimesFromZmanim({
     };
 }
 
+/**
+ * Extracts the display/logic signals we need from Hebcal events:
+ * - Candle lighting (Friday + Saturday if Shabbat flows into Yom Tov)
+ * - Havdalah info
+ * - Parsha info (if present)
+ * - Detects "holiday on Shabbat day" even when location is OFF (no candle events)
+ *
+ * This function does NOT compute times itself; it reads what Hebcal provides.
+ */
 function getShabbatInfo(events, friday, saturday) {
     const shabbatInfo = {
         endsIntoYomTov: false,
@@ -477,17 +517,20 @@ export default function Shabbat() {
         fetchShabbatInfo();
     }, [fetchShabbatInfo]);
 
+    // Refresh once at the next local midnight. Re-schedules after each run.
     useEffect(() => {
-        const schedule = () => {
+        if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+
+        timeoutIdRef.current = setTimeout(() => {
+            fetchShabbatInfo();
+
+            // schedule the next midnight tick
             if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
-
-            timeoutIdRef.current = setTimeout(() => {
-                fetchShabbatInfo();
-                schedule(); // reschedule next midnight
-            }, msUntilNextLocalMidnight());
-        };
-
-        schedule();
+            timeoutIdRef.current = setTimeout(
+                fetchShabbatInfo,
+                msUntilNextLocalMidnight()
+            );
+        }, msUntilNextLocalMidnight());
 
         return () => {
             if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
@@ -497,37 +540,44 @@ export default function Shabbat() {
     const hasLocation = !!location && locationStatus === "granted";
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView style={styles.screen}>
+        <SafeAreaView style={ui.shabbatContainer}>
+            <ScrollView style={ui.screen}>
                 {!fontsLoaded ? null : (
                     <>
-                        <Text style={styles.pageHeader}>Shabbat</Text>
+                        <Text
+                            style={[
+                                ui.shabbatPageHeader,
+                                { fontFamily: "Nayuki" },
+                            ]}
+                        >
+                            Shabbat
+                        </Text>
 
                         {shabbatInfo ? (
                             <>
                                 {/* Erev Shabbat card */}
-                                <View style={styles.card}>
-                                    <Text style={styles.cardTitle}>
+                                <View style={ui.card}>
+                                    <Text style={ui.cardTitle}>
                                         Erev Shabbat
                                     </Text>
 
-                                    <Text style={styles.sentence}>
+                                    <Text style={ui.shabbatSentence}>
                                         {shabbatInfo.erevShabbatDate}
                                     </Text>
 
                                     {shabbatInfo.candleTime ? (
-                                        <Text style={styles.sentence}>
+                                        <Text style={ui.shabbatSentence}>
                                             Candle lighting at{" "}
-                                            <Text style={styles.highlight}>
+                                            <Text style={ui.shabbatHighlight}>
                                                 {shabbatInfo.candleTime}
                                             </Text>
                                         </Text>
                                     ) : null}
 
                                     {shabbatInfo.sundownFriday ? (
-                                        <Text style={styles.sentence}>
+                                        <Text style={ui.shabbatSentence}>
                                             Sundown at{" "}
-                                            <Text style={styles.highlight}>
+                                            <Text style={ui.shabbatHighlight}>
                                                 {shabbatInfo.sundownFriday}
                                             </Text>
                                         </Text>
@@ -535,21 +585,21 @@ export default function Shabbat() {
                                 </View>
 
                                 {/* Yom Shabbat card */}
-                                <View style={styles.card}>
-                                    <Text style={styles.cardTitle}>
+                                <View style={ui.card}>
+                                    <Text style={ui.cardTitle}>
                                         Yom Shabbat
                                     </Text>
 
-                                    <Text style={styles.sentence}>
+                                    <Text style={ui.shabbatSentence}>
                                         {shabbatInfo.yomShabbatDate}
                                     </Text>
 
                                     {/* Normal week: Havdalah */}
                                     {shabbatInfo.shabbatEnds &&
                                     !shabbatInfo.endsIntoYomTov ? (
-                                        <Text style={styles.sentence}>
+                                        <Text style={ui.shabbatSentence}>
                                             Havdalah at{" "}
-                                            <Text style={styles.highlight}>
+                                            <Text style={ui.shabbatHighlight}>
                                                 {shabbatInfo.shabbatEnds}
                                             </Text>{" "}
                                         </Text>
@@ -559,10 +609,14 @@ export default function Shabbat() {
                                     {shabbatInfo.endsIntoYomTov ? (
                                         <>
                                             {shabbatInfo.yomTovCandleTime ? (
-                                                <Text style={styles.sentence}>
+                                                <Text
+                                                    style={ui.shabbatSentence}
+                                                >
                                                     Holiday candle lighting at{" "}
                                                     <Text
-                                                        style={styles.highlight}
+                                                        style={
+                                                            ui.shabbatHighlight
+                                                        }
                                                     >
                                                         {
                                                             shabbatInfo.yomTovCandleTime
@@ -572,8 +626,8 @@ export default function Shabbat() {
                                             ) : (
                                                 <Text
                                                     style={[
-                                                        styles.sentence,
-                                                        styles.muted,
+                                                        ui.shabbatSentence,
+                                                        ui.shabbatMuted,
                                                     ]}
                                                 >
                                                     Shabbat ends into Yom Tov
@@ -581,10 +635,11 @@ export default function Shabbat() {
                                             )}
                                         </>
                                     ) : null}
+
                                     {shabbatInfo.sundownSaturday ? (
-                                        <Text style={styles.sentence}>
+                                        <Text style={ui.shabbatSentence}>
                                             Sundown at{" "}
-                                            <Text style={styles.highlight}>
+                                            <Text style={ui.shabbatHighlight}>
                                                 {shabbatInfo.sundownSaturday}
                                             </Text>
                                         </Text>
@@ -592,31 +647,28 @@ export default function Shabbat() {
                                 </View>
 
                                 {/* Parasha card */}
-                                <View style={styles.card}>
+                                <View style={ui.card}>
                                     {shabbatInfo.endsIntoYomTov ||
                                     shabbatInfo.parshaReplacedByHoliday ? (
-                                        <>
-                                            <Text
-                                                style={[styles.sentenceSmall]}
-                                            >
-                                                Because a holiday begins
-                                                Saturday evening, holiday candle
-                                                lighting replaces Havdalah and
-                                                the holiday Torah reading
-                                                replaces the Parasha.{" "}
-                                            </Text>
-                                        </>
+                                        <Text style={ui.shabbatSentenceSmall}>
+                                            Because a holiday begins Saturday
+                                            evening, holiday candle lighting
+                                            replaces Havdalah and the holiday
+                                            Torah reading replaces the Parasha.
+                                        </Text>
                                     ) : shabbatInfo.parshaEnglish ? (
                                         <>
-                                            <Text style={styles.cardTitle}>
+                                            <Text style={ui.cardTitle}>
                                                 Parasha
                                             </Text>
-                                            <Text style={styles.sentence}>
+                                            <Text style={ui.shabbatSentence}>
                                                 {shabbatInfo.parshaEnglish}
                                             </Text>
 
                                             {shabbatInfo.parshaHebrew ? (
-                                                <Text style={styles.sentence}>
+                                                <Text
+                                                    style={ui.shabbatSentence}
+                                                >
                                                     {shabbatInfo.parshaHebrew}
                                                 </Text>
                                             ) : null}
@@ -624,8 +676,8 @@ export default function Shabbat() {
                                     ) : (
                                         <Text
                                             style={[
-                                                styles.sentence,
-                                                styles.muted,
+                                                ui.shabbatSentence,
+                                                ui.shabbatMuted,
                                             ]}
                                         >
                                             Parasha info unavailable
@@ -634,16 +686,14 @@ export default function Shabbat() {
                                 </View>
                             </>
                         ) : (
-                            <View style={styles.card}>
-                                <Text style={styles.sentence}>
+                            <View style={ui.card}>
+                                <Text style={ui.shabbatSentence}>
                                     {loading
                                         ? "Loading Shabbat info..."
                                         : "No Shabbat info."}
                                 </Text>
                             </View>
                         )}
-
-                        {/* Footer area: Location notice / pill */}
 
                         {/* Bottom sheet for location details */}
                         <BottomSheetDrawer
@@ -652,18 +702,20 @@ export default function Shabbat() {
                             title="Your Location"
                             snapPoints={["30%", "45%"]}
                         >
-                            <View style={styles.sheetLine}>
-                                <Text style={styles.sheetLabel}>Timezone</Text>
-                                <Text style={styles.sheetValue}>
+                            <View style={ui.shabbatSheetLine}>
+                                <Text style={ui.shabbatSheetLabel}>
+                                    Timezone
+                                </Text>
+                                <Text style={ui.shabbatSheetValue}>
                                     {timezone.replace(/_/g, " ")}
                                 </Text>
                             </View>
 
-                            <View style={styles.sheetLine}>
-                                <Text style={styles.sheetLabel}>
+                            <View style={ui.shabbatSheetLine}>
+                                <Text style={ui.shabbatSheetLabel}>
                                     Coordinates
                                 </Text>
-                                <Text style={styles.sheetValue}>
+                                <Text style={ui.shabbatSheetValue}>
                                     {hasLocation
                                         ? `${location.latitude.toFixed(
                                               3
@@ -672,9 +724,11 @@ export default function Shabbat() {
                                 </Text>
                             </View>
 
-                            <View style={styles.sheetLine}>
-                                <Text style={styles.sheetLabel}>Elevation</Text>
-                                <Text style={styles.sheetValue}>
+                            <View style={ui.shabbatSheetLine}>
+                                <Text style={ui.shabbatSheetLabel}>
+                                    Elevation
+                                </Text>
+                                <Text style={ui.shabbatSheetValue}>
                                     {hasLocation &&
                                     Number.isFinite(location.elevation)
                                         ? `${location.elevation.toFixed(
@@ -686,13 +740,14 @@ export default function Shabbat() {
                         </BottomSheetDrawer>
                     </>
                 )}
-                <View style={styles.footer}>
+
+                <View style={ui.shabbatFooter}>
                     {!hasLocation && (
-                        <View style={styles.locationNotice}>
-                            <Text style={styles.locationNoticeTitle}>
+                        <View style={ui.shabbatLocationNotice}>
+                            <Text style={ui.shabbatLocationNoticeTitle}>
                                 Location is off
                             </Text>
-                            <Text style={styles.locationNoticeBody}>
+                            <Text style={ui.shabbatLocationNoticeBody}>
                                 Candle lighting, sundown, and havdalah times use
                                 your device’s location. Turn on location
                                 services to see those times
@@ -700,9 +755,9 @@ export default function Shabbat() {
 
                             <TouchableOpacity
                                 onPress={openSettings}
-                                style={styles.cta}
+                                style={ui.shabbatCta}
                             >
-                                <Text style={styles.ctaText}>
+                                <Text style={ui.shabbatCtaText}>
                                     Open Settings
                                 </Text>
                             </TouchableOpacity>
@@ -710,180 +765,17 @@ export default function Shabbat() {
                     )}
                 </View>
             </ScrollView>
+
             {hasLocation && (
                 <Pressable
                     onPress={() => setShowLocationDetails(true)}
-                    style={styles.locationChip}
+                    style={ui.shabbatLocationChip}
                     hitSlop={12}
                 >
-                    <View style={styles.greenDot} />
-                    <Text style={styles.locationChipText}>Location</Text>
+                    <View style={ui.shabbatGreenDot} />
+                    <Text style={ui.shabbatLocationChipText}>Location</Text>
                 </Pressable>
             )}
         </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#121212",
-        position: "relative",
-    },
-    scrollViewContent: {
-        flex: 1,
-        alignSelf: "stretch",
-    },
-
-    screen: {
-        paddingHorizontal: 20,
-        paddingTop: 44,
-        paddingBottom: 24,
-    },
-
-    pageHeader: {
-        color: "white",
-        fontSize: 30,
-        marginBottom: 22,
-        fontFamily: "Nayuki",
-        alignSelf: "center",
-    },
-
-    card: {
-        backgroundColor: "#202020",
-        borderRadius: 18,
-        padding: 18,
-        marginBottom: 18,
-    },
-
-    cardTitle: {
-        color: "#82CBFF",
-        fontSize: 22,
-        marginBottom: 10,
-        fontWeight: 700,
-    },
-
-    sentence: {
-        color: "rgba(255,255,255,0.92)",
-        fontSize: 18,
-        lineHeight: 26,
-        marginBottom: 6,
-    },
-    sentenceSmall: {
-        color: "rgba(255,255,255,0.92)",
-        fontSize: 16,
-        lineHeight: 22,
-        marginBottom: 6,
-    },
-    highlight: {
-        color: "#82CBFF",
-        fontWeight: "500",
-    },
-    muted: {
-        color: "rgba(255,255,255,0.75)",
-    },
-
-    footer: {
-        marginTop: 4,
-    },
-
-    sheetLine: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 12,
-    },
-    sheetLabel: {
-        color: "rgba(255,255,255,0.75)",
-        fontSize: 14,
-    },
-    sheetValue: {
-        color: "#82CBFF",
-        fontSize: 14,
-        maxWidth: "60%",
-        textAlign: "right",
-    },
-
-    locationNotice: {
-        borderRadius: 12,
-        padding: 14,
-        backgroundColor: "black",
-    },
-    locationNoticeTitle: {
-        color: "white",
-        fontSize: 16,
-        marginBottom: 6,
-        fontWeight: "500",
-    },
-    locationNoticeBody: {
-        color: "white",
-        opacity: 0.9,
-        fontSize: 14,
-        lineHeight: 18,
-        marginBottom: 10,
-    },
-    cta: {
-        borderWidth: 0.5,
-        borderColor: "#82CBFF",
-        borderRadius: 10,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        alignSelf: "flex-start",
-    },
-    ctaText: {
-        color: "#82CBFF",
-        fontSize: 12,
-        fontWeight: "600",
-    },
-
-    debugRow: {
-        flexDirection: "row",
-        gap: 10,
-        alignItems: "center",
-    },
-    debugPill: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.20)",
-        borderRadius: 999,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        alignSelf: "flex-start",
-    },
-    debugPillText: {
-        color: "white",
-        fontSize: 14,
-        opacity: 0.9,
-    },
-    locationChip: {
-        position: "absolute",
-        left: 20,
-        bottom: 18,
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-        borderRadius: 999,
-        borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.18)",
-        backgroundColor: "#121212",
-    },
-    greenDot: {
-        width: 10,
-        height: 10,
-        borderRadius: 99,
-        backgroundColor: "#35D07F",
-    },
-
-    locationChipText: {
-        color: "white",
-        fontSize: 14,
-        opacity: 0.9,
-    },
-    locationFloating: {
-        position: "absolute",
-        left: 18,
-        bottom: 4,
-    },
-});

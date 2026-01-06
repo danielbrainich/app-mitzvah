@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View, FlatList, useWindowDimensions, StyleSheet } from "react-native";
+import { View, FlatList, useWindowDimensions } from "react-native";
 import UpcomingHolidayCard from "./UpcomingHolidayCard";
 
 export default function UpcomingHolidaysCarousel({
