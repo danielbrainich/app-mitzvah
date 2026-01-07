@@ -45,7 +45,6 @@ export default function UpcomingHolidaysCarousel({
                             formatDate={formatDate}
                             hebrewDate={hebrewDate}
                             cardWidth={cardWidth}
-                            todayIso={todayIso}
                         />
                     </View>
                 )}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text } from "react-native";
 import { HDate } from "@hebcal/core";
 
@@ -13,8 +13,9 @@ function stripParentheses(text) {
 }
 
 /**
- * Parse YYYY-MM-DD as a LOCAL Date (avoids timezone shifting).
- * Use this before passing to HDate (HDate does not accept ISO strings directly).
+ * Parse YYYY-MM-DD as a LOCAL Date at midnight.
+ * Why: parsing ISO strings directly can shift days due to timezone (UTC).
+ * When: use before passing into HDate() or any local-day comparisons.
  */
 function parseLocalIso(iso) {
     if (!iso) return null;
@@ -30,8 +31,20 @@ export default function UpcomingHolidayCard({
     cardWidth,
     formatDate,
 }) {
-    const iso = holiday?.date; // expected: YYYY-MM-DD
-    const localDate = parseLocalIso(iso);
+    const title = stripParentheses(holiday?.title);
+
+    // Use the HOLIDAY’s date
+    const gregLabel = useMemo(() => {
+        if (!holiday?.date) return "";
+        return formatDate(holiday.date);
+    }, [holiday?.date, formatDate]);
+
+    // Hebrew label also needs the HOLIDAY’s date, and it must be a Date object
+    const hebLabel = useMemo(() => {
+        const d = parseLocalIso(holiday?.date);
+        if (!d) return "";
+        return new HDate(d).toString();
+    }, [holiday?.date]);
 
     return (
         <View
@@ -40,9 +53,7 @@ export default function UpcomingHolidayCard({
                 cardWidth ? { width: cardWidth } : null,
             ]}
         >
-            <Text style={ui.upcomingHolidayTitle}>
-                {stripParentheses(holiday?.title)}
-            </Text>
+            <Text style={ui.upcomingHolidayTitle}>{title}</Text>
 
             {!!holiday?.hebrewTitle && (
                 <Text style={ui.upcomingHolidayHebrew}>
@@ -51,11 +62,7 @@ export default function UpcomingHolidayCard({
             )}
 
             <Text style={ui.upcomingHolidayDate}>
-                {!hebrewDate
-                    ? formatDate(iso)
-                    : localDate
-                    ? new HDate(localDate).toString()
-                    : ""}
+                {hebrewDate ? hebLabel : gregLabel}
             </Text>
         </View>
     );
