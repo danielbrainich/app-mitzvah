@@ -88,12 +88,8 @@ export default function Settings() {
         <SafeAreaView style={ui.container}>
             <ScrollView
                 style={ui.screen}
-                contentContainerStyle={ui.settingsScrollContent}
+                contentContainerStyle={ui.scrollContent}
             >
-                <Text style={[ui.settingsPageHeader, { fontFamily: "Nayuki" }]}>
-                    Settings
-                </Text>
-
                 {/* Holiday Options Card */}
                 <View style={ui.card}>
                     <Text style={ui.cardTitle}>Holiday Options</Text>

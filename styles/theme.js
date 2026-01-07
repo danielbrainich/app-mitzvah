@@ -118,24 +118,16 @@ export const ui = StyleSheet.create({
         fontWeight: "800",
     },
 
+    // ---------------------------------------------------------------------------
+    // Scroll helpers (shared)
+    // ---------------------------------------------------------------------------
+    scrollContent: {
+        flexGrow: 1,
+    },
+
     // ===========================================================================
     // INFO SCREEN (prefixed)
     // ===========================================================================
-    infoPageHeader: {
-        color: COLORS.white,
-        fontSize: 30,
-        marginBottom: 22,
-        alignSelf: "center",
-        // NOTE: fontFamily stays in screen file because it depends on fontsLoaded.
-    },
-
-    shabbatPageHeader: {
-        color: COLORS.white,
-        fontSize: 30,
-        marginBottom: 22,
-        alignSelf: "center",
-        // NOTE: fontFamily is applied in-screen after fontsLoaded
-    },
 
     infoTiersRow: {
         flexDirection: "row",
@@ -283,10 +275,6 @@ export const ui = StyleSheet.create({
     // ===========================================================================
     // SETTINGS SCREEN (prefixed)
     // ===========================================================================
-    settingsScrollContent: {
-        flexGrow: 1,
-    },
-
     settingsRowLabel: {
         color: "white",
         fontSize: 18,
@@ -320,11 +308,150 @@ export const ui = StyleSheet.create({
         fontWeight: "500",
     },
 
-    settingsPageHeader: {
+    // ===========================================================================
+    // HOLIDAYS SCREEN (prefixed)
+    // ===========================================================================
+    holidaysTodaySection: {
+        flexShrink: 1,
+    },
+
+    holidaysTodayPagerSlot: {
+        // height is set in-screen via [style, { height: TODAY_PAGER_HEIGHT }]
+        justifyContent: "flex-start",
+        paddingTop: 6,
+    },
+
+    holidaysNoHolidayWrap: {
+        justifyContent: "center",
+        alignItems: "flex-start",
+    },
+
+    holidaysBigBoldText: {
+        color: COLORS.accent,
+        // NOTE: fontFamily is applied in-screen after fontsLoaded
+        fontSize: 86,
+        lineHeight: 90,
+    },
+
+    holidaysComingUpSection: {
+        marginTop: "auto",
+        paddingTop: 14,
+    },
+
+    holidaysSecondHeaderText: {
+        color: "white",
+        fontSize: 20,
+        marginBottom: 14,
+    },
+
+    holidaysUpcomingCarouselSlot: {
+        // height is set in-screen via [style, { height: UPCOMING_HEIGHT }]
+    },
+
+    holidaysHeaderText: {
         color: "white",
         fontSize: 30,
-        marginBottom: 22,
-        alignSelf: "center",
-        // NOTE: fontFamily applied in-screen after fontsLoaded
+        marginTop: 12,
+        marginBottom: 0,
+    },
+
+    // ===========================================================================
+    // TODAY HOLIDAY CARD (prefixed)
+    // ===========================================================================
+    todayHolidayCard: {
+        backgroundColor: COLORS.card,
+        borderRadius: 18,
+        padding: 18,
+        paddingTop: 16,
+        justifyContent: "space-between",
+    },
+
+    todayHolidayHeaderText: {
+        color: "white",
+        fontSize: 30,
+        marginBottom: 12,
+    },
+
+    todayHolidayTitleRow: {
+        flexDirection: "row",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: 10,
+    },
+
+    todayHolidayTitle: {
+        flex: 1,
+        color: COLORS.accent,
+        fontFamily: "Nayuki",
+        fontSize: 64,
+        lineHeight: 66,
+    },
+
+    todayHolidayHebrew: {
+        color: "white",
+        fontSize: 26,
+        opacity: 0.95,
+        marginTop: 8,
+    },
+
+    todayHolidayDate: {
+        color: "rgba(255,255,255,0.9)",
+        fontSize: 16,
+        marginTop: 12,
+    },
+
+    // This button is “card-local” (different shape than shared primaryButton)
+    todayHolidayMoreInfoButton: {
+        marginTop: 16,
+        borderRadius: 18,
+        padding: 12,
+        alignItems: "center",
+        borderWidth: 0.5,
+        borderColor: COLORS.accent,
+        backgroundColor: "transparent",
+        alignSelf: "flex-start",
+    },
+    todayHolidayMoreInfoButtonText: {
+        color: COLORS.accent,
+        fontSize: 16,
+        fontWeight: "700",
+    },
+
+    // Bottom sheet typography
+    todayHolidayDrawerHebrew: {
+        color: COLORS.accent,
+        fontSize: 18,
+        fontWeight: "600",
+        marginBottom: 12,
+        opacity: 0.95,
+    },
+    todayHolidayDrawerBody: {
+        color: COLORS.textBody,
+        fontSize: 16,
+        lineHeight: 21,
+    },
+
+    // ===========================================================================
+    // UPCOMING HOLIDAY CARD (prefixed)
+    // ===========================================================================
+    upcomingHolidayCard: {
+        backgroundColor: COLORS.card,
+        borderRadius: 18,
+        padding: 18,
+    },
+    upcomingHolidayTitle: {
+        color: COLORS.accent,
+        fontSize: 18,
+        marginBottom: 6,
+    },
+    upcomingHolidayHebrew: {
+        color: "white",
+        fontSize: 16,
+        marginBottom: 6,
+    },
+    upcomingHolidayDate: {
+        color: "white",
+        fontSize: 14,
+        opacity: 0.75,
     },
 });

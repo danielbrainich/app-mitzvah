@@ -544,15 +544,6 @@ export default function Shabbat() {
             <ScrollView style={ui.screen}>
                 {!fontsLoaded ? null : (
                     <>
-                        <Text
-                            style={[
-                                ui.shabbatPageHeader,
-                                { fontFamily: "Nayuki" },
-                            ]}
-                        >
-                            Shabbat
-                        </Text>
-
                         {shabbatInfo ? (
                             <>
                                 {/* Erev Shabbat card */}

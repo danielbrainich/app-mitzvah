@@ -34,7 +34,6 @@ export default function TodayHolidayCarousel({
 
     return (
         <View
-            style={[styles.wrap, { height }]}
             onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
         >
             {containerWidth > 0 && cardWidth > 0 ? (
@@ -85,7 +84,3 @@ export default function TodayHolidayCarousel({
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    wrap: { width: "100%" },
-});

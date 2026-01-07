@@ -5,9 +5,14 @@ import React, {
     useRef,
     useState,
 } from "react";
-import { StyleSheet, Text, View, ScrollView, SafeAreaView } from "react-native";
+import { Text, View, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
+import { useFonts } from "expo-font";
+
+import { ui } from "../../styles/theme";
+
 import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
 import TodayHolidayCarousel from "../TodayHolidayCarousel";
 import TodayHolidayCard from "../TodayHolidayCard";
@@ -46,7 +51,7 @@ const MONTHS_SHORT = [
 //   • 1 holiday day: "2026-09-12"
 //   • 2 holidays day: "2026-03-02"
 //   • 3 holidays day: "2026-12-10"
-const DEBUG_TODAY_ISO = __DEV__ ? "2026-12-10" : null;
+const DEBUG_TODAY_ISO = __DEV__ ? "2026-03-02" : null;
 
 function localIsoDate(date) {
     const y = date.getFullYear();
@@ -69,13 +74,6 @@ function parseLocalIso(iso) {
 function formatDate(isoDate) {
     const date = parseLocalIso(isoDate);
     return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
-}
-
-function formatShortDate(isoDate) {
-    const date = parseLocalIso(isoDate);
-    return `${date.getDate()} ${
-        MONTHS_SHORT[date.getMonth()]
-    } ${date.getFullYear()}`;
 }
 
 function msUntilNextLocalMidnight() {
@@ -106,7 +104,14 @@ function endOfHebrewYearFromTodayExclusive(todayIso) {
     return end;
 }
 
+const TODAY_PAGER_HEIGHT = 340;
+const UPCOMING_HEIGHT = 120;
+
 export default function Holidays() {
+    const [fontsLoaded] = useFonts({
+        Nayuki: require("../../assets/fonts/NayukiRegular.otf"),
+    });
+
     const { hebrewDate, minorFasts, rosheiChodesh, modernHolidays } =
         useSelector((state) => state.settings);
 
@@ -117,16 +122,11 @@ export default function Holidays() {
     const intervalIdRef = useRef(null);
 
     // Determines "today" using the local calendar date.
-    // In development, DEBUG_TODAY_ISO can override this to simulate specific dates
-    // (e.g. holidays) without changing the device clock.
-    // In production, this always resolves to the user's real local day.
+    // In development, DEBUG_TODAY_ISO can override this to simulate specific dates.
     const todayIso = useMemo(() => DEBUG_TODAY_ISO ?? localIsoToday(), []);
 
     const fetchHolidays = useCallback(() => {
-        // Include today so "Today is" can work
         const startDate = parseLocalIso(todayIso);
-
-        // Cut off after one full Hebrew year from today (prevents “wraparound” repeats)
         const endDate = endOfHebrewYearFromTodayExclusive(todayIso);
 
         const options = {
@@ -231,16 +231,17 @@ export default function Holidays() {
         [holidays, todayIso]
     );
 
+    if (!fontsLoaded) return null;
+
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={ui.container}>
             <ScrollView
-                style={styles.screen}
-                contentContainerStyle={styles.scrollContent}
+                style={ui.screen}
+                contentContainerStyle={ui.scrollContent}
             >
-                <Text style={styles.pageHeader}>Holidays</Text>
                 {/* TODAY */}
                 {todayHolidays.length > 0 ? (
-                    <View style={styles.todaySection}>
+                    <View style={ui.holidaysTodaySection}>
                         <TodayHolidayCarousel
                             data={todayHolidays}
                             height={360}
@@ -254,22 +255,39 @@ export default function Holidays() {
                         />
                     </View>
                 ) : (
-                    <View style={styles.todaySection}>
-                        <Text style={styles.headerText}>Today is</Text>
-                        <View style={styles.todayPagerSlot}>
-                            <View style={styles.noHolidayWrap}>
-                                <Text style={styles.bigBoldText}>
+                    <View style={ui.holidaysTodaySection}>
+                        <Text style={ui.holidaysHeaderText}>Today is</Text>
+
+                        <View
+                            style={[
+                                ui.holidaysTodayPagerSlot,
+                                { height: TODAY_PAGER_HEIGHT },
+                            ]}
+                        >
+                            <View style={ui.holidaysNoHolidayWrap}>
+                                <Text
+                                    style={[
+                                        ui.holidaysBigBoldText,
+                                        { fontFamily: "Nayuki" },
+                                    ]}
+                                >
                                     not a Jewish holiday
                                 </Text>
                             </View>
                         </View>
                     </View>
                 )}
-                {/* COMING UP (pinned to bottom) */}
-                <View style={styles.comingUpSection}>
-                    <Text style={styles.secondHeaderText}>Coming up</Text>
 
-                    <View style={styles.upcomingCarouselSlot}>
+                {/* COMING UP (pinned to bottom) */}
+                <View style={ui.holidaysComingUpSection}>
+                    <Text style={ui.holidaysSecondHeaderText}>Coming up</Text>
+
+                    <View
+                        style={[
+                            ui.holidaysUpcomingCarouselSlot,
+                            { height: UPCOMING_HEIGHT },
+                        ]}
+                    >
                         <UpcomingHolidaysCarousel
                             holidays={upcoming}
                             hebrewDate={hebrewDate}
@@ -284,71 +302,3 @@ export default function Holidays() {
         </SafeAreaView>
     );
 }
-
-const TODAY_PAGER_HEIGHT = 340;
-const UPCOMING_HEIGHT = 120;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#121212",
-    },
-    pageHeader: {
-        color: "white",
-        fontSize: 30,
-        marginBottom: 22,
-        fontFamily: "Nayuki",
-        alignSelf: "center",
-    },
-    screen: {
-        paddingHorizontal: 20,
-        paddingTop: 44,
-        paddingBottom: 24,
-    },
-    scrollContent: {
-        flexGrow: 1,
-    },
-
-    todaySection: {
-        flexShrink: 1,
-    },
-
-    todayPagerSlot: {
-        height: TODAY_PAGER_HEIGHT,
-        justifyContent: "flex-start",
-        paddingTop: 6,
-    },
-
-    noHolidayWrap: {
-        justifyContent: "center",
-        alignItems: "flex-start",
-    },
-
-    bigBoldText: {
-        color: "#82CBFF",
-        fontFamily: "Nayuki",
-        fontSize: 86,
-        lineHeight: 90,
-    },
-
-    comingUpSection: {
-        marginTop: "auto",
-        paddingTop: 14,
-    },
-
-    secondHeaderText: {
-        color: "white",
-        fontSize: 20,
-        marginBottom: 14,
-    },
-
-    upcomingCarouselSlot: {
-        height: UPCOMING_HEIGHT,
-    },
-    headerText: {
-        color: "white",
-        fontSize: 30,
-        marginTop: 12,
-        marginBottom: 0,
-    },
-});

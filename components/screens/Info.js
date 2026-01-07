@@ -44,15 +44,6 @@ export default function Info() {
             <ScrollView contentContainerStyle={ui.screen}>
                 {!fontsLoaded ? null : (
                     <>
-                        <Text
-                            style={[
-                                ui.infoPageHeader,
-                                { fontFamily: "Nayuki" },
-                            ]}
-                        >
-                            Info
-                        </Text>
-
                         <View style={ui.card}>
                             <Text style={ui.cardTitle}>About</Text>
                             <Text style={ui.paragraph}>
