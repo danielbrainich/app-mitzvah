@@ -4,6 +4,8 @@ import Holidays from "./screens/Holidays";
 import Shabbat from "./screens/Shabbat";
 import Settings from "./screens/Settings";
 import Info from "./screens/Info";
+import { colors } from "../styles/theme";
+
 
 const Tab = createBottomTabNavigator();
 
@@ -13,11 +15,11 @@ export default function AppNavigator() {
                 screenOptions={{
                     headerShown: false,
                     tabBarStyle: {
-                        backgroundColor: "#202020",
-                        borderTopColor: "#202020",
+                        backgroundColor: colors.card,
+                        borderTopColor: colors.card,
                     },
-                    tabBarActiveTintColor: "#82CBFF",
-                    tabBarInactiveTintColor: "rgba(255,255,255,0.65)",
+                    tabBarActiveTintColor: colors.accent,
+                    tabBarInactiveTintColor: colors.muted,
                 }}
             >
                 <Tab.Screen name="Holidays" component={Holidays} />

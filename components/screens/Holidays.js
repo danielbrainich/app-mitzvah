@@ -6,27 +6,13 @@ import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 import { useFonts } from "expo-font";
 
 import { ui } from "../../styles/theme";
-import useTodayIso from "../../hooks/useTodayIso";
-
 import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
 import TodayHolidayCarousel from "../TodayHolidayCarousel";
 import TodayHolidayCard from "../TodayHolidayCard";
 import UpcomingHolidaysCarousel from "../UpcomingHolidaysCarousel";
-
-// DEV ONLY: set to "YYYY-MM-DD" to simulate a date. Set to null for real today.
-//   • 1 holiday day: "2026-09-12"
-//   • 2 holidays day: "2026-03-02"
-//   • 3 holidays day: "2026-12-10"
-const DEBUG_TODAY_ISO = __DEV__ ? "2026-03-02" : null;
-
-/**
- * Parse YYYY-MM-DD as a LOCAL date at midnight.
- * Why: avoids UTC shifting when using Date(isoString).
- */
-function parseLocalIso(iso) {
-    const [y, m, d] = iso.split("-").map(Number);
-    return new Date(y, m - 1, d, 0, 0, 0, 0);
-}
+import { parseLocalIso } from "../../utils/datetime";
+import useTodayIsoDay from "../../hooks/useTodayIsoDay";
+import { DEBUG_TODAY_ISO } from "../../utils/debug";
 
 /**
  * Convert a Date -> local YYYY-MM-DD.
@@ -77,14 +63,14 @@ const UPCOMING_HEIGHT = 120;
 
 export default function Holidays() {
     const [fontsLoaded] = useFonts({
-        Nayuki: require("../../assets/fonts/NayukiRegular.otf"),
+        ChutzBold: require("../../assets/fonts/Chutz-Bold.otf"),
     });
 
     const { hebrewDate, minorFasts, rosheiChodesh, modernHolidays } =
         useSelector((state) => state.settings);
 
     // Centralized local “today”, auto-updates at midnight.
-    const todayIso = useTodayIso({ debugIso: DEBUG_TODAY_ISO });
+    const todayIso = useTodayIsoDay(DEBUG_TODAY_ISO);
 
     const [holidays, setHolidays] = useState([]);
     const [todayHolidays, setTodayHolidays] = useState([]);
@@ -203,7 +189,7 @@ export default function Holidays() {
                                 <Text
                                     style={[
                                         ui.holidaysBigBoldText,
-                                        { fontFamily: "Nayuki" },
+                                        { fontFamily: "ChutzBold" },
                                     ]}
                                 >
                                     not a Jewish holiday

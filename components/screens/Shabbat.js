@@ -25,18 +25,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import useAppLocation from "../../hooks/useAppLocation";
 import BottomSheetDrawer from "../BottomSheetDrawer";
 import { ui } from "../../styles/theme";
-import useTodayIso from "../../utils/useTodayIso";
+import useTodayIsoDay from "../../hooks/useTodayIsoDay";
 import {
     parseLocalIso,
     formatTime12h,
     formatGregorianLong,
     isSameLocalDate,
     addMinutes,
-    ceilToMinute
+    ceilToMinute,
 } from "../../utils/datetime";
-
-// DEV-only override for testing specific dates: "YYYY-MM-DD"
-const TEST_TODAY_ISO = __DEV__ ? null : null;
+import { DEBUG_TODAY_ISO } from "../../utils/debug";
 
 /**
  * Compute Friday times from Zmanim.
@@ -209,7 +207,7 @@ function getShabbatInfo(events, friday, saturday) {
 
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
-        Nayuki: require("../../assets/fonts/NayukiRegular.otf"),
+        ChutzBold: require("../../assets/fonts/Chutz-Bold.otf"),
     });
     const [loading, setLoading] = useState(true);
     const [shabbatInfo, setShabbatInfo] = useState(null);
@@ -225,7 +223,7 @@ export default function Shabbat() {
     );
 
     // Centralized local “today”, auto-updates at midnight.
-    const todayIso = useTodayIso({ debugIso: TEST_TODAY_ISO });
+    const todayIso = useTodayIsoDay(DEBUG_TODAY_ISO);
 
     // location comes from the shared hook
     const { status: locationStatus, location } = useAppLocation();
@@ -241,6 +239,7 @@ export default function Shabbat() {
             setLoading(true);
 
             const today = parseLocalIso(todayIso);
+            if (!today) return;
 
             const friday = new Date(today);
             const saturday = new Date(today);

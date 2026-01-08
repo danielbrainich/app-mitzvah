@@ -16,7 +16,7 @@ const SUPPORT_EMAIL = "support@example.com";
 
 export default function Info() {
     const [fontsLoaded] = useFonts({
-        Nayuki: require("../../assets/fonts/NayukiRegular.otf"),
+        ChutzBold: require("../../assets/fonts/Chutz-Bold.otf"),
     });
 
     const [amount, setAmount] = useState(5);

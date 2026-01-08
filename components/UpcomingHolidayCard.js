@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { View, Text } from "react-native";
 import { HDate } from "@hebcal/core";
-
+import { parseLocalIso } from "../utils/datetime";
 import { ui } from "../styles/theme";
 
 /**
@@ -10,19 +10,6 @@ import { ui } from "../styles/theme";
  */
 function stripParentheses(text) {
     return (text || "").replace(/\s*\([^)]*\)/g, "");
-}
-
-/**
- * Parse YYYY-MM-DD as a LOCAL Date at midnight.
- * Why: parsing ISO strings directly can shift days due to timezone (UTC).
- * When: use before passing into HDate() or any local-day comparisons.
- */
-function parseLocalIso(iso) {
-    if (!iso) return null;
-    const [y, m, d] = String(iso).split("-").map(Number);
-    if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d))
-        return null;
-    return new Date(y, m - 1, d, 0, 0, 0, 0);
 }
 
 export default function UpcomingHolidayCard({

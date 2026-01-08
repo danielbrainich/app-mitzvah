@@ -25,7 +25,7 @@ const MAX_MINS = 60;
 export default function Settings() {
     const [fontsLoaded] = useFonts({
         // Settings.js is in components/screens, so assets is 3 levels up
-        Nayuki: require("../../assets/fonts/NayukiRegular.otf"),
+        ChutzBold: require("../../assets/fonts/Chutz-Bold.otf"),
     });
 
     const {

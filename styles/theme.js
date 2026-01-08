@@ -11,9 +11,10 @@ import { StyleSheet } from "react-native";
 
 const COLORS = {
     // Base
-    bg: "#121212",
-    card: "#202020",
+    bg: "black",
+    card: "#131313",
     white: "white",
+    muted: "rgba(255,255,255,0.65)",
 
     // Text
     textPrimary: "rgba(255,255,255,0.92)",
@@ -382,7 +383,7 @@ export const ui = StyleSheet.create({
     todayHolidayTitle: {
         flex: 1,
         color: COLORS.accent,
-        fontFamily: "Nayuki",
+        fontFamily: "ChutzBold",
         fontSize: 64,
         lineHeight: 66,
     },

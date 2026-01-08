@@ -27,7 +27,7 @@ export default function App() {
         let isMounted = true;
 
         Font.loadAsync({
-            Nayuki: require("./assets/fonts/NayukiRegular.otf"),
+            ChutzBold: require("./assets/fonts/Chutz-Bold.otf"),
         })
             .then(() => {
                 if (isMounted) setFontLoaded(true);
