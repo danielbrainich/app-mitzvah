@@ -42,6 +42,7 @@ export const ui = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.bg,
+        paddingBottom: 68,
     },
     // Shabbat needs relative positioning for the floating location chip
     shabbatContainer: {
@@ -318,20 +319,25 @@ export const ui = StyleSheet.create({
 
     holidaysTodayPagerSlot: {
         // height is set in-screen via [style, { height: TODAY_PAGER_HEIGHT }]
-        justifyContent: "flex-start",
+        justifyContent: "center",
         paddingTop: 6,
     },
 
     holidaysNoHolidayWrap: {
+        flex: 1,
+        alignItems: "center",
         justifyContent: "center",
-        alignItems: "flex-start",
+        paddingHorizontal: 16,
     },
 
     holidaysBigBoldText: {
         color: COLORS.accent,
         // NOTE: fontFamily is applied in-screen after fontsLoaded
-        fontSize: 86,
-        lineHeight: 90,
+        fontSize: 77,
+        lineHeight: 74,
+        textAlign: "center",
+        marginTop: 12,
+        marginBottom: 8,
     },
 
     holidaysComingUpSection: {
@@ -386,13 +392,13 @@ export const ui = StyleSheet.create({
         fontFamily: "ChutzBold",
         fontSize: 64,
         lineHeight: 66,
+        textAlign: "center",
     },
 
     todayHolidayHebrew: {
-        color: "white",
-        fontSize: 26,
-        opacity: 0.95,
-        marginTop: 8,
+        color: COLORS.accent,
+        fontSize: 22,
+        marginTop: 0,
     },
 
     todayHolidayDate: {
@@ -403,19 +409,18 @@ export const ui = StyleSheet.create({
 
     // This button is “card-local” (different shape than shared primaryButton)
     todayHolidayMoreInfoButton: {
-        marginTop: 16,
         borderRadius: 18,
         padding: 12,
         alignItems: "center",
         borderWidth: 0.5,
-        borderColor: COLORS.accent,
+        borderColor: "white",
         backgroundColor: "transparent",
-        alignSelf: "flex-start",
+        marginVertical: 24,
     },
     todayHolidayMoreInfoButtonText: {
-        color: COLORS.accent,
-        fontSize: 16,
-        fontWeight: "700",
+        color: "white",
+        fontSize: 14,
+        fontWeight: "500",
     },
 
     // Bottom sheet typography

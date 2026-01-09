@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { HDate } from "@hebcal/core";
 import { parseLocalIso } from "../utils/datetime";
 import { ui } from "../styles/theme";
@@ -16,17 +16,17 @@ export default function UpcomingHolidayCard({
     holiday,
     hebrewDate,
     cardWidth,
-    formatDate,
+    onAbout, // ✅ new
 }) {
     const title = stripParentheses(holiday?.title);
 
-    // Use the HOLIDAY’s date
+    // Gregorian label for THIS holiday
     const gregLabel = useMemo(() => {
         if (!holiday?.date) return "";
-        return formatDate(holiday.date);
-    }, [holiday?.date, formatDate]);
+        return holiday.date;
+    }, [holiday?.date]);
 
-    // Hebrew label also needs the HOLIDAY’s date, and it must be a Date object
+    // Hebrew label for THIS holiday
     const hebLabel = useMemo(() => {
         const d = parseLocalIso(holiday?.date);
         if (!d) return "";
@@ -51,6 +51,13 @@ export default function UpcomingHolidayCard({
             <Text style={ui.upcomingHolidayDate}>
                 {hebrewDate ? hebLabel : gregLabel}
             </Text>
+
+            {/* About button (only if handler exists) */}
+            {onAbout && (
+                <Pressable onPress={() => onAbout(holiday)} hitSlop={10}>
+                    <Text style={ui.holidayAboutLink}>About this holiday</Text>
+                </Pressable>
+            )}
         </View>
     );
 }

@@ -1,20 +1,25 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import { HDate } from "@hebcal/core";
 
 import { ui } from "../styles/theme";
 import { getHolidayDetailsByName } from "../utils/getHolidayDetails";
-import BottomSheetDrawer from "./BottomSheetDrawer";
 
 /**
  * Removes any parenthetical suffix from a holiday title.
  * Example: "Sukkot (CH''M)" -> "Sukkot"
- * Use this for the big display title so it stays clean.
  */
 function stripParentheses(text) {
     return (text || "").replace(/\s*\([^)]*\)/g, "");
 }
 
+/**
+ * NOTE:
+ * This component is now "dumb":
+ * - It renders the card.
+ * - It does NOT own the bottom sheet.
+ * - It asks the parent to open the sheet via onAbout(holiday).
+ */
 export default function TodayHolidayCard({
     holiday,
     cardWidth,
@@ -22,27 +27,33 @@ export default function TodayHolidayCard({
     todayIso,
     formatDate,
     hebrewDate,
+    onAbout, // ✅ parent-owned drawer handler
 }) {
-    const [open, setOpen] = useState(false);
-
-    const todayLabel = !hebrewDate
-        ? formatDate(todayIso)
-        : new HDate().toString();
+    const title = stripParentheses(holiday?.title);
 
     const details = useMemo(
         () => getHolidayDetailsByName(holiday?.title),
         [holiday?.title]
     );
 
-    const title = stripParentheses(holiday?.title);
     const description = details?.description || "";
     const hasDescription = Boolean(description);
+
+    // If you're not showing date here anymore, you can delete this block + the Text below.
+    const todayLabel = useMemo(() => {
+        if (!todayIso) return "";
+        if (!hebrewDate) return formatDate?.(todayIso) ?? "";
+        // If you ever re-enable hebrew date display, use todayIso's date:
+        // new HDate(parseLocalIso(todayIso)).toString()
+        return new HDate().toString();
+    }, [todayIso, hebrewDate, formatDate]);
 
     return (
         <View
             style={[
                 ui.todayHolidayCard,
-                { width: cardWidth, height: cardHeight },
+                cardWidth ? { width: cardWidth } : null,
+                cardHeight ? { height: cardHeight } : null,
             ]}
         >
             <View>
@@ -70,7 +81,7 @@ export default function TodayHolidayCard({
 
                 {hasDescription ? (
                     <Pressable
-                        onPress={() => setOpen(true)}
+                        onPress={() => onAbout?.(holiday)}
                         hitSlop={12}
                         accessibilityRole="button"
                         accessibilityLabel="More info"
@@ -83,23 +94,11 @@ export default function TodayHolidayCard({
                 ) : null}
             </View>
 
-            <Text style={ui.todayHolidayDate} numberOfLines={1}>
-                {todayLabel}
-            </Text>
-
-            <BottomSheetDrawer
-                visible={open}
-                onClose={() => setOpen(false)}
-                title={title}
-                snapPoints={["45%", "55%"]}
-            >
-                {!!holiday?.hebrewTitle && (
-                    <Text style={ui.todayHolidayDrawerHebrew}>
-                        {holiday.hebrewTitle}
-                    </Text>
-                )}
-                <Text style={ui.todayHolidayDrawerBody}>{description}</Text>
-            </BottomSheetDrawer>
+            {!!todayLabel && (
+                <Text style={ui.todayHolidayDate} numberOfLines={1}>
+                    {todayLabel}
+                </Text>
+            )}
         </View>
     );
 }

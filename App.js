@@ -11,12 +11,14 @@ import * as Font from "expo-font";
 import AppNavigator from "./components/AppNavigator";
 import { store, persistor } from "./store/store";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { colors } from "./styles/theme";
+
 
 const Stack = createNativeStackNavigator();
 
 const screenOptions = {
-    headerStyle: { backgroundColor: "#181818" },
-    headerTintColor: "white",
+    headerStyle: { backgroundColor: colors.bg },
+    headerTintColor: colors.bg,
     title: "",
 };
 

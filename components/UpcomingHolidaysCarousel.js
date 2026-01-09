@@ -9,7 +9,8 @@ export default function UpcomingHolidaysCarousel({
     peek = 24,
     gap = 16,
     height = 200,
-    todayIso
+    todayIso,
+    onAbout,
 }) {
     const { width } = useWindowDimensions();
 
@@ -28,7 +29,7 @@ export default function UpcomingHolidaysCarousel({
                 keyExtractor={(item) => item.id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                bounces={true}
+                bounces
                 decelerationRate="fast"
                 snapToInterval={snapInterval}
                 snapToAlignment="start"
@@ -44,7 +45,9 @@ export default function UpcomingHolidaysCarousel({
                             holiday={item}
                             formatDate={formatDate}
                             hebrewDate={hebrewDate}
+                            todayIso={todayIso}
                             cardWidth={cardWidth}
+                            onAbout={onAbout}
                         />
                     </View>
                 )}

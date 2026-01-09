@@ -1,86 +1,65 @@
-import React, { useMemo, useRef, useState } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+// components/TodayHolidayCarousel.js
+import React, { useMemo } from "react";
+import { View, FlatList, useWindowDimensions } from "react-native";
 
+/**
+ * Horizontal pager-style carousel.
+ * - Parent owns the data + drawer logic.
+ * - This component only handles layout + snapping.
+ *
+ * Props:
+ * - data: array of holiday objects
+ * - CardComponent: component that renders a card (receives { holiday, cardWidth, index, ... })
+ * - height: height of the carousel viewport
+ * - cardHeight: optional (passed through to CardComponent)
+ * - peek: how much of the next card is visible
+ * - gap: spacing between cards
+ */
 export default function TodayHolidayCarousel({
     data = [],
-    height = 300,
-    peek = 0,
-    gap = 18,
     CardComponent,
-    formatDate,
-    hebrewDate,
-    ...cardProps
+    height = 360,
+    cardHeight = 360,
+    peek = 42,
+    gap = 18,
 }) {
-    const listRef = useRef(null);
-    const [containerWidth, setContainerWidth] = useState(0);
+    const { width } = useWindowDimensions();
 
-    const hasMultiple = data.length > 1;
-    const effectivePeek = hasMultiple ? peek : 0;
-    const effectiveGap = hasMultiple ? gap : 0;
+    const cardWidth = useMemo(
+        () => Math.max(0, width - peek * 2),
+        [width, peek]
+    );
+    const snapInterval = useMemo(() => cardWidth + gap, [cardWidth, gap]);
 
-    // ✅ Make cards narrower by ONLY the right-peek amount
-    const cardWidth = useMemo(() => {
-        if (!containerWidth) return 0;
-        const w = containerWidth - effectivePeek;
-        return w > 0 ? w : containerWidth;
-    }, [containerWidth, effectivePeek]);
-
-    const snapToInterval = useMemo(() => {
-        if (!hasMultiple || !cardWidth) return undefined;
-        return cardWidth + effectiveGap;
-    }, [hasMultiple, cardWidth, effectiveGap]);
-
-    if (!data.length) return null;
+    if (!data?.length || !CardComponent) return null;
 
     return (
-        <View
-            onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
-        >
-            {containerWidth > 0 && cardWidth > 0 ? (
-                <FlatList
-                    ref={listRef}
-                    data={data}
-                    keyExtractor={(item) => item.id}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    decelerationRate="fast"
-                    bounces={data.length > 1}
-                    snapToInterval={snapToInterval}
-                    snapToAlignment="start"
-                    disableIntervalMomentum
-                    contentContainerStyle={{
-                        paddingLeft: 0,
-                        paddingRight: 0,
-                    }}
-                    ItemSeparatorComponent={
-                        hasMultiple
-                            ? () => <View style={{ width: effectiveGap }} />
-                            : null
-                    }
-                    renderItem={({ item, index }) => {
-                        const isLast = index === data.length - 1;
-
-                        return (
-                            <View
-                                style={{
-                                    // ✅ last card becomes "single-card width"
-                                    width: isLast ? containerWidth : cardWidth,
-                                }}
-                            >
-                                <CardComponent
-                                    holiday={item}
-                                    formatDate={formatDate}
-                                    hebrewDate={hebrewDate}
-                                    cardWidth={
-                                        isLast ? containerWidth : cardWidth
-                                    }
-                                    {...cardProps}
-                                />
-                            </View>
-                        );
-                    }}
-                />
-            ) : null}
+        <View style={{ height }}>
+            <FlatList
+                data={data}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                decelerationRate="fast"
+                snapToInterval={snapInterval}
+                snapToAlignment="start"
+                disableIntervalMomentum
+                contentContainerStyle={{
+                    paddingLeft: peek,
+                    paddingRight: peek,
+                }}
+                ItemSeparatorComponent={() => <View style={{ width: gap }} />}
+                renderItem={({ item, index }) => (
+                    <View style={{ width: cardWidth }}>
+                        <CardComponent
+                            holiday={item}
+                            index={index}
+                            cardWidth={cardWidth}
+                            cardHeight={cardHeight}
+                        />
+                    </View>
+                )}
+            />
         </View>
     );
 }
