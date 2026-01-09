@@ -90,6 +90,7 @@ export default function Settings() {
                 style={ui.screen}
                 contentContainerStyle={ui.scrollContent}
             >
+                
                 {/* Holiday Options Card */}
                 <View style={ui.card}>
                     <Text style={ui.cardTitle}>Holiday Options</Text>

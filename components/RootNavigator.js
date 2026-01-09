@@ -22,9 +22,8 @@ export default function RootNavigator() {
                 name="Settings"
                 component={Settings}
                 options={{
-                    presentation: "modal",
+                    presentation: "card",
                     animation: "slide_from_right",
-                    gestureEnabled: true,
                 }}
             />
         </Stack.Navigator>
