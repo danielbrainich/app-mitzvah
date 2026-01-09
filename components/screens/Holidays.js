@@ -1,7 +1,6 @@
 // components/screens/Holidays.js
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, View, ScrollView, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 import { useFonts } from "expo-font";
@@ -164,7 +163,7 @@ export default function Holidays() {
     const singleHoliday = oneToday ? todayHolidays[0] : null;
 
     return (
-        <SafeAreaView style={ui.container}>
+        <View style={ui.container}>
             <ScrollView
                 style={ui.screen}
                 contentContainerStyle={[ui.scrollContent, { flexGrow: 1 }]}
@@ -306,6 +305,6 @@ export default function Holidays() {
                     </Text>
                 </View>
             </BottomSheetDrawer>
-        </SafeAreaView>
+        </View>
     );
 }

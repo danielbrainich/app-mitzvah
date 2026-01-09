@@ -52,8 +52,6 @@ export const ui = StyleSheet.create({
     },
     screen: {
         paddingHorizontal: 20,
-        paddingTop: 44,
-        paddingBottom: 24,
     },
 
     // ---------------------------------------------------------------------------

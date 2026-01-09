@@ -1,7 +1,16 @@
+import { HDate } from "@hebcal/core";
+
 /**
  * Date/time helpers used across screens.
  * All functions are "local time" (not UTC) to match what users see on-device.
  */
+
+/** Format a local ISO (YYYY-MM-DD) as a Hebrew date string. */
+export function formatHebrewLongFromIso(iso) {
+    const d = parseLocalIso(iso);
+    if (!d) return "";
+    return new HDate(d).toString(); // e.g. "17 Tevet 5786"
+}
 
 /** Format a Date as local YYYY-MM-DD. */
 export function localIsoDate(date) {

@@ -21,7 +21,6 @@ import {
 } from "@hebcal/core";
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
-import { SafeAreaView } from "react-native-safe-area-context";
 import useAppLocation from "../../hooks/useAppLocation";
 import BottomSheetDrawer from "../BottomSheetDrawer";
 import { ui } from "../../styles/theme";
@@ -354,7 +353,7 @@ export default function Shabbat() {
     if (!fontsLoaded) return null;
 
     return (
-        <SafeAreaView style={ui.shabbatContainer}>
+        <View style={ui.shabbatContainer}>
             <ScrollView style={ui.screen}>
                 {shabbatInfo ? (
                     <>
@@ -546,6 +545,6 @@ export default function Shabbat() {
                     <Text style={ui.shabbatLocationChipText}>Location</Text>
                 </Pressable>
             ) : null}
-        </SafeAreaView>
+        </View>
     );
 }
