@@ -4,6 +4,7 @@ import { Text, View, ScrollView, Pressable } from "react-native";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 import { useFonts } from "expo-font";
+import * as Haptics from "expo-haptics";
 
 import { ui } from "../../styles/theme";
 import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
@@ -214,7 +215,12 @@ export default function Holidays() {
                                 )}
 
                                 <Pressable
-                                    onPress={() => openAbout(singleHoliday)}
+                                    onPress={() => {
+                                        Haptics.impactAsync(
+                                            Haptics.ImpactFeedbackStyle.Light
+                                        );
+                                        openAbout(singleHoliday);
+                                    }}
                                     style={ui.todayHolidayMoreInfoButton}
                                 >
                                     <Text

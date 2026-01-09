@@ -32,10 +32,9 @@ export default function AppNavigator() {
                         position: "absolute",
                         left: 12,
                         right: 12,
-                        bottom: 36,
-                        height: 68,
+                        bottom: 12,
+                        height: 60,
                         borderTopWidth: 0,
-                        elevation: 0,
                         borderRadius: 18,
                         marginHorizontal: 16,
                     },
@@ -53,7 +52,7 @@ export default function AppNavigator() {
                     tabBarActiveBackgroundColor: "rgba(130,203,255,0.15)",
 
                     tabBarItemStyle: {
-                        height: 56,
+                        height: 48,
                         borderRadius: 12,
                         marginTop: 6,
                         marginHorizontal: 6,

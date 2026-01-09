@@ -4,6 +4,7 @@ import { HDate } from "@hebcal/core";
 
 import { ui } from "../styles/theme";
 import { getHolidayDetailsByName } from "../utils/getHolidayDetails";
+import * as Haptics from "expo-haptics";
 
 /**
  * Removes any parenthetical suffix from a holiday title.
@@ -81,7 +82,12 @@ export default function TodayHolidayCard({
 
                 {hasDescription ? (
                     <Pressable
-                        onPress={() => onAbout?.(holiday)}
+                        onPress={() => {
+                            Haptics.impactAsync(
+                                Haptics.ImpactFeedbackStyle.Light
+                            );
+                            onAbout?.(holiday);
+                        }}
                         hitSlop={12}
                         accessibilityRole="button"
                         accessibilityLabel="More info"

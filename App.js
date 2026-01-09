@@ -5,6 +5,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { NavigationContainer } from "@react-navigation/native";
+import RootNavigator from "./components/RootNavigator";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
 import * as Font from "expo-font";
@@ -52,15 +53,8 @@ export default function App() {
                 <PersistGate loading={null} persistor={persistor}>
                     <BottomSheetModalProvider>
                         <NavigationContainer>
-                            <StatusBar style="light" />
+                        <RootNavigator />
 
-                            <Stack.Navigator screenOptions={screenOptions}>
-                                <Stack.Screen
-                                    name="Tabs"
-                                    component={AppNavigator}
-                                    options={{ headerShown: false }}
-                                />
-                            </Stack.Navigator>
                         </NavigationContainer>
                     </BottomSheetModalProvider>
                 </PersistGate>

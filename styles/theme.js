@@ -42,7 +42,7 @@ export const ui = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.bg,
-        paddingBottom: 68,
+        paddingBottom: 122,
     },
     // Shabbat needs relative positioning for the floating location chip
     shabbatContainer: {
@@ -445,7 +445,7 @@ export const ui = StyleSheet.create({
     },
     upcomingHolidayTitle: {
         color: COLORS.accent,
-        fontSize: 18,
+        fontSize: 24,
         marginBottom: 6,
     },
     upcomingHolidayHebrew: {
