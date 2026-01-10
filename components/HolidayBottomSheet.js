@@ -34,10 +34,10 @@ export default function HolidayBottomSheet({
                 {/* Row 2: titles (accent + bigger) */}
                 {nameLeft || nameRight ? (
                     <View style={ui.sheetNameRow}>
-                        <Text style={ui.sheetNameLeft} numberOfLines={2}>
+                        <Text style={ui.sheetNameLeft}>
                             {nameLeft ?? ""}
                         </Text>
-                        <Text style={ui.sheetNameRight} numberOfLines={1}>
+                        <Text style={ui.sheetNameRight}>
                             {nameRight ?? ""}
                         </Text>
                     </View>

@@ -529,26 +529,29 @@ export const ui = StyleSheet.create({
         paddingBottom: 18,
         paddingTop: 4,
     },
-
     sheetNameRow: {
         flexDirection: "row",
-        alignItems: "baseline",
+        alignItems: "flex-start",
         justifyContent: "space-between",
-        marginBottom: 10,
+        flexWrap: "wrap",
+        rowGap: 6,
     },
     sheetNameLeft: {
         color: COLORS.accent,
-        fontSize: 24,
+        fontSize: 22,
         fontFamily: "ChutzBold",
-        flexShrink: 1,
+        flexGrow: 1,
+        flexBasis: "50%",      // ⬅ each gets half
         paddingRight: 12,
-    },
-    sheetNameRight: {
+      },
+      sheetNameRight: {
         color: COLORS.accent,
         fontSize: 16,
         opacity: 0.9,
         textAlign: "right",
-        flexShrink: 1,
+        writingDirection: "rtl", // ⬅ important for Hebrew
+        flexGrow: 1,
+        flexBasis: "50%",        // ⬅ each gets half
         paddingLeft: 12,
-    },
+      },
 });
