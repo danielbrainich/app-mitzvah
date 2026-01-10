@@ -249,7 +249,7 @@ export const ui = StyleSheet.create({
     shabbatLocationChip: {
         position: "absolute",
         left: 20,
-        bottom: 18,
+        bottom: 88,
         flexDirection: "row",
         alignItems: "center",
         gap: 8,
@@ -431,7 +431,7 @@ export const ui = StyleSheet.create({
         opacity: 0.95,
     },
     todayHolidayDrawerBody: {
-        color: COLORS.textBody,
+        color: "white",
         fontSize: 16,
         lineHeight: 21,
     },
@@ -465,40 +465,90 @@ export const ui = StyleSheet.create({
     // ===========================================================================
     // BOTTOM SHEET (shared)
     // ===========================================================================
+
     bottomSheetBg: {
-        backgroundColor: COLORS.card, // "#131313"
+        backgroundColor: COLORS.card,
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
     },
+
     bottomSheetHandle: {
         backgroundColor: "rgba(255,255,255,0.25)",
         width: 44,
     },
+
     bottomSheetContent: {
-        paddingHorizontal: 16,
-        paddingBottom: 22,
-        minHeight: 240,
-    },
-    bottomSheetHeaderRow: {
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        paddingTop: 6,
-        paddingBottom: 12,
-    },
-    bottomSheetTitle: {
         flex: 1,
-        color: COLORS.white,
-        fontSize: 18,
-        fontWeight: "700",
-        paddingRight: 12,
     },
+
+    sheetTopRow: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        paddingHorizontal: 12,
+        paddingBottom: 4,
+    },
+
     bottomSheetCloseBtn: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "rgba(255,255,255,0.06)",
+    },
+
+    sheetHeader: {
+        paddingTop: 8,
+        paddingBottom: 12,
+    },
+
+    sheetMetaRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 8,
+    },
+
+    sheetMetaLeft: {
+        color: "white",
+        fontSize: 16,
+        flexShrink: 1,
+        paddingRight: 10,
+    },
+
+    sheetMetaRight: {
+        color: "white",
+        fontSize: 16,
+        textAlign: "right",
+        flexShrink: 1,
+        paddingLeft: 10,
+    },
+
+    sheetBody: {
+        paddingHorizontal: 18,
+        paddingBottom: 18,
+        paddingTop: 4,
+    },
+
+    sheetNameRow: {
+        flexDirection: "row",
+        alignItems: "baseline",
+        justifyContent: "space-between",
+        marginBottom: 10,
+    },
+    sheetNameLeft: {
+        color: COLORS.accent,
+        fontSize: 24,
+        fontFamily: "ChutzBold",
+        flexShrink: 1,
+        paddingRight: 12,
+    },
+    sheetNameRight: {
+        color: COLORS.accent,
+        fontSize: 16,
+        opacity: 0.9,
+        textAlign: "right",
+        flexShrink: 1,
+        paddingLeft: 12,
     },
 });

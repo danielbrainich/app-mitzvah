@@ -8,14 +8,14 @@ import * as Haptics from "expo-haptics";
 
 import { ui } from "../../styles/theme";
 import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
-import { parseLocalIso } from "../../utils/datetime";
+import { parseLocalIso, formatGregorianLong } from "../../utils/datetime";
 import useTodayIsoDay from "../../hooks/useTodayIsoDay";
 import { DEBUG_TODAY_ISO } from "../../utils/debug";
 
 import TodayHolidayCarousel from "../TodayHolidayCarousel";
 import TodayHolidayCard from "../TodayHolidayCard";
 import UpcomingHolidaysCarousel from "../UpcomingHolidaysCarousel";
-import BottomSheetDrawer from "../BottomSheetDrawer";
+import HolidayBottomSheet from "../HolidayBottomSheet";
 
 /**
  * Date -> local YYYY-MM-DD (stable in local time; avoids UTC shifting).
@@ -59,20 +59,20 @@ export default function Holidays() {
         (state) => state.settings
     );
 
-    // ✅ single source of truth for “today”
+    // single source of truth for “today”
     const todayIso = useTodayIsoDay(DEBUG_TODAY_ISO);
 
     const [holidays, setHolidays] = useState([]);
     const [todayHolidays, setTodayHolidays] = useState([]);
 
-    // ✅ ONE drawer for the entire screen
+    // ONE drawer for the entire screen
     const [aboutOpen, setAboutOpen] = useState(false);
     const [aboutHoliday, setAboutHoliday] = useState(null);
 
     const openAbout = useCallback((holiday) => {
         if (!holiday) return;
         setAboutHoliday(holiday);
-        setAboutOpen(true);
+        requestAnimationFrame(() => setAboutOpen(true));
     }, []);
 
     const closeAbout = useCallback(() => setAboutOpen(false), []);
@@ -149,7 +149,7 @@ export default function Holidays() {
         [holidays, todayIso]
     );
 
-    // ✅ simplest way to pass drawer behavior down:
+    // simplest way to pass drawer behavior down:
     // Provide a CardComponent that injects `onAbout`.
     const TodayCard = useMemo(() => {
         return function TodayCardWithAbout(props) {
@@ -283,33 +283,25 @@ export default function Holidays() {
                 </View>
             </ScrollView>
 
-            <BottomSheetDrawer
+            <HolidayBottomSheet
                 visible={aboutOpen}
                 onClose={closeAbout}
-                title={aboutHoliday?.title ?? "About"}
-                snapPoints={["35%", "55%"]}
-            >
-                <View style={{ paddingHorizontal: 18, paddingBottom: 18 }}>
-                    {!!aboutHoliday?.hebrewTitle && (
-                        <Text
-                            style={{
-                                opacity: 0.85,
-                                marginBottom: 10,
-                                textAlign: "center",
-                            }}
-                        >
-                            {aboutHoliday.hebrewTitle}
-                        </Text>
-                    )}
-
-                    <Text style={{ lineHeight: 20, opacity: 0.95 }}>
-                        {aboutHoliday
-                            ? getHolidayDetailsByName(aboutHoliday.title)
-                                  ?.description ?? "No description available."
-                            : ""}
-                    </Text>
-                </View>
-            </BottomSheetDrawer>
+                dateLeft={
+                    aboutHoliday?.date
+                        ? formatGregorianLong(parseLocalIso(aboutHoliday.date))
+                        : ""
+                }
+                dateRight={aboutHoliday?.hebrewDate ?? ""}
+                nameLeft={aboutHoliday?.title ?? ""}
+                nameRight={aboutHoliday?.hebrewTitle ?? ""}
+                description={
+                    aboutHoliday
+                        ? getHolidayDetailsByName(aboutHoliday.title)
+                              ?.description ?? "No description available."
+                        : ""
+                }
+                snapPoints={["35%", "65%"]}
+            />
         </View>
     );
 }

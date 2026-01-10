@@ -87,7 +87,7 @@ export function TopBar({ todayIso }) {
                         backgroundColor: "rgba(255,255,255,0.06)",
                     }}
                 >
-                    <Entypo name="cog" size={18} color="#fff" />
+                    <Entypo name="cog" size={22} color="#fff" />
                 </Pressable>
             </View>
         </SafeAreaView>

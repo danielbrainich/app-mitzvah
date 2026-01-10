@@ -22,9 +22,12 @@ import {
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 import useAppLocation from "../../hooks/useAppLocation";
-import BottomSheetDrawer from "../BottomSheetDrawer";
+import BottomSheetDrawer from "../BottomSheetDrawerBase";
 import { ui } from "../../styles/theme";
 import useTodayIsoDay from "../../hooks/useTodayIsoDay";
+import * as Haptics from "expo-haptics";
+import LocationBottomSheet from "../LocationBottomSheet"; // adjust path if needed
+
 import {
     parseLocalIso,
     formatTime12h,
@@ -476,7 +479,7 @@ export default function Shabbat() {
                     </View>
                 )}
 
-                <BottomSheetDrawer
+                <LocationBottomSheet
                     visible={showLocationDetails}
                     onClose={() => setShowLocationDetails(false)}
                     title="Your Location"
@@ -508,7 +511,7 @@ export default function Shabbat() {
                                 : "Unknown"}
                         </Text>
                     </View>
-                </BottomSheetDrawer>
+                </LocationBottomSheet>
 
                 <View style={ui.shabbatFooter}>
                     {!hasLocation ? (
@@ -523,7 +526,12 @@ export default function Shabbat() {
                             </Text>
 
                             <TouchableOpacity
-                                onPress={openSettings}
+                                onPress={() => {
+                                    openSettings;
+                                    Haptics.impactAsync(
+                                        Haptics.ImpactFeedbackStyle.Light
+                                    );
+                                }}
                                 style={ui.shabbatCta}
                             >
                                 <Text style={ui.shabbatCtaText}>
@@ -537,7 +545,10 @@ export default function Shabbat() {
 
             {hasLocation ? (
                 <Pressable
-                    onPress={() => setShowLocationDetails(true)}
+                    onPress={() => {
+                        setShowLocationDetails(true);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
                     style={ui.shabbatLocationChip}
                     hitSlop={12}
                 >

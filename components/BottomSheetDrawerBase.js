@@ -1,27 +1,27 @@
+// components/BottomSheetDrawerBase.js
 import React, { useEffect, useMemo, useRef, useCallback } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
 import {
     BottomSheetModal,
     BottomSheetView,
     BottomSheetBackdrop,
+    BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { Entypo } from "@expo/vector-icons";
-
+import * as Haptics from "expo-haptics";
 import { ui } from "../styles/theme";
 
-export default function BottomSheetDrawer({
+export default function BottomSheetDrawerBase({
     visible,
     onClose,
-    title,
-    snapPoints = ["45%", "75%"],
+    snapPoints = ["30%", "45%"],
+    defaultIndex = 0, // 0 = shorter (first snap point), 1 = taller (second snap point)
     children,
+    contentContainerStyle,
 }) {
     const modalRef = useRef(null);
     const points = useMemo(() => snapPoints, [snapPoints]);
-
-    const handleDismiss = useCallback(() => {
-        onClose?.();
-    }, [onClose]);
+    const handleDismiss = useCallback(() => onClose?.(), [onClose]);
 
     useEffect(() => {
         if (visible) modalRef.current?.present();
@@ -45,6 +45,7 @@ export default function BottomSheetDrawer({
         <BottomSheetModal
             ref={modalRef}
             snapPoints={points}
+            index={defaultIndex}
             onDismiss={handleDismiss}
             enablePanDownToClose
             backgroundStyle={ui.bottomSheetBg}
@@ -52,23 +53,30 @@ export default function BottomSheetDrawer({
             backdropComponent={renderBackdrop}
         >
             <BottomSheetView style={ui.bottomSheetContent}>
-                <View style={ui.bottomSheetHeaderRow}>
-                    <Text style={ui.bottomSheetTitle} numberOfLines={2}>
-                        {title ?? ""}
-                    </Text>
-
+                {/* Top row: close button only */}
+                <View style={ui.sheetTopRow}>
                     <Pressable
-                        onPress={() => modalRef.current?.dismiss()}
+                        onPress={() => {
+                            modalRef.current?.dismiss();
+                            Haptics.impactAsync(
+                                Haptics.ImpactFeedbackStyle.Light
+                            );
+                        }}
                         hitSlop={12}
                         accessibilityRole="button"
                         accessibilityLabel="Close"
                         style={ui.bottomSheetCloseBtn}
                     >
-                        <Entypo name="cross" size={18} color="white" />
+                        <Entypo name="cross" size={24} color="white" />
                     </Pressable>
                 </View>
 
-                {children}
+                <BottomSheetScrollView
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={contentContainerStyle}
+                >
+                    {children}
+                </BottomSheetScrollView>
             </BottomSheetView>
         </BottomSheetModal>
     );
