@@ -1,6 +1,13 @@
 import React, { useEffect, useMemo, useRef, useCallback } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import { View, Text, Pressable } from "react-native";
+import {
+    BottomSheetModal,
+    BottomSheetView,
+    BottomSheetBackdrop,
+} from "@gorhom/bottom-sheet";
+import { Entypo } from "@expo/vector-icons";
+
+import { ui } from "../styles/theme";
 
 export default function BottomSheetDrawer({
     visible,
@@ -21,19 +28,32 @@ export default function BottomSheetDrawer({
         else modalRef.current?.dismiss();
     }, [visible]);
 
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+                pressBehavior="close"
+                opacity={0.75}
+            />
+        ),
+        []
+    );
+
     return (
         <BottomSheetModal
             ref={modalRef}
             snapPoints={points}
             onDismiss={handleDismiss}
             enablePanDownToClose
-            backgroundStyle={styles.sheetBg}
-            handleIndicatorStyle={styles.handle}
-            backdropComponent={null}
+            backgroundStyle={ui.bottomSheetBg}
+            handleIndicatorStyle={ui.bottomSheetHandle}
+            backdropComponent={renderBackdrop}
         >
-            <BottomSheetView style={styles.content}>
-                <View style={styles.headerRow}>
-                    <Text style={styles.title} numberOfLines={2}>
+            <BottomSheetView style={ui.bottomSheetContent}>
+                <View style={ui.bottomSheetHeaderRow}>
+                    <Text style={ui.bottomSheetTitle} numberOfLines={2}>
                         {title ?? ""}
                     </Text>
 
@@ -42,8 +62,9 @@ export default function BottomSheetDrawer({
                         hitSlop={12}
                         accessibilityRole="button"
                         accessibilityLabel="Close"
-                        style={styles.closeBtn}
-                    ><Text>X</Text>
+                        style={ui.bottomSheetCloseBtn}
+                    >
+                        <Entypo name="cross" size={18} color="white" />
                     </Pressable>
                 </View>
 
@@ -52,39 +73,3 @@ export default function BottomSheetDrawer({
         </BottomSheetModal>
     );
 }
-
-const styles = StyleSheet.create({
-    sheetBg: {
-        backgroundColor: "#202020",
-        borderTopLeftRadius: 18,
-        borderTopRightRadius: 18,
-    },
-    handle: {
-        backgroundColor: "rgba(255,255,255,0.25)",
-        width: 44,
-    },
-    content: {
-        paddingHorizontal: 16,
-        paddingBottom: 22,
-        minHeight: 240
-    },
-    headerRow: {
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        paddingTop: 6,
-        paddingBottom: 12,
-    },
-    title: {
-        flex: 1,
-        color: "white",
-        fontSize: 18,
-        fontWeight: "700",
-        paddingRight: 12,
-    },
-    closeBtn: {
-        color: "white",
-        fontSize: 18,
-        fontWeight: "700",
-    },
-});

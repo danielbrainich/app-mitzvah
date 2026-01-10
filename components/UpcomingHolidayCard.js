@@ -1,16 +1,14 @@
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
 import { HDate } from "@hebcal/core";
-import { parseLocalIso } from "../utils/datetime";
+import {
+    parseLocalIso,
+    formatGregorianLongFromIso, // ✅ add this
+} from "../utils/datetime";
 import { ui } from "../styles/theme";
-import { useFonts } from "expo-font";
 import * as Haptics from "expo-haptics";
 import { Entypo } from "@expo/vector-icons";
 
-/**
- * Removes any parenthetical suffix from a holiday title.
- * Example: "Sukkot (CH''M)" -> "Sukkot"
- */
 function stripParentheses(text) {
     return (text || "").replace(/\s*\([^)]*\)/g, "");
 }
@@ -21,19 +19,13 @@ export default function UpcomingHolidayCard({
     cardWidth,
     onAbout,
 }) {
-    const [fontsLoaded] = useFonts({
-        ChutzBold: require("../assets/fonts/Chutz-Bold.otf"),
-    });
-
     const title = stripParentheses(holiday?.title);
 
-    // Gregorian label for THIS holiday
     const gregLabel = useMemo(() => {
         if (!holiday?.date) return "";
-        return holiday.date;
+        return formatGregorianLongFromIso(holiday.date);
     }, [holiday?.date]);
 
-    // Hebrew label for THIS holiday
     const hebLabel = useMemo(() => {
         const d = parseLocalIso(holiday?.date);
         if (!d) return "";
@@ -53,24 +45,18 @@ export default function UpcomingHolidayCard({
                 { position: "relative" },
             ]}
         >
-            <Text
-                style={[ui.upcomingHolidayTitle, { fontFamily: "ChutzBold" }]}
-            >
-                {title}
-            </Text>
-
-            {!!holiday?.hebrewTitle && (
-                <Text style={ui.upcomingHolidayHebrew}>
-                    {holiday.hebrewTitle},
-                </Text>
-            )}
-
             <Text style={ui.upcomingHolidayDate}>
                 {hebrewDate ? hebLabel : gregLabel}
             </Text>
 
-            {/* About button (only if handler exists) */}
-            {/* Three dots (only if handler exists) */}
+            <Text style={ui.upcomingHolidayTitle}>{title}</Text>
+
+            {!!holiday?.hebrewTitle && (
+                <Text style={ui.upcomingHolidayHebrew}>
+                    {holiday.hebrewTitle}
+                </Text>
+            )}
+
             {onAbout ? (
                 <Pressable
                     onPress={onPressDots}
@@ -88,11 +74,7 @@ export default function UpcomingHolidayCard({
                     accessibilityRole="button"
                     accessibilityLabel="More options"
                 >
-                    <Entypo
-                        name="dots-three-vertical"
-                        size={16}
-                        color="#fff"
-                    />
+                    <Entypo name="dots-three-vertical" size={16} color="#fff" />
                 </Pressable>
             ) : null}
         </View>

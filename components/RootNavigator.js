@@ -1,9 +1,8 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import AppNavigator from "./AppNavigator"; // your tabs
-import Settings from "./screens/Settings"; // your settings screen component
-import { colors } from "../styles/theme";
+import AppNavigator from "./AppNavigator";
+import Settings from "./screens/Settings";
 
 const Stack = createNativeStackNavigator();
 
@@ -12,12 +11,10 @@ export default function RootNavigator() {
         <Stack.Navigator
             screenOptions={{
                 headerShown: false,
-                contentStyle: { backgroundColor: colors.bg },
             }}
         >
             <Stack.Screen name="Tabs" component={AppNavigator} />
 
-            {/* Slides in from right, covers full height */}
             <Stack.Screen
                 name="Settings"
                 component={Settings}

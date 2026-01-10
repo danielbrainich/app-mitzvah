@@ -1,9 +1,18 @@
 import { useFonts } from "expo-font";
-import { Text, View, Switch, ScrollView } from "react-native";
+import {
+    Text,
+    View,
+    Switch,
+    ScrollView,
+    Pressable,
+    TouchableOpacity,
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import Slider from "@react-native-community/slider";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Entypo } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 
 import { ui } from "../../styles/theme";
 
@@ -22,7 +31,15 @@ const DEFAULT_HAVDALAH = 42;
 const MIN_MINS = 1;
 const MAX_MINS = 60;
 
-export default function Settings() {
+// Placeholder until I wire in IAP:
+const handleTip = () => {
+    Alert.alert(
+        "Tip (In-App Purchase)",
+        `Selected: $${amount}\n\nNext step: create IAP products (tip_1, tip_2, tip_5, tip_10, tip_18) and call purchase().`
+    );
+};
+
+export default function Settings({ navigation }) {
     const [fontsLoaded] = useFonts({
         // Settings.js is in components/screens, so assets is 3 levels up
         ChutzBold: require("../../assets/fonts/Chutz-Bold.otf"),
@@ -39,6 +56,8 @@ export default function Settings() {
     } = useSelector((state) => state.settings);
 
     const dispatch = useDispatch();
+
+    const [amount, setAmount] = useState(5);
 
     // Slider expects a number. When toggle is off you store null in Redux,
     // but we still want a sane slider position when toggled back on.
@@ -85,12 +104,40 @@ export default function Settings() {
     if (!fontsLoaded) return null;
 
     return (
-        <SafeAreaView style={ui.container}>
+        <SafeAreaView style={ui.container} edges={["top", "left", "right"]}>
+            {/* Top-right close button */}
+            <View
+                style={{
+                    height: 44,
+                    paddingHorizontal: 16,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                }}
+            >
+                <Pressable
+                    onPress={() => {
+                        navigation.goBack();
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    hitSlop={12}
+                    style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 18,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "rgba(255,255,255,0.06)",
+                    }}
+                >
+                    <Entypo name="chevron-left" size={22} color="white" />
+                </Pressable>
+            </View>
+
             <ScrollView
                 style={ui.screen}
                 contentContainerStyle={ui.scrollContent}
             >
-                
                 {/* Holiday Options Card */}
                 <View style={ui.card}>
                     <Text style={ui.cardTitle}>Holiday Options</Text>
@@ -236,6 +283,51 @@ export default function Settings() {
                             />
                         </View>
                     ) : null}
+                </View>
+                <View style={ui.card}>
+                    <Text style={ui.cardTitle}>Support</Text>
+                    <Text style={ui.paragraph}>
+                        If you find this app fun and useful, please consider
+                        leaving a tip!
+                    </Text>
+
+                    <View style={ui.infoTiersRow}>
+                        {[1, 2, 5, 10, 18].map((v) => {
+                            const selected = v === amount;
+                            return (
+                                <TouchableOpacity
+                                    key={v}
+                                    onPress={() => setAmount(v)}
+                                    activeOpacity={0.85}
+                                    style={[
+                                        ui.infoTierPill,
+                                        selected
+                                            ? ui.infoTierPillSelected
+                                            : null,
+                                    ]}
+                                >
+                                    <Text
+                                        style={[
+                                            ui.infoTierText,
+                                            selected
+                                                ? ui.infoTierTextSelected
+                                                : null,
+                                        ]}
+                                    >
+                                        ${v}
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+
+                    <TouchableOpacity
+                        style={ui.primaryButton}
+                        onPress={handleTip}
+                        activeOpacity={0.85}
+                    >
+                        <Text style={ui.primaryButtonText}>Tip ${amount}</Text>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </SafeAreaView>

@@ -283,7 +283,6 @@ export default function Holidays() {
                 </View>
             </ScrollView>
 
-            {/* One drawer for the entire screen */}
             <BottomSheetDrawer
                 visible={aboutOpen}
                 onClose={closeAbout}

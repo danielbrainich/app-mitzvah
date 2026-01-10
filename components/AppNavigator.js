@@ -2,6 +2,7 @@ import React from "react";
 import { View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Haptics from "expo-haptics";
 
 import Holidays from "./screens/Holidays";
 import Shabbat from "./screens/Shabbat";
@@ -38,6 +39,7 @@ export default function AppNavigator() {
                         borderRadius: 18,
                         marginHorizontal: 16,
                     },
+                    tabBarIcon: () => null,
 
                     tabBarBackground: () => (
                         <View
@@ -49,21 +51,61 @@ export default function AppNavigator() {
                         />
                     ),
 
-                    tabBarActiveBackgroundColor: "rgba(130,203,255,0.15)",
+                    tabBarActiveBackgroundColor: "#313131",
 
                     tabBarItemStyle: {
-                        height: 48,
-                        borderRadius: 12,
-                        marginTop: 6,
-                        marginHorizontal: 6,
+                        flex: 1,
+                        margin: 8,
+                        borderRadius: 10
+                    },
+
+                    tabBarLabelStyle: {
+                        fontSize: 17,
+                        textAlign: "center",
+                        // here
+                    },
+
+                    tabBarStyle: {
+                        position: "absolute",
+                        left: 16,
+                        right: 16,
+                        bottom: 8,
+                        height: 64,
+                        borderTopWidth: 0,
+                        marginHorizontal: 24,
+                        paddingTop: 0,
+                        paddingBottom: 0,
                     },
 
                     tabBarActiveTintColor: colors.accent,
                     tabBarInactiveTintColor: colors.muted,
+
+
                 }}
             >
-                <Tab.Screen name="Holidays" component={Holidays} />
-                <Tab.Screen name="Shabbat" component={Shabbat} />
+                <Tab.Screen
+                    name="Holidays"
+                    component={Holidays}
+                    listeners={{
+                        tabPress: () => {
+                            Haptics.impactAsync(
+                                Haptics.ImpactFeedbackStyle.Light
+                            );
+                        },
+                    }}
+                />
+
+                <Tab.Screen
+                    name="Shabbat"
+                    component={Shabbat}
+                    listeners={{
+                        tabPress: () => {
+                            Haptics.impactAsync(
+                                Haptics.ImpactFeedbackStyle.Light
+                            );
+                        },
+                    }}
+                />
             </Tab.Navigator>
             <TopBar todayIso={todayIso} />
         </SafeAreaView>

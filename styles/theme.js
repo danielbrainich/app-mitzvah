@@ -415,6 +415,7 @@ export const ui = StyleSheet.create({
         backgroundColor: "transparent",
         marginVertical: 24,
     },
+
     todayHolidayMoreInfoButtonText: {
         color: "white",
         fontSize: 14,
@@ -444,18 +445,60 @@ export const ui = StyleSheet.create({
         padding: 18,
     },
     upcomingHolidayTitle: {
+        fontFamily: "ChutzBold",
+
         color: COLORS.accent,
         fontSize: 24,
-        marginBottom: 6,
+        marginBottom: 4,
+        marginTop: 4,
     },
     upcomingHolidayHebrew: {
-        color: "white",
+        color: colors.accent,
         fontSize: 16,
         marginBottom: 6,
     },
     upcomingHolidayDate: {
         color: "white",
         fontSize: 14,
-        opacity: 0.75,
+    },
+
+    // ===========================================================================
+    // BOTTOM SHEET (shared)
+    // ===========================================================================
+    bottomSheetBg: {
+        backgroundColor: COLORS.card, // "#131313"
+        borderTopLeftRadius: 18,
+        borderTopRightRadius: 18,
+    },
+    bottomSheetHandle: {
+        backgroundColor: "rgba(255,255,255,0.25)",
+        width: 44,
+    },
+    bottomSheetContent: {
+        paddingHorizontal: 16,
+        paddingBottom: 22,
+        minHeight: 240,
+    },
+    bottomSheetHeaderRow: {
+        flexDirection: "row",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        paddingTop: 6,
+        paddingBottom: 12,
+    },
+    bottomSheetTitle: {
+        flex: 1,
+        color: COLORS.white,
+        fontSize: 18,
+        fontWeight: "700",
+        paddingRight: 12,
+    },
+    bottomSheetCloseBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "rgba(255,255,255,0.06)",
     },
 });
