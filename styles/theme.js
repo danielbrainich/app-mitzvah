@@ -274,13 +274,12 @@ export const ui = StyleSheet.create({
     },
     settingsSubLabel: {
         color: "rgba(255,255,255,0.72)",
-        fontSize: 13,
-        marginTop: 6,
-        lineHeight: 17,
+        fontSize: 14,
+        marginTop: 6
+
     },
 
     settingsSliderBlock: {
-        paddingTop: 6,
         paddingBottom: 10,
     },
     settingsSliderHeader: {
@@ -291,12 +290,12 @@ export const ui = StyleSheet.create({
     },
     settingsSliderValue: {
         color: COLORS.accent,
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "500",
     },
     settingsSliderHint: {
         color: COLORS.accent,
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "500",
     },
 

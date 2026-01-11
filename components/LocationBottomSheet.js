@@ -4,6 +4,8 @@ import { View, Text } from "react-native";
 import BottomSheetDrawerBase from "./BottomSheetDrawerBase";
 import { ui } from "../styles/theme";
 
+
+
 export default function LocationBottomSheet({
     visible,
     onClose,

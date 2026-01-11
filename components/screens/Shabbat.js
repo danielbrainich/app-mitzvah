@@ -23,7 +23,7 @@ import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
-
+import { useFocusEffect } from "@react-navigation/native";
 import useAppLocation from "../../hooks/useAppLocation";
 import useTodayIsoDay from "../../hooks/useTodayIsoDay";
 import { ui } from "../../styles/theme";
@@ -203,7 +203,12 @@ export default function Shabbat() {
 
     const todayIso = useTodayIsoDay(DEBUG_TODAY_ISO);
 
-    const { status: locationStatus, location } = useAppLocation();
+    const {
+        status: locationStatus,
+        location,
+        requestPermission,
+        refresh,
+    } = useAppLocation();
     const hasLocation = !!location && locationStatus === "granted";
 
     const openSettings = useCallback(() => {
@@ -319,16 +324,38 @@ export default function Shabbat() {
         havdalahTime,
     ]);
 
+    const lat = location?.latitude ?? null;
+    const lon = location?.longitude ?? null;
+
+    useFocusEffect(
+        useCallback(() => {
+            let alive = true;
+
+            (async () => {
+                // 1) make sure permission/location state is current
+                await refresh?.();
+
+                // 2) recompute using latest redux settings + latest location
+                if (alive) {
+                    fetchShabbatInfo();
+                }
+            })();
+
+            return () => {
+                alive = false;
+            };
+        }, [refresh, fetchShabbatInfo])
+    );
+
+    // Live updates while *staying on* Shabbat
     useEffect(() => {
         fetchShabbatInfo();
-    }, [fetchShabbatInfo]);
+    }, [fetchShabbatInfo, locationStatus, lat, lon]);
 
     if (!fontsLoaded) return null;
 
     // ✅ Layout constants for “centered block”
     const MAX_WIDTH = 520;
-    const SIDE_PAD = 22;
-    const BLOCK_GAP = 14;
     const tabBarHeight = useBottomTabBarHeight();
 
     const dash = "—";
@@ -336,6 +363,21 @@ export default function Shabbat() {
     const friSundownValue = shabbatInfo?.sundownFriday ?? dash;
     const endsValue = shabbatInfo?.shabbatEnds ?? dash;
     const satSundownValue = shabbatInfo?.sundownSaturday ?? dash;
+
+    const handleEnableLocation = useCallback(async () => {
+        const st = await requestPermission?.();
+
+        if (st === "granted") {
+            setShowLocationDetails(false);
+            await refresh?.();
+            fetchShabbatInfo();
+            return;
+        }
+
+        if (st === "denied") {
+            openSettings();
+        }
+    }, [requestPermission, refresh, fetchShabbatInfo, openSettings]);
 
     return (
         <View style={ui.container}>
@@ -346,11 +388,7 @@ export default function Shabbat() {
                     ui.scrollContent,
                     {
                         flexGrow: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingHorizontal: SIDE_PAD,
-                        paddingTop: 18,
-                        // ✅ Reserve space for the tab bar so the centered block doesn't land under it
+                        paddingTop: 8,
                         paddingBottom: tabBarHeight + 18,
                     },
                 ]}
@@ -360,7 +398,6 @@ export default function Shabbat() {
                     style={{
                         width: "100%",
                         maxWidth: MAX_WIDTH,
-                        gap: BLOCK_GAP,
                     }}
                 >
                     {shabbatInfo ? (
@@ -501,7 +538,9 @@ export default function Shabbat() {
                                     ]}
                                 />
                                 <Text style={ui.shabbatLocationChipText}>
-                                    {hasLocation ? "Location on" : "Location off"}
+                                    {hasLocation
+                                        ? "Location on"
+                                        : "Location off"}
                                 </Text>
                             </Pressable>
                         </View>
@@ -565,7 +604,7 @@ export default function Shabbat() {
 
                             <TouchableOpacity
                                 onPress={() => {
-                                    openSettings();
+                                    handleEnableLocation();
                                     Haptics.impactAsync(
                                         Haptics.ImpactFeedbackStyle.Light
                                     );
@@ -574,7 +613,7 @@ export default function Shabbat() {
                                 activeOpacity={0.85}
                             >
                                 <Text style={ui.shabbatCtaText}>
-                                    Open Settings
+                                    Enable Location
                                 </Text>
                             </TouchableOpacity>
                         </>

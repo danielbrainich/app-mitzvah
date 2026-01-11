@@ -28,9 +28,9 @@ import {
 } from "../../store/actions";
 import { LayoutAnimation, Platform, UIManager } from "react-native";
 
-const DEFAULT_CANDLE = 18;
-const DEFAULT_HAVDALAH = 42;
-const MIN_MINS = 1;
+const DEFAULT_CANDLE = 0;
+const DEFAULT_HAVDALAH = 0;
+const MIN_MINS = 0;
 const MAX_MINS = 60;
 
 // Placeholder until I wire in IAP:
@@ -141,7 +141,14 @@ export default function Settings({ navigation }) {
 
             <ScrollView
                 style={ui.screen}
-                contentContainerStyle={ui.scrollContent}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={[
+                    ui.scrollContent,
+                    {
+                        flexGrow: 1,
+                        paddingTop: 10,
+                    },
+                ]}
             >
                 {/* Holiday Options Card */}
                 <View style={ui.card}>
@@ -206,7 +213,8 @@ export default function Settings({ navigation }) {
                                 Custom candle lighting
                             </Text>
                             <Text style={ui.settingsSubLabel}>
-                                Default is {DEFAULT_CANDLE} min before sundown
+                                Minutes before sundown:{" "}
+                                {candleLightingToggle ? candleValue : 18}
                             </Text>
                         </View>
 
@@ -221,15 +229,6 @@ export default function Settings({ navigation }) {
 
                     {candleLightingToggle ? (
                         <View style={ui.settingsSliderBlock}>
-                            <View style={ui.settingsSliderHeader}>
-                                <Text style={ui.settingsSliderValue}>
-                                    {candleValue} min
-                                </Text>
-                                <Text style={ui.settingsSliderHint}>
-                                    before sundown
-                                </Text>
-                            </View>
-
                             <Slider
                                 value={candleValue}
                                 minimumValue={MIN_MINS}
@@ -244,6 +243,15 @@ export default function Settings({ navigation }) {
                                     )
                                 }
                             />
+
+                            <View
+                                style={{
+                                    height: 1,
+                                    backgroundColor: "rgba(255,255,255,0.08)",
+                                    marginTop: 16,
+                                    marginHorizontal: 4,
+                                }}
+                            />
                         </View>
                     ) : null}
 
@@ -254,7 +262,8 @@ export default function Settings({ navigation }) {
                                 Custom shabbat end
                             </Text>
                             <Text style={ui.settingsSubLabel}>
-                                Default is {DEFAULT_HAVDALAH} min after sundown
+                                Minutes after sundown:{" "}
+                                {havdalahTimeToggle ? havdalahValue : 42}
                             </Text>
                         </View>
 
@@ -269,15 +278,6 @@ export default function Settings({ navigation }) {
 
                     {havdalahTimeToggle ? (
                         <View style={ui.settingsSliderBlock}>
-                            <View style={ui.settingsSliderHeader}>
-                                <Text style={ui.settingsSliderValue}>
-                                    {havdalahValue} min
-                                </Text>
-                                <Text style={ui.settingsSliderHint}>
-                                    after sundown
-                                </Text>
-                            </View>
-
                             <Slider
                                 value={havdalahValue}
                                 minimumValue={MIN_MINS}
@@ -298,8 +298,8 @@ export default function Settings({ navigation }) {
                         Support
                     </Text>
                     <Text style={ui.paragraph}>
-                        If you find this app fun and useful, please consider
-                        leaving a tip!
+                        If you enjoy using this app, please consider leaving a
+                        tip!
                     </Text>
 
                     <View style={ui.infoTiersRow}>
