@@ -18,8 +18,8 @@ export default function HolidayBottomSheet({
             visible={visible}
             onClose={onClose}
             snapPoints={snapPoints}
-            defaultIndex={1}
-            contentContainerStyle={ui.sheetBody} // ✅ use your sheetBody padding
+            defaultIndex={0}
+            contentContainerStyle={ui.sheetBody} // 
         >
             {/* Header */}
             <View style={ui.sheetHeader}>

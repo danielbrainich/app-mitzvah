@@ -16,6 +16,7 @@ import TodayHolidayCarousel from "../TodayHolidayCarousel";
 import TodayHolidayCard from "../TodayHolidayCard";
 import UpcomingHolidaysCarousel from "../UpcomingHolidaysCarousel";
 import HolidayBottomSheet from "../HolidayBottomSheet";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 /**
  * Date -> local YYYY-MM-DD (stable in local time; avoids UTC shifting).
@@ -76,6 +77,8 @@ export default function Holidays() {
     }, []);
 
     const closeAbout = useCallback(() => setAboutOpen(false), []);
+
+    const tabBarHeight = useBottomTabBarHeight();
 
     // Fetch + format once whenever settings/today changes
     const fetchHolidays = useCallback(() => {
@@ -167,7 +170,13 @@ export default function Holidays() {
         <View style={ui.container}>
             <ScrollView
                 style={ui.screen}
-                contentContainerStyle={[ui.scrollContent, { flexGrow: 1 }]}
+                contentContainerStyle={[
+                    ui.scrollContent,
+                    {
+                        flexGrow: 1,
+                        paddingBottom: tabBarHeight + 16,
+                    },
+                ]}
             >
                 <View style={{ flex: 1 }}>
                     {/* TODAY */}

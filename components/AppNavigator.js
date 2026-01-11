@@ -52,17 +52,16 @@ export default function AppNavigator() {
                     ),
 
                     tabBarActiveBackgroundColor: "#313131",
-
                     tabBarItemStyle: {
                         flex: 1,
                         margin: 8,
-                        borderRadius: 10
+                        borderRadius: 10,
                     },
 
                     tabBarLabelStyle: {
-                        fontSize: 17,
-                        textAlign: "center",
-                        // here
+                        fontSize: 16,
+                        fontWeight: 500,
+                        height: 34
                     },
 
                     tabBarStyle: {
@@ -77,10 +76,8 @@ export default function AppNavigator() {
                         paddingBottom: 0,
                     },
 
-                    tabBarActiveTintColor: colors.accent,
+                    tabBarActiveTintColor: "white",
                     tabBarInactiveTintColor: colors.muted,
-
-
                 }}
             >
                 <Tab.Screen

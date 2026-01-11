@@ -14,7 +14,7 @@ import { ui } from "../styles/theme";
 export default function BottomSheetDrawerBase({
     visible,
     onClose,
-    snapPoints = ["30%", "45%"],
+    snapPoints = ["35%", "65%"],
     defaultIndex = 0, // 0 = shorter (first snap point), 1 = taller (second snap point)
     children,
     contentContainerStyle,
@@ -51,6 +51,7 @@ export default function BottomSheetDrawerBase({
             backgroundStyle={ui.bottomSheetBg}
             handleIndicatorStyle={ui.bottomSheetHandle}
             backdropComponent={renderBackdrop}
+            enableDynamicSizing={false} 
         >
             <BottomSheetView style={ui.bottomSheetContent}>
                 {/* Top row: close button only */}

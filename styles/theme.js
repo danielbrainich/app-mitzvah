@@ -42,16 +42,9 @@ export const ui = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.bg,
-        paddingBottom: 122,
-    },
-    // Shabbat needs relative positioning for the floating location chip
-    shabbatContainer: {
-        flex: 1,
-        backgroundColor: COLORS.bg,
-        position: "relative",
     },
     screen: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 8,
     },
 
     // ---------------------------------------------------------------------------
@@ -79,8 +72,8 @@ export const ui = StyleSheet.create({
     },
     cardTitle: {
         color: COLORS.accent,
-        fontSize: 22,
-        marginBottom: 10,
+        fontSize: 26,
+        marginBottom: 6,
         fontWeight: "700",
     },
 
@@ -167,22 +160,21 @@ export const ui = StyleSheet.create({
     // SHABBAT SCREEN (prefixed where appropriate)
     // ===========================================================================
 
-    // Shared-ish text styles Shabbat uses a lot
+    shabbatIntro: {
+        color: "white",
+        fontSize: 30,
+        marginVertical: 16,
+    },
     shabbatSentence: {
         color: "rgba(255,255,255,0.92)",
-        fontSize: 18,
-        lineHeight: 26,
-        marginBottom: 6,
+        fontSize: 14,
+        marginBottom: 16,
     },
     shabbatSentenceSmall: {
         color: "rgba(255,255,255,0.92)",
         fontSize: 16,
         lineHeight: 22,
         marginBottom: 6,
-    },
-    shabbatHighlight: {
-        color: COLORS.accent,
-        fontWeight: "500",
     },
     shabbatMuted: {
         color: "rgba(255,255,255,0.75)",
@@ -200,12 +192,12 @@ export const ui = StyleSheet.create({
         marginBottom: 12,
     },
     shabbatSheetLabel: {
-        color: "rgba(255,255,255,0.75)",
-        fontSize: 14,
+        color: "white",
+        fontSize: 18,
     },
     shabbatSheetValue: {
-        color: COLORS.accent,
-        fontSize: 14,
+        color: "white",
+        fontSize: 18,
         maxWidth: "60%",
         textAlign: "right",
     },
@@ -230,7 +222,6 @@ export const ui = StyleSheet.create({
         marginBottom: 10,
     },
 
-    // "Open Settings" CTA matches the old styling (not the shared primary button)
     shabbatCta: {
         borderWidth: 0.5,
         borderColor: COLORS.accent,
@@ -244,12 +235,7 @@ export const ui = StyleSheet.create({
         fontSize: 12,
         fontWeight: "600",
     },
-
-    // Floating location chip
     shabbatLocationChip: {
-        position: "absolute",
-        left: 20,
-        bottom: 88,
         flexDirection: "row",
         alignItems: "center",
         gap: 8,
@@ -260,6 +246,12 @@ export const ui = StyleSheet.create({
         borderColor: "rgba(255,255,255,0.18)",
         backgroundColor: COLORS.bg,
     },
+
+    shabbatLocationChipInline: {
+        position: "relative",
+        alignSelf: "flex-start",
+    },
+
     shabbatGreenDot: {
         width: 10,
         height: 10,
@@ -405,7 +397,6 @@ export const ui = StyleSheet.create({
         marginTop: 12,
     },
 
-    // This button is “card-local” (different shape than shared primaryButton)
     todayHolidayMoreInfoButton: {
         borderRadius: 18,
         padding: 12,
@@ -422,7 +413,6 @@ export const ui = StyleSheet.create({
         fontWeight: "500",
     },
 
-    // Bottom sheet typography
     todayHolidayDrawerHebrew: {
         color: COLORS.accent,
         fontSize: 18,
@@ -491,10 +481,8 @@ export const ui = StyleSheet.create({
     bottomSheetCloseBtn: {
         width: 40,
         height: 40,
-        borderRadius: 20,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "rgba(255,255,255,0.06)",
     },
 
     sheetHeader: {
@@ -541,17 +529,23 @@ export const ui = StyleSheet.create({
         fontSize: 22,
         fontFamily: "ChutzBold",
         flexGrow: 1,
-        flexBasis: "50%",      // ⬅ each gets half
+        flexBasis: "50%",
         paddingRight: 12,
-      },
-      sheetNameRight: {
+    },
+    sheetNameRight: {
         color: COLORS.accent,
         fontSize: 16,
         opacity: 0.9,
         textAlign: "right",
-        writingDirection: "rtl", // ⬅ important for Hebrew
+        writingDirection: "rtl",
         flexGrow: 1,
-        flexBasis: "50%",        // ⬅ each gets half
+        flexBasis: "50%",
         paddingLeft: 12,
-      },
+    },
+
+    bottomSheetTitle: {
+        color: "white",
+        fontSize: 20,
+        marginBottom: 14,
+    },
 });

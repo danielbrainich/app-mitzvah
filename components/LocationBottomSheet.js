@@ -8,7 +8,7 @@ export default function LocationBottomSheet({
     visible,
     onClose,
     title = "Your Location",
-    snapPoints = ["30%", "45%"],
+    snapPoints = ["35%", "65%"],
     children,
 }) {
     return (
