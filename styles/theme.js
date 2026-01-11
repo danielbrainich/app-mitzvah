@@ -81,7 +81,7 @@ export const ui = StyleSheet.create({
     // Typography (shared)
     // ---------------------------------------------------------------------------
     paragraph: {
-        color: COLORS.textBody,
+        color: "white",
         fontSize: 16,
         lineHeight: 22,
         marginBottom: 10,
@@ -124,19 +124,19 @@ export const ui = StyleSheet.create({
 
     infoTiersRow: {
         flexDirection: "row",
-        flexWrap: "wrap",
+        justifyContent: "space-between",
         marginBottom: 18,
         marginTop: 4,
     },
 
     infoTierPill: {
+        width: 56,            
+        alignItems: "center",
         borderWidth: 1,
         borderColor: COLORS.pillBorder,
         borderRadius: 999,
         paddingVertical: 8,
-        paddingHorizontal: 12,
         backgroundColor: "transparent",
-        margin: 5,
     },
     infoTierPillSelected: {
         borderColor: COLORS.accentBorder,

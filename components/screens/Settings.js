@@ -6,6 +6,7 @@ import {
     ScrollView,
     Pressable,
     TouchableOpacity,
+    Alert,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import React, { useMemo, useCallback, useState } from "react";
@@ -32,7 +33,7 @@ const MIN_MINS = 1;
 const MAX_MINS = 60;
 
 // Placeholder until I wire in IAP:
-const handleTip = () => {
+const handleTip = (amount) => {
     Alert.alert(
         "Tip (In-App Purchase)",
         `Selected: $${amount}\n\nNext step: create IAP products (tip_1, tip_2, tip_5, tip_10, tip_18) and call purchase().`
@@ -41,7 +42,6 @@ const handleTip = () => {
 
 export default function Settings({ navigation }) {
     const [fontsLoaded] = useFonts({
-        // Settings.js is in components/screens, so assets is 3 levels up
         ChutzBold: require("../../assets/fonts/Chutz-Bold.otf"),
     });
 
@@ -140,7 +140,9 @@ export default function Settings({ navigation }) {
             >
                 {/* Holiday Options Card */}
                 <View style={ui.card}>
-                    <Text style={ui.cardTitle}>Holiday Options</Text>
+                    <Text style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}>
+                        Holiday Options
+                    </Text>
 
                     <View style={ui.row}>
                         <Text style={ui.settingsRowLabel}>
@@ -188,7 +190,9 @@ export default function Settings({ navigation }) {
 
                 {/* Shabbat Options Card */}
                 <View style={ui.card}>
-                    <Text style={ui.cardTitle}>Shabbat Options</Text>
+                    <Text style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}>
+                        Shabbat Options
+                    </Text>
 
                     {/* Candle Lighting */}
                     <View style={ui.row}>
@@ -242,7 +246,7 @@ export default function Settings({ navigation }) {
                     <View style={ui.row}>
                         <View style={ui.rowLeft}>
                             <Text style={ui.settingsRowLabel}>
-                                Custom Havdalah
+                                Custom shabbat end
                             </Text>
                             <Text style={ui.settingsSubLabel}>
                                 Default is {DEFAULT_HAVDALAH} min after sundown
@@ -285,7 +289,9 @@ export default function Settings({ navigation }) {
                     ) : null}
                 </View>
                 <View style={ui.card}>
-                    <Text style={ui.cardTitle}>Support</Text>
+                    <Text style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}>
+                        Support
+                    </Text>
                     <Text style={ui.paragraph}>
                         If you find this app fun and useful, please consider
                         leaving a tip!
@@ -297,7 +303,12 @@ export default function Settings({ navigation }) {
                             return (
                                 <TouchableOpacity
                                     key={v}
-                                    onPress={() => setAmount(v)}
+                                    onPress={() => {
+                                        setAmount(v);
+                                        Haptics.impactAsync(
+                                            Haptics.ImpactFeedbackStyle.Light
+                                        );
+                                    }}
                                     activeOpacity={0.85}
                                     style={[
                                         ui.infoTierPill,
@@ -323,7 +334,12 @@ export default function Settings({ navigation }) {
 
                     <TouchableOpacity
                         style={ui.primaryButton}
-                        onPress={handleTip}
+                        onPress={() => {
+                            handleTip(amount);
+                            Haptics.impactAsync(
+                                Haptics.ImpactFeedbackStyle.Light
+                            );
+                        }}
                         activeOpacity={0.85}
                     >
                         <Text style={ui.primaryButtonText}>Tip ${amount}</Text>

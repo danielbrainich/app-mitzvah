@@ -343,8 +343,6 @@ export default function Shabbat() {
             >
                 {shabbatInfo ? (
                     <>
-                        <Text style={ui.shabbatIntro}>Shabbat Times</Text>
-
                         {/* Erev Shabbat */}
                         <View style={ui.card}>
                             <Text
