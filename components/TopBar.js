@@ -54,19 +54,32 @@ export function TopBar({ todayIso }) {
                         paddingVertical: 6,
                     }}
                 >
-                    <Text
+                    <View
                         style={{
-                            color: "white",
-                            fontSize: 14,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 8,
                             borderRadius: 18,
                             paddingVertical: 8,
                             paddingHorizontal: 16,
                             backgroundColor: colors.card,
                         }}
-                        numberOfLines={1}
                     >
-                        {label}
-                    </Text>
+                        <Entypo
+                            name="cycle"
+                            size={14}
+                            color="rgba(255,255,255,0.65)"
+                        />
+                        <Text
+                            style={{
+                                color: "white",
+                                fontSize: 14,
+                            }}
+                            numberOfLines={1}
+                        >
+                            {label}
+                        </Text>
+                    </View>
                 </Pressable>
 
                 {/* RIGHT: Gear pinned to right */}
@@ -79,12 +92,12 @@ export function TopBar({ todayIso }) {
                     style={{
                         position: "absolute",
                         right: 16,
-                        width: 36,
-                        height: 36,
+                        width: 38,
+                        height: 38,
                         borderRadius: 18,
                         alignItems: "center",
                         justifyContent: "center",
-                        backgroundColor: "rgba(255,255,255,0.06)",
+                        backgroundColor: colors.card,
                     }}
                 >
                     <Entypo name="cog" size={22} color="#fff" />

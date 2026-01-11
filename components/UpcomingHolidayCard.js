@@ -74,7 +74,7 @@ export default function UpcomingHolidayCard({
                     accessibilityRole="button"
                     accessibilityLabel="More options"
                 >
-                    <Entypo name="dots-three-vertical" size={16} color="#fff" />
+                    <Entypo name="dots-three-vertical" size={16} color="white" />
                 </Pressable>
             ) : null}
         </View>

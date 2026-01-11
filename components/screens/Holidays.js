@@ -1,10 +1,12 @@
-// components/screens/Holidays.js
+// screens/Holidays.js
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, View, ScrollView, Pressable } from "react-native";
 import { useSelector } from "react-redux";
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 import { useFonts } from "expo-font";
 import * as Haptics from "expo-haptics";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { Entypo } from "@expo/vector-icons";
 
 import { ui } from "../../styles/theme";
 import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
@@ -12,11 +14,8 @@ import { parseLocalIso, formatGregorianLong } from "../../utils/datetime";
 import useTodayIsoDay from "../../hooks/useTodayIsoDay";
 import { DEBUG_TODAY_ISO } from "../../utils/debug";
 
-import TodayHolidayCarousel from "../TodayHolidayCarousel";
-import TodayHolidayCard from "../TodayHolidayCard";
 import UpcomingHolidaysCarousel from "../UpcomingHolidaysCarousel";
 import HolidayBottomSheet from "../HolidayBottomSheet";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 /**
  * Date -> local YYYY-MM-DD (stable in local time; avoids UTC shifting).
@@ -48,8 +47,106 @@ function endOfHebrewYearFromTodayExclusive(todayIso) {
     return end;
 }
 
-const TODAY_CARD_HEIGHT = 360;
+const TODAY_STACK_HEIGHT = 360;
 const UPCOMING_HEIGHT = 120;
+
+/**
+ * Slim "Today" card for 2–3 holidays.
+ * - English (left)
+ * - Hebrew (below, centered)
+ * - three vertical dots on the right to open About
+ * Uses existing styles only.
+ */
+function TodayHolidaySlimCard({ holiday, onAbout }) {
+    if (!holiday) return null;
+
+    const title = holiday.title ?? "";
+    const hebrewTitle = holiday.hebrewTitle ?? "";
+
+    return (
+        <View style={ui.upcomingHolidayCard}>
+            <View
+                style={{
+                    flexDirection: "row",
+                    alignItems: "flex-start",
+                    justifyContent: "space-between",
+                    gap: 12,
+                }}
+            >
+                <View style={{ flex: 1 }}>
+                    <Text
+                        style={[
+                            ui.upcomingHolidayTitle,
+                            { fontFamily: "ChutzBold" },
+                        ]}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                    >
+                        {title}
+                    </Text>
+                </View>
+
+                <Pressable
+                    onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        onAbout?.(holiday);
+                    }}
+                    hitSlop={12}
+                    style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: 17,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "rgba(255,255,255,0.06)",
+                    }}
+                    accessibilityRole="button"
+                    accessibilityLabel="More info"
+                >
+                    <Entypo
+                        name="dots-three-vertical"
+                        size={16}
+                        color="white"
+                    />
+                </Pressable>
+            </View>
+
+            {!!hebrewTitle && (
+                <Text
+                    style={[
+                        ui.upcomingHolidayHebrew,
+                        { textAlign: "left", marginTop: 6 },
+                    ]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                >
+                    {hebrewTitle}
+                </Text>
+            )}
+        </View>
+    );
+}
+
+function TodayHolidayStack({ holidays, height, onAbout }) {
+    const list = (holidays || []).filter(Boolean);
+    if (list.length < 2) return null;
+
+    const gap = 14;
+
+    return (
+        <View style={{ height, justifyContent: "center" }}>
+            <View style={{ gap }}>
+                {list.slice(0, 3).map((h) => (
+                    <TodayHolidaySlimCard
+                        key={h.id ?? `${h.title}-${h.date}`}
+                        holiday={h}
+                        onAbout={onAbout}
+                    />
+                ))}
+            </View>
+        </View>
+    );
+}
 
 export default function Holidays() {
     const [fontsLoaded] = useFonts({
@@ -60,13 +157,11 @@ export default function Holidays() {
         (state) => state.settings
     );
 
-    // single source of truth for “today”
     const todayIso = useTodayIsoDay(DEBUG_TODAY_ISO);
 
     const [holidays, setHolidays] = useState([]);
     const [todayHolidays, setTodayHolidays] = useState([]);
 
-    // ONE drawer for the entire screen
     const [aboutOpen, setAboutOpen] = useState(false);
     const [aboutHoliday, setAboutHoliday] = useState(null);
 
@@ -80,7 +175,6 @@ export default function Holidays() {
 
     const tabBarHeight = useBottomTabBarHeight();
 
-    // Fetch + format once whenever settings/today changes
     const fetchHolidays = useCallback(() => {
         const start = parseLocalIso(todayIso);
         const end = endOfHebrewYearFromTodayExclusive(todayIso);
@@ -91,13 +185,11 @@ export default function Holidays() {
             isHebrewYear: false,
             candlelighting: false,
 
-            // feature toggles
             noMinorFast: !minorFasts,
             noSpecialShabbat: true,
             noModern: !modernHolidays,
             noRoshChodesh: !rosheiChodesh,
 
-            // keep these off
             sedrot: false,
             omer: false,
             shabbatMevarchim: false,
@@ -121,24 +213,6 @@ export default function Holidays() {
                 };
             });
 
-        // Optional dev audit: descriptions coverage
-        if (__DEV__) {
-            const uniqueTitles = [...new Set(formatted.map((h) => h.title))];
-            const missing = uniqueTitles.filter(
-                (title) => !getHolidayDetailsByName(title)?.description
-            );
-
-            console.group(`[Holiday descriptions]`);
-            console.log(`Unique titles: ${uniqueTitles.length}`);
-            if (missing.length === 0)
-                console.log("✅ All holidays have descriptions");
-            else {
-                console.warn(`❌ Missing ${missing.length} descriptions:`);
-                missing.forEach((t) => console.warn("•", t));
-            }
-            console.groupEnd();
-        }
-
         setHolidays(formatted);
         setTodayHolidays(formatted.filter((h) => h.date === todayIso));
     }, [todayIso, minorFasts, modernHolidays, rosheiChodesh]);
@@ -152,14 +226,6 @@ export default function Holidays() {
         [holidays, todayIso]
     );
 
-    // simplest way to pass drawer behavior down:
-    // Provide a CardComponent that injects `onAbout`.
-    const TodayCard = useMemo(() => {
-        return function TodayCardWithAbout(props) {
-            return <TodayHolidayCard {...props} onAbout={openAbout} />;
-        };
-    }, [openAbout]);
-
     if (!fontsLoaded) return null;
 
     const oneToday = todayHolidays.length === 1;
@@ -172,27 +238,32 @@ export default function Holidays() {
                 style={ui.screen}
                 contentContainerStyle={[
                     ui.scrollContent,
-                    {
-                        flexGrow: 1,
-                        paddingBottom: tabBarHeight + 16,
-                    },
+                    { flexGrow: 1, paddingBottom: tabBarHeight + 16 },
                 ]}
             >
                 <View style={{ flex: 1 }}>
                     {/* TODAY */}
                     {manyToday ? (
                         <View style={[ui.holidaysTodaySection, { flex: 1 }]}>
-                            <TodayHolidayCarousel
-                                data={todayHolidays}
-                                height={TODAY_CARD_HEIGHT}
-                                peek={42}
-                                gap={18}
-                                cardHeight={TODAY_CARD_HEIGHT}
-                                CardComponent={TodayCard}
-                            />
+                            <View
+                                style={{
+                                    flex: 1,
+                                    justifyContent: "center", // ✅ keeps the whole TODAY section vertically balanced
+                                }}
+                            >
+                                <Text style={ui.holidaysHeaderText}>
+                                    Today is
+                                </Text>
+
+                                <View style={{ marginTop: 12 }}>
+                                    <TodayHolidayStack
+                                        holidays={todayHolidays}
+                                        onAbout={openAbout}
+                                    />
+                                </View>
+                            </View>
                         </View>
                     ) : oneToday ? (
-                        // Single holiday: same centered style as “not a holiday”
                         <View style={[ui.holidaysTodaySection, { flex: 1 }]}>
                             <View
                                 style={{
@@ -209,15 +280,13 @@ export default function Holidays() {
                                 <Text
                                     style={[
                                         ui.holidaysBigBoldText,
-                                        {
-                                            fontFamily: "ChutzBold",
-                                        },
+                                        { fontFamily: "ChutzBold" },
                                     ]}
                                 >
-                                    {singleHoliday.title}
+                                    {singleHoliday?.title ?? ""}
                                 </Text>
 
-                                {singleHoliday.hebrewTitle && (
+                                {singleHoliday?.hebrewTitle && (
                                     <Text style={ui.todayHolidayHebrew}>
                                         {singleHoliday.hebrewTitle}
                                     </Text>
@@ -243,7 +312,6 @@ export default function Holidays() {
                             </View>
                         </View>
                     ) : (
-                        // Not a holiday: centered
                         <View style={[ui.holidaysTodaySection, { flex: 1 }]}>
                             <View
                                 style={{

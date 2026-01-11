@@ -12,7 +12,7 @@ import { StyleSheet } from "react-native";
 const COLORS = {
     // Base
     bg: "black",
-    card: "#131313",
+    card: "#1A1A1A",
     white: "white",
     muted: "rgba(255,255,255,0.65)",
 
@@ -130,7 +130,7 @@ export const ui = StyleSheet.create({
     },
 
     infoTierPill: {
-        width: 56,            
+        width: 56,
         alignItems: "center",
         borderWidth: 1,
         borderColor: COLORS.pillBorder,
@@ -322,9 +322,17 @@ export const ui = StyleSheet.create({
 
     holidaysBigBoldText: {
         color: COLORS.accent,
-        // NOTE: fontFamily is applied in-screen after fontsLoaded
         fontSize: 77,
         lineHeight: 74,
+        textAlign: "center",
+        marginTop: 12,
+        marginBottom: 8,
+    },
+
+    twoHolidaysBigBoldText: {
+        color: COLORS.accent,
+        fontSize: 66,
+        lineHeight: 64,
         textAlign: "center",
         marginTop: 12,
         marginBottom: 8,
@@ -351,6 +359,7 @@ export const ui = StyleSheet.create({
         marginTop: 12,
         marginBottom: 0,
     },
+
 
     // ===========================================================================
     // TODAY HOLIDAY CARD (prefixed)

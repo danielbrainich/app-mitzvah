@@ -26,6 +26,7 @@ import {
     setCandleLightingToggle,
     setHavdalahTimeToggle,
 } from "../../store/actions";
+import { LayoutAnimation, Platform, UIManager } from "react-native";
 
 const DEFAULT_CANDLE = 18;
 const DEFAULT_HAVDALAH = 42;
@@ -74,6 +75,8 @@ export default function Settings({ navigation }) {
     }, [havdalahTimeToggle, havdalahTime]);
 
     const handleCandleLightingToggle = useCallback(() => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
         const newToggleState = !candleLightingToggle;
         dispatch(setCandleLightingToggle(newToggleState));
 
@@ -88,6 +91,8 @@ export default function Settings({ navigation }) {
     }, [dispatch, candleLightingToggle, candleLightingTime]);
 
     const handleHavdalahTimeToggle = useCallback(() => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
         const newToggleState = !havdalahTimeToggle;
         dispatch(setHavdalahTimeToggle(newToggleState));
 
