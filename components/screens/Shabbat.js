@@ -201,7 +201,6 @@ export default function Shabbat() {
         []
     );
 
-    const tabBarHeight = useBottomTabBarHeight();
     const todayIso = useTodayIsoDay(DEBUG_TODAY_ISO);
 
     const { status: locationStatus, location } = useAppLocation();
@@ -237,7 +236,6 @@ export default function Shabbat() {
                 ? makeHebcalLocation(location, timezone)
                 : null;
 
-            // IMPORTANT: Use your user settings here (not 1 minute)
             const candleMins = Number.isFinite(candleLightingTime)
                 ? candleLightingTime
                 : 18;
@@ -250,8 +248,6 @@ export default function Shabbat() {
                 start: friday,
                 end,
                 sedrot: true,
-
-                // Only request timed candle/havdalah if location is available
                 ...(hebcalLocation
                     ? {
                           location: hebcalLocation,
@@ -264,7 +260,6 @@ export default function Shabbat() {
 
             const signals = extractShabbatSignals({ events, friday, saturday });
 
-            // Sundown (single source of truth) — only possible with location anyway
             const fridaySunset = hasLocation
                 ? computeSundownFromZmanim({ location, timezone, date: friday })
                 : null;
@@ -277,8 +272,7 @@ export default function Shabbat() {
                   })
                 : null;
 
-            // ✅ LOGIC CHANGE (only): derive candle + ends from *the same* sunset values
-            // This guarantees your “X minutes before/after sundown” setting is always consistent.
+            // ✅ derive candle + ends from *the same* sunset values
             const candleTimeStr = fridaySunset
                 ? formatTime12h(addMinutes(fridaySunset, -candleMins))
                 : null;
@@ -331,209 +325,159 @@ export default function Shabbat() {
 
     if (!fontsLoaded) return null;
 
+    // ✅ Layout constants for “centered block”
+    const MAX_WIDTH = 520;
+    const SIDE_PAD = 22;
+    const BLOCK_GAP = 14;
+    const tabBarHeight = useBottomTabBarHeight();
+
+    const dash = "—";
+    const candleValue = shabbatInfo?.candleTime ?? dash;
+    const friSundownValue = shabbatInfo?.sundownFriday ?? dash;
+    const endsValue = shabbatInfo?.shabbatEnds ?? dash;
+    const satSundownValue = shabbatInfo?.sundownSaturday ?? dash;
+
     return (
         <View style={ui.container}>
             <ScrollView
                 style={ui.screen}
+                showsVerticalScrollIndicator={false}
                 contentContainerStyle={[
                     ui.scrollContent,
-                    { paddingBottom: tabBarHeight + 16 },
+                    {
+                        flexGrow: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingHorizontal: SIDE_PAD,
+                        paddingTop: 18,
+                        // ✅ Reserve space for the tab bar so the centered block doesn't land under it
+                        paddingBottom: tabBarHeight + 18,
+                    },
                 ]}
-                showsVerticalScrollIndicator={false}
             >
-                {shabbatInfo ? (
-                    <>
-                        {/* Erev Shabbat */}
-                        <View style={ui.card}>
-                            <Text
-                                style={[
-                                    ui.cardTitle,
-                                    { fontFamily: "ChutzBold" },
-                                ]}
-                            >
-                                Erev Shabbat
-                            </Text>
+                {/* Inner fixed-width column */}
+                <View
+                    style={{
+                        width: "100%",
+                        maxWidth: MAX_WIDTH,
+                        gap: BLOCK_GAP,
+                    }}
+                >
+                    {shabbatInfo ? (
+                        <>
+                            {/* Erev Shabbat */}
+                            <View style={ui.card}>
+                                <Text
+                                    style={[
+                                        ui.cardTitle,
+                                        { fontFamily: "ChutzBold" },
+                                    ]}
+                                >
+                                    Erev Shabbat
+                                </Text>
 
-                            <Text style={ui.shabbatSentence}>
-                                {shabbatInfo.erevShabbatDate}
-                            </Text>
+                                <Text style={ui.shabbatSentence}>
+                                    {shabbatInfo.erevShabbatDate}
+                                </Text>
 
-                            {shabbatInfo.candleTime && (
+                                {/* ✅ Always show rows; use dash for missing values */}
                                 <View style={ui.shabbatSheetLine}>
                                     <Text style={ui.shabbatSheetLabel}>
                                         Candle lighting
                                     </Text>
                                     <Text style={ui.shabbatSheetValue}>
-                                        {shabbatInfo.candleTime}
+                                        {candleValue}
                                     </Text>
                                 </View>
-                            )}
 
-                            {shabbatInfo.sundownFriday && (
                                 <View style={ui.shabbatSheetLine}>
                                     <Text style={ui.shabbatSheetLabel}>
                                         Sundown
                                     </Text>
                                     <Text style={ui.shabbatSheetValue}>
-                                        {shabbatInfo.sundownFriday}
+                                        {friSundownValue}
                                     </Text>
                                 </View>
-                            )}
+                            </View>
 
-                            {!hasLocation ? (
+                            {/* Yom Shabbat */}
+                            <View style={ui.card}>
                                 <Text
                                     style={[
-                                        ui.shabbatSentenceSmall,
-                                        ui.shabbatMuted,
+                                        ui.cardTitle,
+                                        { fontFamily: "ChutzBold" },
                                     ]}
                                 >
-                                    Turn on location services to see times for
-                                    your area.
+                                    Yom Shabbat
                                 </Text>
-                            ) : null}
-                        </View>
 
-                        {/* Yom Shabbat */}
-                        <View style={ui.card}>
-                            <Text
-                                style={[
-                                    ui.cardTitle,
-                                    { fontFamily: "ChutzBold" },
-                                ]}
-                            >
-                                Yom Shabbat
-                            </Text>
+                                <Text style={ui.shabbatSentence}>
+                                    {shabbatInfo.yomShabbatDate}
+                                </Text>
 
-                            <Text style={ui.shabbatSentence}>
-                                {shabbatInfo.yomShabbatDate}
-                            </Text>
-
-                            {shabbatInfo.shabbatEnds && (
+                                {/* ✅ Always show rows; use dash for missing values */}
                                 <View style={ui.shabbatSheetLine}>
                                     <Text style={ui.shabbatSheetLabel}>
                                         Shabbat ends
                                     </Text>
                                     <Text style={ui.shabbatSheetValue}>
-                                        {shabbatInfo.shabbatEnds}
+                                        {endsValue}
                                     </Text>
                                 </View>
-                            )}
-                            {shabbatInfo.sundownSaturday && (
+
                                 <View style={ui.shabbatSheetLine}>
                                     <Text style={ui.shabbatSheetLabel}>
                                         Sundown
                                     </Text>
                                     <Text style={ui.shabbatSheetValue}>
-                                        {shabbatInfo.sundownSaturday}
+                                        {satSundownValue}
                                     </Text>
                                 </View>
-                            )}
-                        </View>
+                            </View>
 
-                        {/* Parasha */}
-                        <View style={ui.card}>
-                            <Text
-                                style={[
-                                    ui.cardTitle,
-                                    { fontFamily: "ChutzBold" },
-                                ]}
-                            >
-                                Parasha
-                            </Text>
+                            {/* Parasha */}
+                            <View style={ui.card}>
+                                <Text
+                                    style={[
+                                        ui.cardTitle,
+                                        { fontFamily: "ChutzBold" },
+                                    ]}
+                                >
+                                    Parasha
+                                </Text>
 
-                            {shabbatInfo.parshaEnglish &&
-                            !shabbatInfo.parshaReplacedByHoliday ? (
-                                <View style={ui.shabbatSheetLine}>
-                                    <Text style={ui.shabbatSheetLabel}>
-                                        {shabbatInfo.parshaEnglish}
-                                    </Text>
-                                    {shabbatInfo.parshaHebrew ? (
-                                        <Text style={ui.shabbatSheetValue}>
-                                            {shabbatInfo.parshaHebrew}
+                                {shabbatInfo.parshaEnglish &&
+                                !shabbatInfo.parshaReplacedByHoliday ? (
+                                    <View style={ui.shabbatSheetLine}>
+                                        <Text style={ui.shabbatSheetLabel}>
+                                            {shabbatInfo.parshaEnglish}
                                         </Text>
-                                    ) : null}
-                                </View>
-                            ) : (
-                                <Text style={ui.shabbatSentenceSmall}>
-                                    This week’s holiday Torah reading replaces
-                                    the parasha.
-                                </Text>
-                            )}
-                        </View>
-                    </>
-                ) : (
-                    <View style={ui.card}>
-                        <Text style={ui.shabbatSentence}>
-                            {loading
-                                ? "Loading Shabbat info..."
-                                : "No Shabbat info."}
-                        </Text>
-                    </View>
-                )}
-
-                {/* Location bottom sheet */}
-                <LocationBottomSheet
-                    visible={showLocationDetails}
-                    onClose={() => setShowLocationDetails(false)}
-                    title="Your Location"
-                    snapPoints={["35%", "65%"]}
-                >
-                    <View style={ui.shabbatSheetLine}>
-                        <Text style={ui.shabbatSheetLabel}>Timezone</Text>
-                        <Text style={ui.shabbatSheetValue}>
-                            {timezone.replace(/_/g, " ")}
-                        </Text>
-                    </View>
-
-                    <View style={ui.shabbatSheetLine}>
-                        <Text style={ui.shabbatSheetLabel}>Coordinates</Text>
-                        <Text style={ui.shabbatSheetValue}>
-                            {hasLocation
-                                ? `${location.latitude.toFixed(
-                                      3
-                                  )}, ${location.longitude.toFixed(3)}`
-                                : "Unavailable"}
-                        </Text>
-                    </View>
-
-                    <View style={ui.shabbatSheetLine}>
-                        <Text style={ui.shabbatSheetLabel}>Elevation</Text>
-                        <Text style={ui.shabbatSheetValue}>
-                            {hasLocation && Number.isFinite(location.elevation)
-                                ? `${location.elevation.toFixed(1)} meters`
-                                : "Unknown"}
-                        </Text>
-                    </View>
-                </LocationBottomSheet>
-
-                {/* Footer notice / chip */}
-                <View style={ui.shabbatFooter}>
-                    {!hasLocation ? (
-                        <View style={ui.shabbatLocationNotice}>
-                            <Text style={ui.shabbatLocationNoticeTitle}>
-                                Location is off
-                            </Text>
-                            <Text style={ui.shabbatLocationNoticeBody}>
-                                Candle lighting, sundown, and end times use your
-                                device’s location. Turn on location services to
-                                see those times.
-                            </Text>
-
-                            <TouchableOpacity
-                                onPress={() => {
-                                    openSettings();
-                                    Haptics.impactAsync(
-                                        Haptics.ImpactFeedbackStyle.Light
-                                    );
-                                }}
-                                style={ui.shabbatCta}
-                            >
-                                <Text style={ui.shabbatCtaText}>
-                                    Open Settings
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
+                                        {shabbatInfo.parshaHebrew ? (
+                                            <Text style={ui.shabbatSheetValue}>
+                                                {shabbatInfo.parshaHebrew}
+                                            </Text>
+                                        ) : null}
+                                    </View>
+                                ) : (
+                                    <Text style={ui.shabbatSentenceSmall}>
+                                        This week’s holiday Torah reading
+                                        replaces the parasha.
+                                    </Text>
+                                )}
+                            </View>
+                        </>
                     ) : (
+                        <View style={ui.card}>
+                            <Text style={ui.shabbatSentence}>
+                                {loading
+                                    ? "Loading Shabbat info..."
+                                    : "No Shabbat info."}
+                            </Text>
+                        </View>
+                    )}
+
+                    {/* Footer notice / chip (included in centered block) */}
+                    <View style={ui.shabbatFooter}>
                         <View style={{ marginTop: 10 }}>
                             <Pressable
                                 onPress={() => {
@@ -548,14 +492,94 @@ export default function Shabbat() {
                                 ]}
                                 hitSlop={12}
                             >
-                                <View style={ui.shabbatGreenDot} />
+                                <View
+                                    style={[
+                                        ui.shabbatGreenDot,
+                                        !hasLocation
+                                            ? { backgroundColor: "#ff3b30" }
+                                            : null,
+                                    ]}
+                                />
                                 <Text style={ui.shabbatLocationChipText}>
-                                    Location
+                                    {hasLocation ? "Location on" : "Location off"}
                                 </Text>
                             </Pressable>
                         </View>
-                    )}
+                    </View>
                 </View>
+
+                {/* Location bottom sheet */}
+                <LocationBottomSheet
+                    visible={showLocationDetails}
+                    onClose={() => setShowLocationDetails(false)}
+                    title="Your Location"
+                    snapPoints={["35%", "65%"]}
+                >
+                    {hasLocation ? (
+                        <>
+                            <View style={ui.shabbatSheetLine}>
+                                <Text style={ui.shabbatSheetLabel}>
+                                    Timezone
+                                </Text>
+                                <Text style={ui.shabbatSheetValue}>
+                                    {timezone.replace(/_/g, " ")}
+                                </Text>
+                            </View>
+
+                            <View style={ui.shabbatSheetLine}>
+                                <Text style={ui.shabbatSheetLabel}>
+                                    Coordinates
+                                </Text>
+                                <Text style={ui.shabbatSheetValue}>
+                                    {`${location.latitude.toFixed(
+                                        3
+                                    )}, ${location.longitude.toFixed(3)}`}
+                                </Text>
+                            </View>
+
+                            <View style={ui.shabbatSheetLine}>
+                                <Text style={ui.shabbatSheetLabel}>
+                                    Elevation
+                                </Text>
+                                <Text style={ui.shabbatSheetValue}>
+                                    {Number.isFinite(location.elevation)
+                                        ? `${location.elevation.toFixed(
+                                              1
+                                          )} meters`
+                                        : "Unknown"}
+                                </Text>
+                            </View>
+                        </>
+                    ) : (
+                        <>
+                            <Text
+                                style={[
+                                    ui.shabbatSentenceSmall,
+                                    { marginBottom: 12 },
+                                ]}
+                            >
+                                To calculate candle lighting, sundown, and
+                                Shabbat end times for your area, please enable
+                                Location Services for this app.
+                            </Text>
+
+                            <TouchableOpacity
+                                onPress={() => {
+                                    openSettings();
+                                    Haptics.impactAsync(
+                                        Haptics.ImpactFeedbackStyle.Light
+                                    );
+                                }}
+                                style={ui.shabbatCta}
+                                activeOpacity={0.85}
+                            >
+                                <Text style={ui.shabbatCtaText}>
+                                    Open Settings
+                                </Text>
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </LocationBottomSheet>
             </ScrollView>
         </View>
     );
