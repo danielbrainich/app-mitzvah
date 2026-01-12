@@ -248,7 +248,7 @@ export default function Holidays() {
                             <View
                                 style={{
                                     flex: 1,
-                                    justifyContent: "center", // ✅ keeps the whole TODAY section vertically balanced
+                                    justifyContent: "top", //
                                 }}
                             >
                                 <Text style={ui.holidaysHeaderText}>

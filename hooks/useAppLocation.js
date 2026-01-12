@@ -1,6 +1,6 @@
-// hooks/useAppLocation.js
 import * as Location from "expo-location";
 import { useCallback, useEffect, useState } from "react";
+import { AppState } from "react-native";
 
 export default function useAppLocation() {
     const [status, setStatus] = useState("unknown"); // "granted" | "denied" | "undetermined" | "unknown"
@@ -8,7 +8,7 @@ export default function useAppLocation() {
 
     const refresh = useCallback(async () => {
         const perm = await Location.getForegroundPermissionsAsync();
-        setStatus(perm.status); // "granted" | "denied" | "undetermined"
+        setStatus(perm.status);
 
         if (perm.status === "granted") {
             const pos = await Location.getCurrentPositionAsync({});
@@ -42,8 +42,20 @@ export default function useAppLocation() {
         return perm.status;
     }, []);
 
+    // initial load
     useEffect(() => {
         refresh();
+    }, [refresh]);
+
+    // ✅ when returning from Settings, re-check permission + update location
+
+    useEffect(() => {
+        const sub = AppState.addEventListener("change", (state) => {
+            if (state === "active") {
+                refresh();
+            }
+        });
+        return () => sub.remove();
     }, [refresh]);
 
     return { status, location, refresh, requestPermission };

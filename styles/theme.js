@@ -193,11 +193,11 @@ export const ui = StyleSheet.create({
     },
     shabbatSheetLabel: {
         color: "white",
-        fontSize: 18,
+        fontSize: 16,
     },
     shabbatSheetValue: {
         color: "white",
-        fontSize: 18,
+        fontSize: 16,
         maxWidth: "60%",
         textAlign: "right",
     },
@@ -552,7 +552,7 @@ export const ui = StyleSheet.create({
     },
 
     bottomSheetTitle: {
-        color: "white",
+        color: COLORS.accent,
         fontSize: 20,
         marginBottom: 14,
     },

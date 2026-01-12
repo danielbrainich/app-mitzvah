@@ -17,13 +17,13 @@ import {
     HavdalahEvent,
     HDate,
     Zmanim,
-    Event, // used to detect holiday on Shabbat even without location
+    Event,
 } from "@hebcal/core";
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
-import { useFocusEffect } from "@react-navigation/native";
+
 import useAppLocation from "../../hooks/useAppLocation";
 import useTodayIsoDay from "../../hooks/useTodayIsoDay";
 import { ui } from "../../styles/theme";
@@ -46,7 +46,7 @@ function getUpcomingFridayAndSaturday(today) {
     const saturday = new Date(today);
 
     if (today.getDay() === 6) {
-        // Today is Saturday: show current Shabbat (Fri/Sat)
+        // Saturday: show current Shabbat (Fri/Sat)
         friday.setDate(today.getDate() - 1);
         saturday.setDate(today.getDate());
     } else {
@@ -78,7 +78,7 @@ function makeHebcalLocation(location, timezone) {
     );
 }
 
-// ✅ Consistent minute rounding: one source of truth, one rounding rule
+// ✅ FIXED: returns the rounded date (you had `return;`)
 function floorToMinute(d) {
     if (!(d instanceof Date)) return null;
     const x = new Date(d);
@@ -88,6 +88,7 @@ function floorToMinute(d) {
 
 function computeSundownFromZmanim({ location, timezone, date }) {
     if (!location) return null;
+
     const hebcalLocation = makeHebcalLocation(location, timezone);
     if (!hebcalLocation) return null;
 
@@ -95,20 +96,12 @@ function computeSundownFromZmanim({ location, timezone, date }) {
     const sunsetRaw = zmanim.sunset();
     if (!(sunsetRaw instanceof Date)) return null;
 
-    // ✅ Use the same rounded sunset everywhere (prevents “off by 1–2 mins” confusion)
     return floorToMinute(sunsetRaw);
 }
 
-/**
- * Extract:
- * - Friday candle lighting time (Hebcal CandleLightingEvent)
- * - Saturday "Shabbat ends" time (Hebcal HavdalahEvent if present)
- * - Whether a holiday/CH"M is on Saturday (for parsha replacement message)
- * - Whether Shabbat ends into Yom Tov (Saturday CandleLightingEvent exists)
- */
 function extractShabbatSignals({ events, friday, saturday }) {
     let fridayCandleTime = null;
-    let saturdayCandleTime = null; // indicates Yom Tov candle lighting Saturday night
+    let saturdayCandleTime = null;
     let havdalahTime = null;
 
     let parshaEnglish = null;
@@ -117,24 +110,20 @@ function extractShabbatSignals({ events, friday, saturday }) {
     let holidayOnSaturday = false;
 
     for (const ev of events || []) {
-        // Candle lighting events (timed)
         if (ev instanceof CandleLightingEvent) {
             if (!(ev.eventTime instanceof Date)) continue;
 
             if (isSameLocalDate(ev.eventTime, friday)) {
-                // Choose the first Friday candle lighting (usually correct)
                 if (!fridayCandleTime) fridayCandleTime = ev.eventTime;
                 continue;
             }
 
             if (isSameLocalDate(ev.eventTime, saturday)) {
-                // Candle lighting on Saturday night -> Shabbat into Yom Tov
                 if (!saturdayCandleTime) saturdayCandleTime = ev.eventTime;
                 continue;
             }
         }
 
-        // Havdalah event (timed) - may be absent when Yom Tov begins
         if (ev instanceof HavdalahEvent) {
             if (!(ev.eventTime instanceof Date)) continue;
             if (!isSameLocalDate(ev.eventTime, saturday)) continue;
@@ -142,14 +131,12 @@ function extractShabbatSignals({ events, friday, saturday }) {
             continue;
         }
 
-        // Parsha
         if (ev instanceof ParshaEvent) {
             parshaEnglish = ev.render("en");
             parshaHebrew = ev.renderBrief("he-x-NoNikud");
             continue;
         }
 
-        // Holiday detection on Saturday (works even without location)
         if (!holidayOnSaturday && ev instanceof Event) {
             const d = typeof ev.getDate === "function" ? ev.getDate() : null;
             const g = d && typeof d.greg === "function" ? d.greg() : null;
@@ -167,9 +154,6 @@ function extractShabbatSignals({ events, friday, saturday }) {
     }
 
     const endsIntoYomTov = !!saturdayCandleTime;
-
-    // If there’s a holiday on Saturday, Parsha may be replaced.
-    // This is more reliable than “parsha missing => replaced” by itself.
     const parshaReplacedByHoliday =
         holidayOnSaturday && (!parshaEnglish || !parshaHebrew);
 
@@ -207,9 +191,15 @@ export default function Shabbat() {
         status: locationStatus,
         location,
         requestPermission,
-        refresh,
     } = useAppLocation();
-    const hasLocation = !!location && locationStatus === "granted";
+
+    // ✅ stable primitives so we don't depend on location object identity
+    const lat = location?.latitude ?? null;
+    const lon = location?.longitude ?? null;
+    const elevation = location?.elevation ?? null;
+
+    const hasLocation =
+        lat != null && lon != null && locationStatus === "granted";
 
     const openSettings = useCallback(() => {
         Linking.openSettings().catch(() =>
@@ -237,8 +227,12 @@ export default function Shabbat() {
             end.setDate(end.getDate() + 1);
             end.setHours(0, 0, 0, 0);
 
-            const hebcalLocation = hasLocation
-                ? makeHebcalLocation(location, timezone)
+            const locObj = hasLocation
+                ? { latitude: lat, longitude: lon, elevation }
+                : null;
+
+            const hebcalLocation = locObj
+                ? makeHebcalLocation(locObj, timezone)
                 : null;
 
             const candleMins = Number.isFinite(candleLightingTime)
@@ -266,18 +260,21 @@ export default function Shabbat() {
             const signals = extractShabbatSignals({ events, friday, saturday });
 
             const fridaySunset = hasLocation
-                ? computeSundownFromZmanim({ location, timezone, date: friday })
+                ? computeSundownFromZmanim({
+                      location: locObj,
+                      timezone,
+                      date: friday,
+                  })
                 : null;
 
             const saturdaySunset = hasLocation
                 ? computeSundownFromZmanim({
-                      location,
+                      location: locObj,
                       timezone,
                       date: saturday,
                   })
                 : null;
 
-            // ✅ derive candle + ends from *the same* sunset values
             const candleTimeStr = fridaySunset
                 ? formatTime12h(addMinutes(fridaySunset, -candleMins))
                 : null;
@@ -317,44 +314,25 @@ export default function Shabbat() {
         }
     }, [
         todayIso,
-        hasLocation,
-        location,
         timezone,
+        hasLocation,
+        lat,
+        lon,
+        elevation,
         candleLightingTime,
         havdalahTime,
     ]);
 
-    const lat = location?.latitude ?? null;
-    const lon = location?.longitude ?? null;
-
-    useFocusEffect(
-        useCallback(() => {
-            let alive = true;
-
-            (async () => {
-                // 1) make sure permission/location state is current
-                await refresh?.();
-
-                // 2) recompute using latest redux settings + latest location
-                if (alive) {
-                    fetchShabbatInfo();
-                }
-            })();
-
-            return () => {
-                alive = false;
-            };
-        }, [refresh, fetchShabbatInfo])
-    );
-
-    // Live updates while *staying on* Shabbat
+    // ✅ This runs:
+    // - on first mount
+    // - when redux settings change
+    // - when AppState refresh updates locationStatus/lat/lon
     useEffect(() => {
         fetchShabbatInfo();
-    }, [fetchShabbatInfo, locationStatus, lat, lon]);
+    }, [fetchShabbatInfo]);
 
     if (!fontsLoaded) return null;
 
-    // ✅ Layout constants for “centered block”
     const MAX_WIDTH = 520;
     const tabBarHeight = useBottomTabBarHeight();
 
@@ -367,17 +345,16 @@ export default function Shabbat() {
     const handleEnableLocation = useCallback(async () => {
         const st = await requestPermission?.();
 
-        if (st === "granted") {
-            setShowLocationDetails(false);
-            await refresh?.();
-            fetchShabbatInfo();
+        // If user previously denied, iOS often won't show the prompt again.
+        // In that case, send them to Settings.
+        if (st !== "granted") {
+            openSettings();
             return;
         }
 
-        if (st === "denied") {
-            openSettings();
-        }
-    }, [requestPermission, refresh, fetchShabbatInfo, openSettings]);
+        setShowLocationDetails(false);
+        // no need to call refresh here; requestPermission already set location
+    }, [requestPermission, openSettings]);
 
     return (
         <View style={ui.container}>
@@ -393,16 +370,9 @@ export default function Shabbat() {
                     },
                 ]}
             >
-                {/* Inner fixed-width column */}
-                <View
-                    style={{
-                        width: "100%",
-                        maxWidth: MAX_WIDTH,
-                    }}
-                >
+                <View style={{ width: "100%", maxWidth: MAX_WIDTH }}>
                     {shabbatInfo ? (
                         <>
-                            {/* Erev Shabbat */}
                             <View style={ui.card}>
                                 <Text
                                     style={[
@@ -417,7 +387,6 @@ export default function Shabbat() {
                                     {shabbatInfo.erevShabbatDate}
                                 </Text>
 
-                                {/* ✅ Always show rows; use dash for missing values */}
                                 <View style={ui.shabbatSheetLine}>
                                     <Text style={ui.shabbatSheetLabel}>
                                         Candle lighting
@@ -437,7 +406,6 @@ export default function Shabbat() {
                                 </View>
                             </View>
 
-                            {/* Yom Shabbat */}
                             <View style={ui.card}>
                                 <Text
                                     style={[
@@ -452,7 +420,6 @@ export default function Shabbat() {
                                     {shabbatInfo.yomShabbatDate}
                                 </Text>
 
-                                {/* ✅ Always show rows; use dash for missing values */}
                                 <View style={ui.shabbatSheetLine}>
                                     <Text style={ui.shabbatSheetLabel}>
                                         Shabbat ends
@@ -472,7 +439,6 @@ export default function Shabbat() {
                                 </View>
                             </View>
 
-                            {/* Parasha */}
                             <View style={ui.card}>
                                 <Text
                                     style={[
@@ -513,7 +479,6 @@ export default function Shabbat() {
                         </View>
                     )}
 
-                    {/* Footer notice / chip (included in centered block) */}
                     <View style={ui.shabbatFooter}>
                         <View style={{ marginTop: 10 }}>
                             <Pressable
@@ -547,11 +512,10 @@ export default function Shabbat() {
                     </View>
                 </View>
 
-                {/* Location bottom sheet */}
                 <LocationBottomSheet
                     visible={showLocationDetails}
                     onClose={() => setShowLocationDetails(false)}
-                    title="Your Location"
+                    title="Location"
                     snapPoints={["35%", "65%"]}
                 >
                     {hasLocation ? (
@@ -570,9 +534,7 @@ export default function Shabbat() {
                                     Coordinates
                                 </Text>
                                 <Text style={ui.shabbatSheetValue}>
-                                    {`${location.latitude.toFixed(
-                                        3
-                                    )}, ${location.longitude.toFixed(3)}`}
+                                    {`${lat.toFixed(3)}, ${lon.toFixed(3)}`}
                                 </Text>
                             </View>
 
@@ -581,10 +543,8 @@ export default function Shabbat() {
                                     Elevation
                                 </Text>
                                 <Text style={ui.shabbatSheetValue}>
-                                    {Number.isFinite(location.elevation)
-                                        ? `${location.elevation.toFixed(
-                                              1
-                                          )} meters`
+                                    {Number.isFinite(elevation)
+                                        ? `${elevation.toFixed(1)} meters`
                                         : "Unknown"}
                                 </Text>
                             </View>
@@ -609,10 +569,23 @@ export default function Shabbat() {
                                         Haptics.ImpactFeedbackStyle.Light
                                     );
                                 }}
-                                style={ui.shabbatCta}
+                                style={[
+                                    ui.todayHolidayMoreInfoButton,
+                                    {
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                        borderRadius: 12,
+                                        alignSelf: "flex-start",
+                                        marginTop: 6,
+                                    },
+                                ]}
                                 activeOpacity={0.85}
                             >
-                                <Text style={ui.shabbatCtaText}>
+                                <Text
+                                    style={[
+                                        ui.todayHolidayMoreInfoButtonText,
+                                    ]}
+                                >
                                     Enable Location
                                 </Text>
                             </TouchableOpacity>
