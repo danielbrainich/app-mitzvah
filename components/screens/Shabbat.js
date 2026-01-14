@@ -1,5 +1,10 @@
-// screens/Shabbat.js
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import {
     View,
     Text,
@@ -9,16 +14,6 @@ import {
     Pressable,
     ScrollView,
 } from "react-native";
-import {
-    HebrewCalendar,
-    Location,
-    CandleLightingEvent,
-    ParshaEvent,
-    HavdalahEvent,
-    HDate,
-    Zmanim,
-    Event,
-} from "@hebcal/core";
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -33,136 +28,10 @@ import {
     parseLocalIso,
     formatTime12h,
     formatGregorianLong,
-    isSameLocalDate,
-    addMinutes,
 } from "../../utils/datetime";
 import { DEBUG_TODAY_ISO } from "../../utils/debug";
 
-/**
- * Helpers
- */
-function getUpcomingFridayAndSaturday(today) {
-    const friday = new Date(today);
-    const saturday = new Date(today);
-
-    if (today.getDay() === 6) {
-        friday.setDate(today.getDate() - 1);
-        saturday.setDate(today.getDate());
-    } else {
-        friday.setDate(today.getDate() + (5 - today.getDay()));
-        saturday.setTime(friday.getTime());
-        saturday.setDate(friday.getDate() + 1);
-    }
-
-    return { friday, saturday };
-}
-
-function makeHebcalLocation(loc, timezone) {
-    if (!loc) return null;
-
-    const elevation = Number.isFinite(loc.elevation)
-        ? loc.elevation
-        : undefined;
-
-    return new Location(
-        loc.latitude,
-        loc.longitude,
-        false,
-        timezone,
-        undefined,
-        "US",
-        undefined,
-        elevation
-    );
-}
-
-function floorToMinute(d) {
-    if (!(d instanceof Date)) return null;
-    const x = new Date(d);
-    x.setSeconds(0, 0);
-    return x;
-}
-
-function computeSundownFromZmanim({ location, timezone, date }) {
-    if (!location) return null;
-
-    const hebcalLocation = makeHebcalLocation(location, timezone);
-    if (!hebcalLocation) return null;
-
-    const zmanim = new Zmanim(hebcalLocation, date);
-    const sunsetRaw = zmanim.sunset();
-    if (!(sunsetRaw instanceof Date)) return null;
-
-    return floorToMinute(sunsetRaw);
-}
-
-function extractShabbatSignals({ events, friday, saturday }) {
-    let fridayCandleTime = null;
-    let saturdayCandleTime = null;
-    let havdalahTime = null;
-
-    let parshaEnglish = null;
-    let parshaHebrew = null;
-
-    let holidayOnSaturday = false;
-
-    for (const ev of events || []) {
-        if (ev instanceof CandleLightingEvent) {
-            if (!(ev.eventTime instanceof Date)) continue;
-
-            if (isSameLocalDate(ev.eventTime, friday)) {
-                if (!fridayCandleTime) fridayCandleTime = ev.eventTime;
-                continue;
-            }
-
-            if (isSameLocalDate(ev.eventTime, saturday)) {
-                if (!saturdayCandleTime) saturdayCandleTime = ev.eventTime;
-                continue;
-            }
-        }
-
-        if (ev instanceof HavdalahEvent) {
-            if (!(ev.eventTime instanceof Date)) continue;
-            if (!isSameLocalDate(ev.eventTime, saturday)) continue;
-            havdalahTime = ev.eventTime;
-            continue;
-        }
-
-        if (ev instanceof ParshaEvent) {
-            parshaEnglish = ev.render("en");
-            parshaHebrew = ev.renderBrief("he-x-NoNikud");
-            continue;
-        }
-
-        if (!holidayOnSaturday && ev instanceof Event) {
-            const d = typeof ev.getDate === "function" ? ev.getDate() : null;
-            const g = d && typeof d.greg === "function" ? d.greg() : null;
-
-            if (g instanceof Date && isSameLocalDate(g, saturday)) {
-                const cats =
-                    typeof ev.getCategories === "function"
-                        ? ev.getCategories()
-                        : [];
-                if (cats.includes("major") || cats.includes("chol_hamoed")) {
-                    holidayOnSaturday = true;
-                }
-            }
-        }
-    }
-
-    const endsIntoYomTov = !!saturdayCandleTime;
-    const parshaReplacedByHoliday =
-        holidayOnSaturday && (!parshaEnglish || !parshaHebrew);
-
-    return {
-        fridayCandleTime,
-        havdalahTime,
-        endsIntoYomTov,
-        parshaEnglish,
-        parshaHebrew,
-        parshaReplacedByHoliday,
-    };
-}
+import { computeShabbatInfo } from "../../lib/computeShabbatInfo";
 
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
@@ -189,16 +58,31 @@ export default function Shabbat() {
         location,
         requestPermission,
     } = useAppLocation();
-
     const hasLocation = locationStatus === "granted" && !!location;
+
+    // Primitives to avoid dependency loops on object identity
     const lat = location?.latitude ?? null;
     const lon = location?.longitude ?? null;
-    const elevation = location?.elevation ?? null;
+    const elev = location?.elevation ?? null;
+
+    const candleMins = Number.isFinite(candleLightingTime)
+        ? candleLightingTime
+        : 18;
+    const havdalahMins = Number.isFinite(havdalahTime) ? havdalahTime : 42;
 
     const openSettings = useCallback(() => {
         Linking.openSettings().catch(() =>
             Alert.alert("Unable to open settings")
         );
+    }, []);
+
+    // Guard against setting state after unmount
+    const aliveRef = useRef(true);
+    useEffect(() => {
+        aliveRef.current = true;
+        return () => {
+            aliveRef.current = false;
+        };
     }, []);
 
     const fetchShabbatInfo = useCallback(async () => {
@@ -208,103 +92,22 @@ export default function Shabbat() {
             const today = parseLocalIso(todayIso);
             if (!today) return;
 
-            const { friday, saturday } = getUpcomingFridayAndSaturday(today);
-
-            const erevShabbatDate = formatGregorianLong(friday);
-            const yomShabbatDate = formatGregorianLong(saturday);
-
-            const erevShabbatHebrewDate = new HDate(friday).toString();
-            const yomShabbatHebrewDate = new HDate(saturday).toString();
-
-            // include Saturday night
-            const end = new Date(saturday);
-            end.setDate(end.getDate() + 1);
-            end.setHours(0, 0, 0, 0);
-
-            const locObj = hasLocation
-                ? { latitude: lat, longitude: lon, elevation }
-                : null;
-
-            const hebcalLocation = locObj
-                ? makeHebcalLocation(locObj, timezone)
-                : null;
-
-            const candleMins = Number.isFinite(candleLightingTime)
-                ? candleLightingTime
-                : 18;
-
-            const havdalahMins = Number.isFinite(havdalahTime)
-                ? havdalahTime
-                : 42;
-
-            const events = HebrewCalendar.calendar({
-                start: friday,
-                end,
-                sedrot: true,
-                ...(hebcalLocation
-                    ? {
-                          location: hebcalLocation,
-                          candlelighting: true,
-                          candleLightingMins: candleMins,
-                          havdalahMins,
-                      }
-                    : {}),
-            });
-
-            const signals = extractShabbatSignals({ events, friday, saturday });
-
-            const fridaySunset = hasLocation
-                ? computeSundownFromZmanim({
-                      location: locObj,
-                      timezone,
-                      date: friday,
-                  })
-                : null;
-
-            const saturdaySunset = hasLocation
-                ? computeSundownFromZmanim({
-                      location: locObj,
-                      timezone,
-                      date: saturday,
-                  })
-                : null;
-
-            const candleTimeStr = fridaySunset
-                ? formatTime12h(addMinutes(fridaySunset, -candleMins))
-                : null;
-
-            const shabbatEndsStr = saturdaySunset
-                ? formatTime12h(addMinutes(saturdaySunset, havdalahMins))
-                : null;
-
-            setShabbatInfo({
-                erevShabbatDate,
-                erevShabbatHebrewDate,
-                yomShabbatDate,
-                yomShabbatHebrewDate,
-
-                candleTime: candleTimeStr,
-                sundownFriday: fridaySunset
-                    ? formatTime12h(fridaySunset)
-                    : null,
-
-                shabbatEnds: shabbatEndsStr,
-                sundownSaturday: saturdaySunset
-                    ? formatTime12h(saturdaySunset)
-                    : null,
-
-                endsIntoYomTov: signals.endsIntoYomTov,
-
-                parshaEnglish: signals.parshaEnglish,
-                parshaHebrew: signals.parshaHebrew,
-                parshaReplacedByHoliday: signals.parshaReplacedByHoliday,
-
+            const result = computeShabbatInfo({
+                today,
                 todayIso,
+                timezone,
+                location: hasLocation
+                    ? { latitude: lat, longitude: lon, elevation: elev }
+                    : null,
+                candleMins,
+                havdalahMins,
             });
-        } catch (error) {
-            console.error("[Shabbat] Error fetching Shabbat info:", error);
+
+            if (aliveRef.current) setShabbatInfo(result);
+        } catch (e) {
+            console.error("[Shabbat] Error fetching Shabbat info:", e);
         } finally {
-            setLoading(false);
+            if (aliveRef.current) setLoading(false);
         }
     }, [
         todayIso,
@@ -312,20 +115,33 @@ export default function Shabbat() {
         hasLocation,
         lat,
         lon,
-        elevation,
-        candleLightingTime,
-        havdalahTime,
+        elev,
+        candleMins,
+        havdalahMins,
     ]);
 
-    // ✅ Single effect: run when location/settings inputs change
+    // Recompute when:
+    // - location permission changes
+    // - lat/lon/elev changes
+    // - user settings for mins change
+    // - day changes
     useEffect(() => {
         fetchShabbatInfo();
-    }, [fetchShabbatInfo, locationStatus, lat, lon, elevation]);
+    }, [
+        fetchShabbatInfo,
+        locationStatus,
+        lat,
+        lon,
+        elev,
+        candleMins,
+        havdalahMins,
+    ]);
 
     const handleEnableLocation = useCallback(async () => {
         const st = await requestPermission();
 
         if (st !== "granted") {
+            // If user chose "Don't Allow" permanently, send to settings.
             openSettings();
             return;
         }
@@ -339,10 +155,22 @@ export default function Shabbat() {
     const tabBarHeight = useBottomTabBarHeight();
 
     const dash = "—";
-    const candleValue = shabbatInfo?.candleTime ?? dash;
-    const friSundownValue = shabbatInfo?.sundownFriday ?? dash;
-    const endsValue = shabbatInfo?.shabbatEnds ?? dash;
-    const satSundownValue = shabbatInfo?.sundownSaturday ?? dash;
+
+    const candleValue = shabbatInfo?.candleTime
+        ? formatTime12h(shabbatInfo.candleTime)
+        : dash;
+
+    const friSundownValue = shabbatInfo?.fridaySunset
+        ? formatTime12h(shabbatInfo.fridaySunset)
+        : dash;
+
+    const endsValue = shabbatInfo?.shabbatEnds
+        ? formatTime12h(shabbatInfo.shabbatEnds)
+        : dash;
+
+    const satSundownValue = shabbatInfo?.saturdaySunset
+        ? formatTime12h(shabbatInfo.saturdaySunset)
+        : dash;
 
     return (
         <View style={ui.container}>
@@ -361,6 +189,7 @@ export default function Shabbat() {
                 <View style={{ width: "100%", maxWidth: MAX_WIDTH }}>
                     {shabbatInfo ? (
                         <>
+                            {/* Erev Shabbat */}
                             <View style={ui.card}>
                                 <Text
                                     style={[
@@ -372,7 +201,7 @@ export default function Shabbat() {
                                 </Text>
 
                                 <Text style={ui.shabbatSentence}>
-                                    {shabbatInfo.erevShabbatDate}
+                                    {formatGregorianLong(shabbatInfo.friday)}
                                 </Text>
 
                                 <View style={ui.shabbatSheetLine}>
@@ -394,6 +223,7 @@ export default function Shabbat() {
                                 </View>
                             </View>
 
+                            {/* Yom Shabbat */}
                             <View style={ui.card}>
                                 <Text
                                     style={[
@@ -405,7 +235,7 @@ export default function Shabbat() {
                                 </Text>
 
                                 <Text style={ui.shabbatSentence}>
-                                    {shabbatInfo.yomShabbatDate}
+                                    {formatGregorianLong(shabbatInfo.saturday)}
                                 </Text>
 
                                 <View style={ui.shabbatSheetLine}>
@@ -427,6 +257,7 @@ export default function Shabbat() {
                                 </View>
                             </View>
 
+                            {/* Parasha */}
                             <View style={ui.card}>
                                 <Text
                                     style={[
@@ -467,6 +298,7 @@ export default function Shabbat() {
                         </View>
                     )}
 
+                    {/* Footer chip */}
                     <View style={ui.shabbatFooter}>
                         <View style={{ marginTop: 10 }}>
                             <Pressable
@@ -500,6 +332,7 @@ export default function Shabbat() {
                     </View>
                 </View>
 
+                {/* Location bottom sheet */}
                 <LocationBottomSheet
                     visible={showLocationDetails}
                     onClose={() => setShowLocationDetails(false)}
@@ -531,8 +364,8 @@ export default function Shabbat() {
                                     Elevation
                                 </Text>
                                 <Text style={ui.shabbatSheetValue}>
-                                    {Number.isFinite(elevation)
-                                        ? `${elevation.toFixed(1)} meters`
+                                    {Number.isFinite(elev)
+                                        ? `${elev.toFixed(1)} meters`
                                         : "Unknown"}
                                 </Text>
                             </View>
@@ -550,6 +383,7 @@ export default function Shabbat() {
                                 Location Services for this app.
                             </Text>
 
+                            {/* Smaller "More Info" style button */}
                             <TouchableOpacity
                                 onPress={() => {
                                     handleEnableLocation();
