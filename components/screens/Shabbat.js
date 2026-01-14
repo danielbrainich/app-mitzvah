@@ -29,7 +29,6 @@ import {
     formatTime12h,
     formatGregorianLong,
 } from "../../utils/datetime";
-import { DEBUG_TODAY_ISO } from "../../utils/debug";
 
 import { computeShabbatInfo } from "../../lib/computeShabbatInfo";
 
@@ -51,7 +50,7 @@ export default function Shabbat() {
         []
     );
 
-    const todayIso = useTodayIsoDay(DEBUG_TODAY_ISO);
+    const todayIso = useTodayIsoDay();
 
     const {
         status: locationStatus,

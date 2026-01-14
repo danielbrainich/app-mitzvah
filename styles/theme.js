@@ -41,7 +41,7 @@ export const ui = StyleSheet.create({
     // ---------------------------------------------------------------------------
     container: {
         flex: 1,
-        backgroundColor: COLORS.bg,
+        backgroundColor: "COLORS.bg",
     },
     screen: {
         paddingHorizontal: 8,
@@ -275,8 +275,7 @@ export const ui = StyleSheet.create({
     settingsSubLabel: {
         color: "rgba(255,255,255,0.72)",
         fontSize: 14,
-        marginTop: 6
-
+        marginTop: 6,
     },
 
     settingsSliderBlock: {
@@ -358,7 +357,6 @@ export const ui = StyleSheet.create({
         marginTop: 12,
         marginBottom: 0,
     },
-
 
     // ===========================================================================
     // TODAY HOLIDAY CARD (prefixed)
@@ -555,5 +553,131 @@ export const ui = StyleSheet.create({
         color: COLORS.accent,
         fontSize: 20,
         marginBottom: 14,
+    },
+
+    // ===========================================================================
+    /* TOP BAR (shared) */
+    // ===========================================================================
+
+    topBarSafe: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
+    },
+
+    topBarWrap: {
+        height: 44, // keep in sync with TOPBAR_H
+        paddingHorizontal: 16,
+        justifyContent: "center",
+        position: "relative",
+    },
+
+    topBarDatePressable: {
+        position: "absolute",
+        left: 16,
+        paddingVertical: 6,
+    },
+
+    topBarDatePill: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        borderRadius: 18,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        backgroundColor: COLORS.card,
+    },
+
+    topBarDateText: {
+        color: "white",
+        fontSize: 14,
+    },
+
+    topBarDevDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: COLORS.accent, // your light blue
+        marginLeft: 4,
+    },
+
+    topBarIconBtn: {
+        width: 38,
+        height: 38,
+        borderRadius: 18,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: COLORS.card,
+    },
+
+    topBarGearBtn: {
+        position: "absolute",
+        right: 16,
+    },
+
+    topBarKebabBtn: {
+        position: "absolute",
+        // "between" left pill and gear
+        // gear is at right:16 with width 38, plus 10 gap
+        right: 16 + 38 + 10,
+    },
+
+    // DEV modal
+    devModalBackdrop: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0,0,0,0.55)",
+    },
+
+    devModalCard: {
+        marginTop: 90,
+        marginHorizontal: 16,
+        backgroundColor: COLORS.card,
+        borderRadius: 16,
+        padding: 14,
+        borderWidth: 1,
+        borderColor: "rgba(255,255,255,0.08)",
+    },
+
+    devModalTitle: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "600",
+    },
+
+    devModalHelper: {
+        color: "rgba(255,255,255,0.65)",
+        fontSize: 12,
+        marginTop: 10,
+    },
+
+    devModalBtnRow: {
+        flexDirection: "row",
+        gap: 10,
+    },
+
+    devModalBtn: {
+        flex: 1,
+        paddingVertical: 10,
+        borderRadius: 12,
+        alignItems: "center",
+    },
+
+    devModalBtnGhost: {
+        backgroundColor: "rgba(255,255,255,0.08)",
+    },
+
+    devModalBtnPrimary: {
+        backgroundColor: "#313131",
+    },
+
+    devModalBtnText: {
+        color: "white",
+        fontWeight: "600",
     },
 });

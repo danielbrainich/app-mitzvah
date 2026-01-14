@@ -12,7 +12,6 @@ import { ui } from "../../styles/theme";
 import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
 import { parseLocalIso, formatGregorianLong } from "../../utils/datetime";
 import useTodayIsoDay from "../../hooks/useTodayIsoDay";
-import { DEBUG_TODAY_ISO } from "../../utils/debug";
 
 import UpcomingHolidaysCarousel from "../UpcomingHolidaysCarousel";
 import HolidayBottomSheet from "../HolidayBottomSheet";
@@ -157,7 +156,7 @@ export default function Holidays() {
         (state) => state.settings
     );
 
-    const todayIso = useTodayIsoDay(DEBUG_TODAY_ISO);
+    const todayIso = useTodayIsoDay();
 
     const [holidays, setHolidays] = useState([]);
     const [todayHolidays, setTodayHolidays] = useState([]);

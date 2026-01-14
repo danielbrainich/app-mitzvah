@@ -7,14 +7,13 @@ import * as Haptics from "expo-haptics";
 import Holidays from "./screens/Holidays";
 import Shabbat from "./screens/Shabbat";
 import { colors } from "../styles/theme";
-import { DEBUG_TODAY_ISO } from "../utils/debug";
 import useTodayIsoDay from "../hooks/useTodayIsoDay";
 import { TopBar } from "../components/TopBar";
 
 const Tab = createBottomTabNavigator();
 
 export default function AppNavigator() {
-    const todayIso = useTodayIsoDay(DEBUG_TODAY_ISO);
+    const todayIso = useTodayIsoDay();
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
