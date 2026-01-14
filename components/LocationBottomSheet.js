@@ -1,10 +1,7 @@
-// components/LocationBottomSheet.js
 import React from "react";
 import { View, Text } from "react-native";
 import BottomSheetDrawerBase from "./BottomSheetDrawerBase";
 import { ui } from "../styles/theme";
-
-
 
 export default function LocationBottomSheet({
     visible,
@@ -24,7 +21,9 @@ export default function LocationBottomSheet({
                 paddingBottom: 22,
             }}
         >
-            <Text style={ui.bottomSheetTitle}>{title}</Text>
+            <Text style={[ui.bottomSheetTitle, { fontFamily: "ChutzBold" }]}>
+                {title}
+            </Text>
             <View style={{ height: 12 }} />
             {children}
         </BottomSheetDrawerBase>
