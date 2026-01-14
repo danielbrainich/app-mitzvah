@@ -46,11 +46,9 @@ function getUpcomingFridayAndSaturday(today) {
     const saturday = new Date(today);
 
     if (today.getDay() === 6) {
-        // Saturday: show current Shabbat (Fri/Sat)
         friday.setDate(today.getDate() - 1);
         saturday.setDate(today.getDate());
     } else {
-        // Upcoming Shabbat
         friday.setDate(today.getDate() + (5 - today.getDay()));
         saturday.setTime(friday.getTime());
         saturday.setDate(friday.getDate() + 1);
@@ -59,16 +57,16 @@ function getUpcomingFridayAndSaturday(today) {
     return { friday, saturday };
 }
 
-function makeHebcalLocation(location, timezone) {
-    if (!location) return null;
+function makeHebcalLocation(loc, timezone) {
+    if (!loc) return null;
 
-    const elevation = Number.isFinite(location.elevation)
-        ? location.elevation
+    const elevation = Number.isFinite(loc.elevation)
+        ? loc.elevation
         : undefined;
 
     return new Location(
-        location.latitude,
-        location.longitude,
+        loc.latitude,
+        loc.longitude,
         false,
         timezone,
         undefined,
@@ -78,7 +76,6 @@ function makeHebcalLocation(location, timezone) {
     );
 }
 
-// ✅ FIXED: returns the rounded date (you had `return;`)
 function floorToMinute(d) {
     if (!(d instanceof Date)) return null;
     const x = new Date(d);
@@ -193,13 +190,10 @@ export default function Shabbat() {
         requestPermission,
     } = useAppLocation();
 
-    // ✅ stable primitives so we don't depend on location object identity
+    const hasLocation = locationStatus === "granted" && !!location;
     const lat = location?.latitude ?? null;
     const lon = location?.longitude ?? null;
     const elevation = location?.elevation ?? null;
-
-    const hasLocation =
-        lat != null && lon != null && locationStatus === "granted";
 
     const openSettings = useCallback(() => {
         Linking.openSettings().catch(() =>
@@ -222,7 +216,7 @@ export default function Shabbat() {
             const erevShabbatHebrewDate = new HDate(friday).toString();
             const yomShabbatHebrewDate = new HDate(saturday).toString();
 
-            // Range end: include Saturday night
+            // include Saturday night
             const end = new Date(saturday);
             end.setDate(end.getDate() + 1);
             end.setHours(0, 0, 0, 0);
@@ -323,13 +317,21 @@ export default function Shabbat() {
         havdalahTime,
     ]);
 
-    // ✅ This runs:
-    // - on first mount
-    // - when redux settings change
-    // - when AppState refresh updates locationStatus/lat/lon
+    // ✅ Single effect: run when location/settings inputs change
     useEffect(() => {
         fetchShabbatInfo();
-    }, [fetchShabbatInfo]);
+    }, [fetchShabbatInfo, locationStatus, lat, lon, elevation]);
+
+    const handleEnableLocation = useCallback(async () => {
+        const st = await requestPermission();
+
+        if (st !== "granted") {
+            openSettings();
+            return;
+        }
+
+        setShowLocationDetails(false);
+    }, [requestPermission, openSettings]);
 
     if (!fontsLoaded) return null;
 
@@ -341,20 +343,6 @@ export default function Shabbat() {
     const friSundownValue = shabbatInfo?.sundownFriday ?? dash;
     const endsValue = shabbatInfo?.shabbatEnds ?? dash;
     const satSundownValue = shabbatInfo?.sundownSaturday ?? dash;
-
-    const handleEnableLocation = useCallback(async () => {
-        const st = await requestPermission?.();
-
-        // If user previously denied, iOS often won't show the prompt again.
-        // In that case, send them to Settings.
-        if (st !== "granted") {
-            openSettings();
-            return;
-        }
-
-        setShowLocationDetails(false);
-        // no need to call refresh here; requestPermission already set location
-    }, [requestPermission, openSettings]);
 
     return (
         <View style={ui.container}>
@@ -581,11 +569,7 @@ export default function Shabbat() {
                                 ]}
                                 activeOpacity={0.85}
                             >
-                                <Text
-                                    style={[
-                                        ui.todayHolidayMoreInfoButtonText,
-                                    ]}
-                                >
+                                <Text style={ui.todayHolidayMoreInfoButtonText}>
                                     Enable Location
                                 </Text>
                             </TouchableOpacity>
