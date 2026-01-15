@@ -41,7 +41,7 @@ export const ui = StyleSheet.create({
     // ---------------------------------------------------------------------------
     container: {
         flex: 1,
-        backgroundColor: "COLORS.bg",
+        backgroundColor: COLORS.bg,
     },
     screen: {
         paddingHorizontal: 8,
@@ -267,6 +267,40 @@ export const ui = StyleSheet.create({
     // ===========================================================================
     // SETTINGS SCREEN (prefixed)
     // ===========================================================================
+
+    settingsSafe: {
+        flex: 1,
+        backgroundColor: COLORS.bg,
+    },
+
+    settingsTopBar: {
+        height: 44,
+        paddingHorizontal: 16,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+    },
+
+    settingsBackBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "rgba(255,255,255,0.06)",
+    },
+
+    settingsScrollContent: {
+        flexGrow: 1,
+        paddingTop: 10,
+    },
+
+    settingsDivider: {
+        height: 1,
+        backgroundColor: "rgba(255,255,255,0.08)",
+        marginTop: 16,
+        marginHorizontal: 4,
+    },
     settingsRowLabel: {
         color: "white",
         fontSize: 18,

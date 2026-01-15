@@ -26,7 +26,7 @@ import {
     setCandleLightingToggle,
     setHavdalahTimeToggle,
 } from "../../store/actions";
-import { LayoutAnimation, Platform, UIManager } from "react-native";
+import { LayoutAnimation } from "react-native";
 
 const DEFAULT_CANDLE = 0;
 const DEFAULT_HAVDALAH = 0;
@@ -57,11 +57,8 @@ export default function Settings({ navigation }) {
     } = useSelector((state) => state.settings);
 
     const dispatch = useDispatch();
-
     const [amount, setAmount] = useState(5);
 
-    // Slider expects a number. When toggle is off you store null in Redux,
-    // but we still want a sane slider position when toggled back on.
     const candleValue = useMemo(() => {
         if (!candleLightingToggle) return DEFAULT_CANDLE;
         return Number.isFinite(candleLightingTime)
@@ -109,248 +106,259 @@ export default function Settings({ navigation }) {
     if (!fontsLoaded) return null;
 
     return (
-        <SafeAreaView style={ui.container} edges={["top", "left", "right"]}>
-            {/* Top-right close button */}
-            <View
-                style={{
-                    height: 44,
-                    paddingHorizontal: 16,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                }}
+        <View style={ui.container}>
+            <SafeAreaView
+                style={ui.settingsSafe}
+                edges={["top", "left", "right"]}
             >
-                <Pressable
-                    onPress={() => {
-                        navigation.goBack();
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                    hitSlop={12}
-                    style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: 18,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        backgroundColor: "rgba(255,255,255,0.06)",
-                    }}
-                >
-                    <Entypo name="chevron-left" size={22} color="white" />
-                </Pressable>
-            </View>
-
-            <ScrollView
-                style={ui.screen}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={[
-                    ui.scrollContent,
-                    {
-                        flexGrow: 1,
-                        paddingTop: 10,
-                    },
-                ]}
-            >
-                {/* Holiday Options Card */}
-                <View style={ui.card}>
-                    <Text style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}>
-                        Holiday Options
-                    </Text>
-
-                    <View style={ui.row}>
-                        <Text style={ui.settingsRowLabel}>
-                            Include modern holidays
-                        </Text>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={"#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={() =>
-                                dispatch(toggleModernHolidays())
-                            }
-                            value={modernHolidays}
-                        />
-                    </View>
-
-                    <View style={ui.row}>
-                        <Text style={ui.settingsRowLabel}>
-                            Include minor fasts
-                        </Text>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={"#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={() => dispatch(toggleMinorFasts())}
-                            value={minorFasts}
-                        />
-                    </View>
-
-                    <View style={ui.row}>
-                        <Text style={ui.settingsRowLabel}>
-                            Include roshei chodesh
-                        </Text>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={"#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={() =>
-                                dispatch(toggleRosheiChodesh())
-                            }
-                            value={rosheiChodesh}
-                        />
-                    </View>
-                </View>
-
-                {/* Shabbat Options Card */}
-                <View style={ui.card}>
-                    <Text style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}>
-                        Shabbat Options
-                    </Text>
-
-                    {/* Candle Lighting */}
-                    <View style={ui.row}>
-                        <View style={ui.rowLeft}>
-                            <Text style={ui.settingsRowLabel}>
-                                Custom candle lighting
-                            </Text>
-                            <Text style={ui.settingsSubLabel}>
-                                Minutes before sundown:{" "}
-                                {candleLightingToggle ? candleValue : 18}
-                            </Text>
-                        </View>
-
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={"#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={handleCandleLightingToggle}
-                            value={candleLightingToggle}
-                        />
-                    </View>
-
-                    {candleLightingToggle ? (
-                        <View style={ui.settingsSliderBlock}>
-                            <Slider
-                                value={candleValue}
-                                minimumValue={MIN_MINS}
-                                maximumValue={MAX_MINS}
-                                step={1}
-                                minimumTrackTintColor="#82CBFF"
-                                maximumTrackTintColor="rgba(255,255,255,0.25)"
-                                thumbTintColor="#f4f3f4"
-                                onValueChange={(v) =>
-                                    dispatch(
-                                        setCandleLightingTime(Math.round(v))
-                                    )
-                                }
-                            />
-
-                            <View
-                                style={{
-                                    height: 1,
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    marginTop: 16,
-                                    marginHorizontal: 4,
-                                }}
-                            />
-                        </View>
-                    ) : null}
-
-                    {/* Havdalah */}
-                    <View style={ui.row}>
-                        <View style={ui.rowLeft}>
-                            <Text style={ui.settingsRowLabel}>
-                                Custom shabbat end
-                            </Text>
-                            <Text style={ui.settingsSubLabel}>
-                                Minutes after sundown:{" "}
-                                {havdalahTimeToggle ? havdalahValue : 42}
-                            </Text>
-                        </View>
-
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#82CBFF" }}
-                            thumbColor={"#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={handleHavdalahTimeToggle}
-                            value={havdalahTimeToggle}
-                        />
-                    </View>
-
-                    {havdalahTimeToggle ? (
-                        <View style={ui.settingsSliderBlock}>
-                            <Slider
-                                value={havdalahValue}
-                                minimumValue={MIN_MINS}
-                                maximumValue={MAX_MINS}
-                                step={1}
-                                minimumTrackTintColor="#82CBFF"
-                                maximumTrackTintColor="rgba(255,255,255,0.25)"
-                                thumbTintColor="#f4f3f4"
-                                onValueChange={(v) =>
-                                    dispatch(setHavdalahTime(Math.round(v)))
-                                }
-                            />
-                        </View>
-                    ) : null}
-                </View>
-                <View style={ui.card}>
-                    <Text style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}>
-                        Support
-                    </Text>
-                    <Text style={ui.paragraph}>
-                        If you enjoy using this app, please consider leaving a
-                        tip!
-                    </Text>
-
-                    <View style={ui.infoTiersRow}>
-                        {[1, 2, 5, 10, 18].map((v) => {
-                            const selected = v === amount;
-                            return (
-                                <TouchableOpacity
-                                    key={v}
-                                    onPress={() => {
-                                        setAmount(v);
-                                        Haptics.impactAsync(
-                                            Haptics.ImpactFeedbackStyle.Light
-                                        );
-                                    }}
-                                    activeOpacity={0.85}
-                                    style={[
-                                        ui.infoTierPill,
-                                        selected
-                                            ? ui.infoTierPillSelected
-                                            : null,
-                                    ]}
-                                >
-                                    <Text
-                                        style={[
-                                            ui.infoTierText,
-                                            selected
-                                                ? ui.infoTierTextSelected
-                                                : null,
-                                        ]}
-                                    >
-                                        ${v}
-                                    </Text>
-                                </TouchableOpacity>
-                            );
-                        })}
-                    </View>
-
-                    <TouchableOpacity
-                        style={ui.primaryButton}
+                {/* Top-left back button */}
+                <View style={ui.settingsTopBar}>
+                    <Pressable
                         onPress={() => {
-                            handleTip(amount);
+                            navigation.goBack();
                             Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
                             );
                         }}
-                        activeOpacity={0.85}
+                        hitSlop={12}
+                        style={ui.settingsBackBtn}
                     >
-                        <Text style={ui.primaryButtonText}>Tip ${amount}</Text>
-                    </TouchableOpacity>
+                        <Entypo name="chevron-left" size={22} color="white" />
+                    </Pressable>
                 </View>
-            </ScrollView>
-        </SafeAreaView>
+
+                <ScrollView
+                    style={ui.screen}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={[
+                        ui.scrollContent,
+                        ui.settingsScrollContent,
+                    ]}
+                >
+                    {/* Holiday Options Card */}
+                    <View style={ui.card}>
+                        <Text
+                            style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}
+                        >
+                            Holiday Options
+                        </Text>
+
+                        <View style={ui.row}>
+                            <Text style={ui.settingsRowLabel}>
+                                Include modern holidays
+                            </Text>
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor="#f4f3f4"
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={() =>
+                                    dispatch(toggleModernHolidays())
+                                }
+                                value={modernHolidays}
+                            />
+                        </View>
+
+                        <View style={ui.row}>
+                            <Text style={ui.settingsRowLabel}>
+                                Include minor fasts
+                            </Text>
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor="#f4f3f4"
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={() =>
+                                    dispatch(toggleMinorFasts())
+                                }
+                                value={minorFasts}
+                            />
+                        </View>
+
+                        <View style={ui.row}>
+                            <Text style={ui.settingsRowLabel}>
+                                Include roshei chodesh
+                            </Text>
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor="#f4f3f4"
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={() =>
+                                    dispatch(toggleRosheiChodesh())
+                                }
+                                value={rosheiChodesh}
+                            />
+                        </View>
+                    </View>
+
+                    {/* Shabbat Options Card */}
+                    <View style={ui.card}>
+                        <Text
+                            style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}
+                        >
+                            Shabbat Options
+                        </Text>
+
+                        {/* Candle Lighting */}
+                        <View style={ui.row}>
+                            <View style={ui.rowLeft}>
+                                <Text style={ui.settingsRowLabel}>
+                                    Custom candle lighting
+                                </Text>
+                                <Text style={ui.settingsSubLabel}>
+                                    Minutes before sundown:{" "}
+                                    {candleLightingToggle ? candleValue : 18}
+                                </Text>
+                            </View>
+
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor="#f4f3f4"
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={handleCandleLightingToggle}
+                                value={candleLightingToggle}
+                            />
+                        </View>
+
+                        {candleLightingToggle ? (
+                            <View style={ui.settingsSliderBlock}>
+                                <Slider
+                                    value={candleValue}
+                                    minimumValue={MIN_MINS}
+                                    maximumValue={MAX_MINS}
+                                    step={1}
+                                    minimumTrackTintColor="#82CBFF"
+                                    maximumTrackTintColor="rgba(255,255,255,0.25)"
+                                    thumbTintColor="#f4f3f4"
+                                    onValueChange={(v) =>
+                                        dispatch(
+                                            setCandleLightingTime(Math.round(v))
+                                        )
+                                    }
+                                />
+
+                                <View style={ui.settingsDivider} />
+                            </View>
+                        ) : null}
+
+                        {/* Havdalah */}
+                        <View style={ui.row}>
+                            <View style={ui.rowLeft}>
+                                <Text style={ui.settingsRowLabel}>
+                                    Custom shabbat end
+                                </Text>
+                                <Text style={ui.settingsSubLabel}>
+                                    Minutes after sundown:{" "}
+                                    {havdalahTimeToggle ? havdalahValue : 42}
+                                </Text>
+                            </View>
+
+                            <Switch
+                                trackColor={{
+                                    false: "#767577",
+                                    true: "#82CBFF",
+                                }}
+                                thumbColor="#f4f3f4"
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={handleHavdalahTimeToggle}
+                                value={havdalahTimeToggle}
+                            />
+                        </View>
+
+                        {havdalahTimeToggle ? (
+                            <View style={ui.settingsSliderBlock}>
+                                <Slider
+                                    value={havdalahValue}
+                                    minimumValue={MIN_MINS}
+                                    maximumValue={MAX_MINS}
+                                    step={1}
+                                    minimumTrackTintColor="#82CBFF"
+                                    maximumTrackTintColor="rgba(255,255,255,0.25)"
+                                    thumbTintColor="#f4f3f4"
+                                    onValueChange={(v) =>
+                                        dispatch(setHavdalahTime(Math.round(v)))
+                                    }
+                                />
+                            </View>
+                        ) : null}
+                    </View>
+
+                    {/* Support */}
+                    <View style={ui.card}>
+                        <Text
+                            style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}
+                        >
+                            Support
+                        </Text>
+
+                        <Text style={ui.paragraph}>
+                            If you enjoy using this app, please consider leaving
+                            a tip!
+                        </Text>
+
+                        <View style={ui.infoTiersRow}>
+                            {[1, 2, 5, 10, 18].map((v) => {
+                                const selected = v === amount;
+                                return (
+                                    <TouchableOpacity
+                                        key={v}
+                                        onPress={() => {
+                                            setAmount(v);
+                                            Haptics.impactAsync(
+                                                Haptics.ImpactFeedbackStyle
+                                                    .Light
+                                            );
+                                        }}
+                                        activeOpacity={0.85}
+                                        style={[
+                                            ui.infoTierPill,
+                                            selected
+                                                ? ui.infoTierPillSelected
+                                                : null,
+                                        ]}
+                                    >
+                                        <Text
+                                            style={[
+                                                ui.infoTierText,
+                                                selected
+                                                    ? ui.infoTierTextSelected
+                                                    : null,
+                                            ]}
+                                        >
+                                            ${v}
+                                        </Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
+
+                        <TouchableOpacity
+                            style={ui.primaryButton}
+                            onPress={() => {
+                                handleTip(amount);
+                                Haptics.impactAsync(
+                                    Haptics.ImpactFeedbackStyle.Light
+                                );
+                            }}
+                            activeOpacity={0.85}
+                        >
+                            <Text style={ui.primaryButtonText}>
+                                Tip ${amount}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
+        </View>
     );
 }
