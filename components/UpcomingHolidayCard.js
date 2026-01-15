@@ -3,7 +3,7 @@ import { View, Text, Pressable } from "react-native";
 import { HDate } from "@hebcal/core";
 import {
     parseLocalIso,
-    formatGregorianLongFromIso, // ✅ add this
+    formatGregorianLongFromIso,
 } from "../utils/datetime";
 import { ui } from "../styles/theme";
 import * as Haptics from "expo-haptics";

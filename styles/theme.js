@@ -306,7 +306,6 @@ export const ui = StyleSheet.create({
     },
 
     holidaysTodayPagerSlot: {
-        // height is set in-screen via [style, { height: TODAY_PAGER_HEIGHT }]
         justifyContent: "center",
         paddingTop: 6,
     },
@@ -320,17 +319,7 @@ export const ui = StyleSheet.create({
 
     holidaysBigBoldText: {
         color: COLORS.accent,
-        fontSize: 77,
-        lineHeight: 74,
-        textAlign: "center",
-        marginTop: 12,
-        marginBottom: 8,
-    },
-
-    twoHolidaysBigBoldText: {
-        color: COLORS.accent,
         fontSize: 66,
-        lineHeight: 64,
         textAlign: "center",
         marginTop: 12,
         marginBottom: 8,
@@ -356,6 +345,22 @@ export const ui = StyleSheet.create({
         fontSize: 30,
         marginTop: 12,
         marginBottom: 0,
+    },
+
+    carouselDotsRow: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 10,
+        marginBottom: 4,
+    },
+
+    carouselDot: {
+        backgroundColor: "rgba(255,255,255,0.22)",
+    },
+
+    carouselDotActive: {
+        backgroundColor: "rgba(130,203,255,0.95)",
     },
 
     // ===========================================================================
