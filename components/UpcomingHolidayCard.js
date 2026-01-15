@@ -1,17 +1,10 @@
 import React, { useMemo, useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
 import { HDate } from "@hebcal/core";
-import {
-    parseLocalIso,
-    formatGregorianLongFromIso,
-} from "../utils/datetime";
+import { parseLocalIso, formatGregorianLongFromIso } from "../utils/datetime";
 import { ui } from "../styles/theme";
 import * as Haptics from "expo-haptics";
 import { Entypo } from "@expo/vector-icons";
-
-function stripParentheses(text) {
-    return (text || "").replace(/\s*\([^)]*\)/g, "");
-}
 
 export default function UpcomingHolidayCard({
     holiday,
@@ -19,7 +12,7 @@ export default function UpcomingHolidayCard({
     cardWidth,
     onAbout,
 }) {
-    const title = stripParentheses(holiday?.title);
+    const title = holiday?.title;
 
     const gregLabel = useMemo(() => {
         if (!holiday?.date) return "";
@@ -27,7 +20,7 @@ export default function UpcomingHolidayCard({
     }, [holiday?.date]);
 
     const hebLabel = useMemo(() => {
-        const d = parseLocalIso(holiday?.date);
+        const d = parseLocalIso(holiday?.date); 
         if (!d) return "";
         return new HDate(d).toString();
     }, [holiday?.date]);
@@ -49,8 +42,13 @@ export default function UpcomingHolidayCard({
                 {hebrewDate ? hebLabel : gregLabel}
             </Text>
 
-            <Text style={ui.upcomingHolidayTitle}>{title}</Text>
-
+            <Text
+                style={[ui.upcomingHolidayTitle]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+            >
+                {holiday.title}
+            </Text>
             {!!holiday?.hebrewTitle && (
                 <Text style={ui.upcomingHolidayHebrew}>
                     {holiday.hebrewTitle}
@@ -74,7 +72,11 @@ export default function UpcomingHolidayCard({
                     accessibilityRole="button"
                     accessibilityLabel="More options"
                 >
-                    <Entypo name="dots-three-vertical" size={16} color="white" />
+                    <Entypo
+                        name="dots-three-vertical"
+                        size={16}
+                        color="white"
+                    />
                 </Pressable>
             ) : null}
         </View>
