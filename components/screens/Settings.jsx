@@ -108,7 +108,7 @@ export default function Settings({ navigation }) {
     return (
         <View style={ui.container}>
             <SafeAreaView
-                style={ui.settingsSafe}
+                style={ui.safeArea}
                 edges={["top", "left", "right"]}
             >
                 {/* Top-left back button */}

@@ -19,7 +19,7 @@ export default function HolidayBottomSheet({
             onClose={onClose}
             snapPoints={snapPoints}
             defaultIndex={0}
-            contentContainerStyle={ui.sheetBody} // 
+            contentContainerStyle={ui.sheetBody} //
         >
             {/* Header */}
             <View style={ui.sheetHeader}>
@@ -34,18 +34,14 @@ export default function HolidayBottomSheet({
                 {/* Row 2: titles (accent + bigger) */}
                 {nameLeft || nameRight ? (
                     <View style={ui.sheetNameRow}>
-                        <Text style={ui.sheetNameLeft}>
-                            {nameLeft ?? ""}
-                        </Text>
-                        <Text style={ui.sheetNameRight}>
-                            {nameRight ?? ""}
-                        </Text>
+                        <Text style={ui.sheetNameLeft}>{nameLeft ?? ""}</Text>
+                        <Text style={ui.sheetNameRight}>{nameRight ?? ""}</Text>
                     </View>
                 ) : null}
             </View>
 
             {/* Body */}
-            <Text style={ui.todayHolidayDrawerBody}>{description ?? ""}</Text>
+            <Text style={ui.sheetBodyText}>{description ?? ""}</Text>
         </BottomSheetDrawerBase>
     );
 }

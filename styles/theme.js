@@ -35,6 +35,44 @@ export const colors = {
     ...COLORS,
 };
 
+export const nav = {
+    topSpacer: { height: 48 },
+
+    sceneContainer: { backgroundColor: COLORS.bg },
+
+    tabBarBackground: {
+        flex: 1,
+        backgroundColor: COLORS.card,
+        borderRadius: 18,
+    },
+
+    tabBarStyle: {
+        position: "absolute",
+        left: 16,
+        right: 16,
+        bottom: 8,
+        height: 64,
+        borderTopWidth: 0,
+        marginHorizontal: 24,
+        paddingTop: 0,
+        paddingBottom: 0,
+    },
+
+    tabBarItemStyle: {
+        flex: 1,
+        margin: 8,
+        borderRadius: 10,
+    },
+
+    tabBarLabelStyle: {
+        fontSize: 16,
+        fontWeight: "500", // ✅ should be string in RN
+        height: 34,
+    },
+
+    tabBarActiveBg: "#313131",
+};
+
 export const ui = StyleSheet.create({
     // ---------------------------------------------------------------------------
     // Layout (shared)
@@ -42,6 +80,15 @@ export const ui = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.bg,
+    },
+
+    safeArea: {
+        flex: 1,
+        backgroundColor: COLORS.bg,
+    },
+
+    topSpacer: {
+        height: 48,
     },
     screen: {
         paddingHorizontal: 8,
@@ -562,6 +609,13 @@ export const ui = StyleSheet.create({
         paddingBottom: 18,
         paddingTop: 4,
     },
+
+    sheetBodyText: {
+        color: "white",
+        fontSize: 16,
+        lineHeight: 21,
+    },
+
     sheetNameRow: {
         flexDirection: "row",
         alignItems: "flex-start",
@@ -592,6 +646,23 @@ export const ui = StyleSheet.create({
         color: COLORS.accent,
         fontSize: 20,
         marginBottom: 14,
+    },
+
+    // LOCATION SHEET (prefixed)
+    locationSheetBody: {
+        paddingHorizontal: 16,
+        paddingBottom: 22,
+    },
+
+    locationSheetTitle: {
+        color: COLORS.accent,
+        fontSize: 20,
+        marginBottom: 14,
+        fontFamily: "ChutzBold",
+    },
+
+    locationSheetSpacer: {
+        height: 12,
     },
 
     // ===========================================================================

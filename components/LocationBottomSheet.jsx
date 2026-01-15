@@ -16,15 +16,10 @@ export default function LocationBottomSheet({
             onClose={onClose}
             snapPoints={snapPoints}
             defaultIndex={0}
-            contentContainerStyle={{
-                paddingHorizontal: 16,
-                paddingBottom: 22,
-            }}
+            contentContainerStyle={ui.locationSheetBody}
         >
-            <Text style={[ui.bottomSheetTitle, { fontFamily: "ChutzBold" }]}>
-                {title}
-            </Text>
-            <View style={{ height: 12 }} />
+            <Text style={ui.locationSheetTitle}>{title}</Text>
+            <View style={ui.locationSheetSpacer} />
             {children}
         </BottomSheetDrawerBase>
     );
