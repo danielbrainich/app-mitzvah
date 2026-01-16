@@ -16,7 +16,6 @@ import { Entypo } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 
 import { ui } from "../../styles/theme";
-
 import {
     toggleMinorFasts,
     toggleRosheiChodesh,
@@ -108,7 +107,7 @@ export default function Settings({ navigation }) {
     return (
         <View style={ui.container}>
             <SafeAreaView
-                style={ui.safeArea}
+                style={ui.settingsSafe}
                 edges={["top", "left", "right"]}
             >
                 {/* Top-left back button */}

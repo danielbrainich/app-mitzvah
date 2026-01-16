@@ -6,7 +6,7 @@ import { StyleSheet } from "react-native";
  *
  * Convention:
  * - Generic names = reusable across screens (container, screen, card, etc.)
- * - Screen-specific names = prefixed (info*, shabbat*, holidays*, etc.)
+ * - Screen-specific names = prefixed (info*, shabbat*, holidays*, settings*, etc.)
  */
 
 const COLORS = {
@@ -35,6 +35,9 @@ export const colors = {
     ...COLORS,
 };
 
+/**
+ * Non-StyleSheet config objects (React Navigation likes plain objects)
+ */
 export const nav = {
     topSpacer: { height: 48 },
 
@@ -66,7 +69,7 @@ export const nav = {
 
     tabBarLabelStyle: {
         fontSize: 16,
-        fontWeight: "500", // ✅ should be string in RN
+        fontWeight: "500",
         height: 34,
     },
 
@@ -74,9 +77,9 @@ export const nav = {
 };
 
 export const ui = StyleSheet.create({
-    // ---------------------------------------------------------------------------
-    // Layout (shared)
-    // ---------------------------------------------------------------------------
+    // ===========================================================================
+    // LAYOUT (shared)
+    // ===========================================================================
     container: {
         flex: 1,
         backgroundColor: COLORS.bg,
@@ -90,33 +93,36 @@ export const ui = StyleSheet.create({
     topSpacer: {
         height: 48,
     },
+
     screen: {
         paddingHorizontal: 8,
     },
 
-    // ---------------------------------------------------------------------------
-    // Rows (shared)
-    // ---------------------------------------------------------------------------
+    // ===========================================================================
+    // ROWS (shared)
+    // ===========================================================================
     row: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
         paddingVertical: 10,
     },
+
     rowLeft: {
         flex: 1,
         paddingRight: 12,
     },
 
-    // ---------------------------------------------------------------------------
-    // Cards (shared)
-    // ---------------------------------------------------------------------------
+    // ===========================================================================
+    // CARDS (shared)
+    // ===========================================================================
     card: {
         backgroundColor: COLORS.card,
         borderRadius: 18,
         padding: 18,
         marginBottom: 18,
     },
+
     cardTitle: {
         color: COLORS.accent,
         fontSize: 26,
@@ -124,15 +130,16 @@ export const ui = StyleSheet.create({
         fontWeight: "700",
     },
 
-    // ---------------------------------------------------------------------------
-    // Typography (shared)
-    // ---------------------------------------------------------------------------
+    // ===========================================================================
+    // TYPOGRAPHY (shared)
+    // ===========================================================================
     paragraph: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 16,
         lineHeight: 22,
         marginBottom: 10,
     },
+
     link: {
         color: COLORS.accent,
         fontSize: 16,
@@ -140,9 +147,9 @@ export const ui = StyleSheet.create({
         textDecorationLine: "underline",
     },
 
-    // ---------------------------------------------------------------------------
-    // Buttons (shared)
-    // ---------------------------------------------------------------------------
+    // ===========================================================================
+    // BUTTONS (shared)
+    // ===========================================================================
     primaryButton: {
         marginTop: 2,
         borderRadius: 12,
@@ -152,23 +159,23 @@ export const ui = StyleSheet.create({
         borderColor: COLORS.accent,
         backgroundColor: "transparent",
     },
+
     primaryButtonText: {
         color: COLORS.accent,
         fontSize: 16,
         fontWeight: "800",
     },
 
-    // ---------------------------------------------------------------------------
-    // Scroll helpers (shared)
-    // ---------------------------------------------------------------------------
+    // ===========================================================================
+    // SCROLL HELPERS (shared)
+    // ===========================================================================
     scrollContent: {
         flexGrow: 1,
     },
 
     // ===========================================================================
-    // INFO SCREEN (prefixed)
+    // INFO SCREEN
     // ===========================================================================
-
     infoTiersRow: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -185,6 +192,7 @@ export const ui = StyleSheet.create({
         paddingVertical: 8,
         backgroundColor: "transparent",
     },
+
     infoTierPillSelected: {
         borderColor: COLORS.accentBorder,
         backgroundColor: COLORS.accentBg,
@@ -195,6 +203,7 @@ export const ui = StyleSheet.create({
         fontSize: 14,
         fontWeight: "700",
     },
+
     infoTierTextSelected: {
         color: COLORS.accent,
     },
@@ -204,65 +213,68 @@ export const ui = StyleSheet.create({
     },
 
     // ===========================================================================
-    // SHABBAT SCREEN (prefixed where appropriate)
+    // SHABBAT SCREEN
     // ===========================================================================
-
     shabbatIntro: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 30,
         marginVertical: 16,
     },
+
     shabbatSentence: {
-        color: "rgba(255,255,255,0.92)",
+        color: COLORS.textPrimary,
         fontSize: 14,
         marginBottom: 16,
     },
+
     shabbatSentenceSmall: {
-        color: "rgba(255,255,255,0.92)",
+        color: COLORS.textPrimary,
         fontSize: 16,
         lineHeight: 22,
         marginBottom: 6,
     },
+
     shabbatMuted: {
         color: "rgba(255,255,255,0.75)",
     },
 
-    // Footer spacing wrapper
     shabbatFooter: {
         marginTop: 4,
     },
 
-    // Bottom sheet rows
     shabbatSheetLine: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 12,
     },
+
     shabbatSheetLabel: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 16,
     },
+
     shabbatSheetValue: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 16,
         maxWidth: "60%",
         textAlign: "right",
     },
 
-    // Location off notice
     shabbatLocationNotice: {
         borderRadius: 12,
         padding: 14,
-        backgroundColor: "black",
+        backgroundColor: COLORS.bg,
     },
+
     shabbatLocationNoticeTitle: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 16,
         marginBottom: 6,
         fontWeight: "500",
     },
+
     shabbatLocationNoticeBody: {
-        color: "white",
+        color: COLORS.white,
         opacity: 0.9,
         fontSize: 14,
         lineHeight: 18,
@@ -277,11 +289,13 @@ export const ui = StyleSheet.create({
         paddingHorizontal: 12,
         alignSelf: "flex-start",
     },
+
     shabbatCtaText: {
         color: COLORS.accent,
         fontSize: 12,
         fontWeight: "600",
     },
+
     shabbatLocationChip: {
         flexDirection: "row",
         alignItems: "center",
@@ -305,16 +319,16 @@ export const ui = StyleSheet.create({
         borderRadius: 99,
         backgroundColor: "#35D07F",
     },
+
     shabbatLocationChipText: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 14,
         opacity: 0.9,
     },
 
     // ===========================================================================
-    // SETTINGS SCREEN (prefixed)
+    // SETTINGS SCREEN
     // ===========================================================================
-
     settingsSafe: {
         flex: 1,
         backgroundColor: COLORS.bg,
@@ -348,11 +362,13 @@ export const ui = StyleSheet.create({
         marginTop: 16,
         marginHorizontal: 4,
     },
+
     settingsRowLabel: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 18,
         lineHeight: 22,
     },
+
     settingsSubLabel: {
         color: "rgba(255,255,255,0.72)",
         fontSize: 14,
@@ -362,17 +378,20 @@ export const ui = StyleSheet.create({
     settingsSliderBlock: {
         paddingBottom: 10,
     },
+
     settingsSliderHeader: {
         flexDirection: "row",
         alignItems: "baseline",
         justifyContent: "space-between",
         marginBottom: 8,
     },
+
     settingsSliderValue: {
         color: COLORS.accent,
         fontSize: 14,
         fontWeight: "500",
     },
+
     settingsSliderHint: {
         color: COLORS.accent,
         fontSize: 14,
@@ -380,7 +399,7 @@ export const ui = StyleSheet.create({
     },
 
     // ===========================================================================
-    // HOLIDAYS SCREEN (prefixed)
+    // HOLIDAYS SCREEN
     // ===========================================================================
     holidaysTodaySection: {
         flexShrink: 1,
@@ -412,7 +431,7 @@ export const ui = StyleSheet.create({
     },
 
     holidaysSecondHeaderText: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 20,
         marginBottom: 14,
     },
@@ -422,12 +441,13 @@ export const ui = StyleSheet.create({
     },
 
     holidaysHeaderText: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 30,
         marginTop: 12,
         marginBottom: 0,
     },
 
+    // Dots (shared for carousels)
     carouselDotsRow: {
         flexDirection: "row",
         justifyContent: "center",
@@ -444,8 +464,17 @@ export const ui = StyleSheet.create({
         backgroundColor: "rgba(130,203,255,0.95)",
     },
 
+    // TodayHolidayCarousel helpers
+    todayCarouselWrap: {
+        width: "100%",
+    },
+
+    todayCarouselPage: {
+        // width + height are set dynamically
+    },
+
     // ===========================================================================
-    // TODAY HOLIDAY CARD (prefixed)
+    // TODAY HOLIDAY CARD
     // ===========================================================================
     todayHolidayCard: {
         backgroundColor: COLORS.card,
@@ -456,7 +485,7 @@ export const ui = StyleSheet.create({
     },
 
     todayHolidayHeaderText: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 30,
         marginBottom: 12,
     },
@@ -494,13 +523,13 @@ export const ui = StyleSheet.create({
         padding: 12,
         alignItems: "center",
         borderWidth: 0.5,
-        borderColor: "white",
+        borderColor: COLORS.white,
         backgroundColor: "transparent",
         marginVertical: 24,
     },
 
     todayHolidayMoreInfoButtonText: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 14,
         fontWeight: "500",
     },
@@ -512,42 +541,74 @@ export const ui = StyleSheet.create({
         marginBottom: 12,
         opacity: 0.95,
     },
+
     todayHolidayDrawerBody: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 16,
         lineHeight: 21,
     },
 
     // ===========================================================================
-    // UPCOMING HOLIDAY CARD (prefixed)
+    // UPCOMING HOLIDAY CARD
     // ===========================================================================
     upcomingHolidayCard: {
         backgroundColor: COLORS.card,
         borderRadius: 18,
         padding: 18,
+        position: "relative",
     },
+
     upcomingHolidayTitle: {
         fontFamily: "ChutzBold",
-
         color: COLORS.accent,
         fontSize: 24,
         marginBottom: 4,
         marginTop: 4,
     },
+
     upcomingHolidayHebrew: {
-        color: colors.accent,
+        color: COLORS.accent,
         fontSize: 16,
         marginBottom: 6,
     },
+
     upcomingHolidayDate: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 14,
+    },
+
+    upcomingHolidayMoreBtn: {
+        position: "absolute",
+        top: 12,
+        right: 12,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+
+    // UpcomingHolidaysCarousel helpers
+    holidaysUpcomingCarouselWrap: {
+        // height is dynamic via inline { height }
+    },
+
+    holidaysUpcomingCarouselContent: {
+        paddingLeft: 0,
+        // paddingRight is dynamic (peek)
+    },
+
+    holidaysUpcomingCarouselSeparator: {
+        // width is dynamic (gap)
+    },
+
+    holidaysUpcomingCarouselItemWrap: {
+        // width is dynamic (cardWidth)
     },
 
     // ===========================================================================
     // BOTTOM SHEET (shared)
     // ===========================================================================
-
     bottomSheetBg: {
         backgroundColor: COLORS.card,
         borderTopLeftRadius: 18,
@@ -590,14 +651,14 @@ export const ui = StyleSheet.create({
     },
 
     sheetMetaLeft: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 16,
         flexShrink: 1,
         paddingRight: 10,
     },
 
     sheetMetaRight: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 16,
         textAlign: "right",
         flexShrink: 1,
@@ -611,7 +672,7 @@ export const ui = StyleSheet.create({
     },
 
     sheetBodyText: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 16,
         lineHeight: 21,
     },
@@ -623,6 +684,7 @@ export const ui = StyleSheet.create({
         flexWrap: "wrap",
         rowGap: 6,
     },
+
     sheetNameLeft: {
         color: COLORS.accent,
         fontSize: 22,
@@ -631,6 +693,7 @@ export const ui = StyleSheet.create({
         flexBasis: "50%",
         paddingRight: 12,
     },
+
     sheetNameRight: {
         color: COLORS.accent,
         fontSize: 16,
@@ -648,7 +711,9 @@ export const ui = StyleSheet.create({
         marginBottom: 14,
     },
 
-    // LOCATION SHEET (prefixed)
+    // ===========================================================================
+    // LOCATION SHEET
+    // ===========================================================================
     locationSheetBody: {
         paddingHorizontal: 16,
         paddingBottom: 22,
@@ -666,9 +731,8 @@ export const ui = StyleSheet.create({
     },
 
     // ===========================================================================
-    /* TOP BAR (shared) */
+    // TOP BAR (shared)
     // ===========================================================================
-
     topBarSafe: {
         position: "absolute",
         top: 0,
@@ -678,7 +742,7 @@ export const ui = StyleSheet.create({
     },
 
     topBarWrap: {
-        height: 44, // keep in sync with TOPBAR_H
+        height: 44,
         paddingHorizontal: 16,
         justifyContent: "center",
         position: "relative",
@@ -701,7 +765,7 @@ export const ui = StyleSheet.create({
     },
 
     topBarDateText: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 14,
     },
 
@@ -709,7 +773,7 @@ export const ui = StyleSheet.create({
         width: 6,
         height: 6,
         borderRadius: 3,
-        backgroundColor: COLORS.accent, // your light blue
+        backgroundColor: COLORS.accent,
         marginLeft: 4,
     },
 
@@ -729,8 +793,6 @@ export const ui = StyleSheet.create({
 
     topBarKebabBtn: {
         position: "absolute",
-        // "between" left pill and gear
-        // gear is at right:16 with width 38, plus 10 gap
         right: 16 + 38 + 10,
     },
 
@@ -755,7 +817,7 @@ export const ui = StyleSheet.create({
     },
 
     devModalTitle: {
-        color: "white",
+        color: COLORS.white,
         fontSize: 16,
         fontWeight: "600",
     },
@@ -787,7 +849,11 @@ export const ui = StyleSheet.create({
     },
 
     devModalBtnText: {
-        color: "white",
+        color: COLORS.white,
         fontWeight: "600",
     },
+
+    // Optional spacers (if you want to remove inline <View style={{ height: ... }} />)
+    devModalSpacer10: { height: 10 },
+    devModalSpacer12: { height: 12 },
 });

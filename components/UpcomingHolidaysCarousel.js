@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { View, FlatList, useWindowDimensions } from "react-native";
 import UpcomingHolidayCard from "./UpcomingHolidayCard";
+import { ui } from "../styles/theme"; // adjust path if needed
 
 export default function UpcomingHolidaysCarousel({
     holidays = [],
@@ -14,16 +15,25 @@ export default function UpcomingHolidaysCarousel({
 }) {
     const { width } = useWindowDimensions();
 
-    const cardWidth = useMemo(() => {
-        return Math.max(0, width - peek * 2);
-    }, [width, peek]);
-
+    const cardWidth = useMemo(
+        () => Math.max(0, width - peek * 2),
+        [width, peek]
+    );
     const snapInterval = useMemo(() => cardWidth + gap, [cardWidth, gap]);
+
+    const Separator = useCallback(
+        () => (
+            <View
+                style={[ui.holidaysUpcomingCarouselSeparator, { width: gap }]}
+            />
+        ),
+        [gap]
+    );
 
     if (!holidays.length) return null;
 
     return (
-        <View style={{ height }}>
+        <View style={[ui.holidaysUpcomingCarouselWrap, { height }]}>
             <FlatList
                 data={holidays}
                 keyExtractor={(item) => item.id}
@@ -34,19 +44,23 @@ export default function UpcomingHolidaysCarousel({
                 snapToInterval={snapInterval}
                 snapToAlignment="start"
                 disableIntervalMomentum
-                contentContainerStyle={{
-                    paddingLeft: 0,
-                    paddingRight: peek,
-                }}
-                ItemSeparatorComponent={() => <View style={{ width: gap }} />}
+                contentContainerStyle={[
+                    ui.holidaysUpcomingCarouselContent,
+                    { paddingRight: peek },
+                ]}
+                ItemSeparatorComponent={Separator}
                 renderItem={({ item }) => (
-                    <View style={{ width: cardWidth }}>
+                    <View
+                        style={[
+                            ui.holidaysUpcomingCarouselItemWrap,
+                            { width: cardWidth },
+                        ]}
+                    >
                         <UpcomingHolidayCard
                             holiday={item}
                             formatDate={formatDate}
                             hebrewDate={hebrewDate}
                             todayIso={todayIso}
-                            cardWidth={cardWidth}
                             onAbout={onAbout}
                         />
                     </View>

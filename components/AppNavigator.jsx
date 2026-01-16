@@ -9,6 +9,7 @@ import Shabbat from "./screens/Shabbat";
 import { colors, nav } from "../styles/theme";
 import useTodayIsoDay from "../hooks/useTodayIsoDay";
 import { TopBar } from "./TopBar";
+import { ui } from "../styles/theme";
 
 const Tab = createBottomTabNavigator();
 

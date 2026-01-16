@@ -11,14 +11,12 @@ import { ui, colors } from "../styles/theme";
 import * as Haptics from "expo-haptics";
 import { Entypo } from "@expo/vector-icons";
 
-// Must be exported from your useTodayIsoDay file
 import {
     setDevOverrideIsoDate,
     getDevOverrideIsoDate,
 } from "../hooks/useTodayIsoDay";
 
-const TOPBAR_H = 44;
-
+// Local helpers (small + only used here)
 function parseIsoToDate(iso) {
     const [y, m, d] = iso.split("-").map(Number);
     return new Date(y, m - 1, d);
@@ -90,7 +88,7 @@ export function TopBar({ todayIso }) {
 
     return (
         <SafeAreaView edges={["top", "left", "right"]} style={ui.topBarSafe}>
-            <View style={[ui.topBarWrap, { height: TOPBAR_H }]}>
+            <View style={ui.topBarWrap}>
                 {/* LEFT: Date pill */}
                 <Pressable
                     onPress={() => {
@@ -98,7 +96,6 @@ export function TopBar({ todayIso }) {
                         setShowHebrew((v) => !v);
                     }}
                     onLongPress={() => {
-                        // DEV shortcut: long press date pill opens debug picker
                         if (__DEV__) openDev();
                     }}
                     hitSlop={12}
@@ -150,13 +147,12 @@ export function TopBar({ todayIso }) {
                     animationType="fade"
                     onRequestClose={closeDev}
                 >
-                    {/* backdrop */}
                     <Pressable onPress={closeDev} style={ui.devModalBackdrop} />
 
                     <View style={ui.devModalCard}>
                         <Text style={ui.devModalTitle}>Set Debug Date</Text>
 
-                        <View style={{ height: 10 }} />
+                        <View style={ui.devModalSpacer10} />
 
                         <DateTimePicker
                             value={pickerDate}
@@ -170,7 +166,7 @@ export function TopBar({ todayIso }) {
                             }}
                         />
 
-                        <View style={{ height: 12 }} />
+                        <View style={ui.devModalSpacer12} />
 
                         <View style={ui.devModalBtnRow}>
                             <Pressable

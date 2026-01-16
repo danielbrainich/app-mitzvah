@@ -6,21 +6,14 @@ import { ui } from "../styles/theme";
 import * as Haptics from "expo-haptics";
 import { Entypo } from "@expo/vector-icons";
 
-export default function UpcomingHolidayCard({
-    holiday,
-    hebrewDate,
-    cardWidth,
-    onAbout,
-}) {
-    const title = holiday?.title;
-
+export default function UpcomingHolidayCard({ holiday, hebrewDate, onAbout }) {
     const gregLabel = useMemo(() => {
         if (!holiday?.date) return "";
         return formatGregorianLongFromIso(holiday.date);
     }, [holiday?.date]);
 
     const hebLabel = useMemo(() => {
-        const d = parseLocalIso(holiday?.date); 
+        const d = parseLocalIso(holiday?.date);
         if (!d) return "";
         return new HDate(d).toString();
     }, [holiday?.date]);
@@ -31,24 +24,19 @@ export default function UpcomingHolidayCard({
     }, [onAbout, holiday]);
 
     return (
-        <View
-            style={[
-                ui.upcomingHolidayCard,
-                cardWidth ? { width: cardWidth } : null,
-                { position: "relative" },
-            ]}
-        >
+        <View style={ui.upcomingHolidayCard}>
             <Text style={ui.upcomingHolidayDate}>
                 {hebrewDate ? hebLabel : gregLabel}
             </Text>
 
             <Text
-                style={[ui.upcomingHolidayTitle]}
+                style={ui.upcomingHolidayTitle}
                 numberOfLines={1}
                 ellipsizeMode="tail"
             >
-                {holiday.title}
+                {holiday?.title ?? ""}
             </Text>
+
             {!!holiday?.hebrewTitle && (
                 <Text style={ui.upcomingHolidayHebrew}>
                     {holiday.hebrewTitle}
@@ -59,16 +47,7 @@ export default function UpcomingHolidayCard({
                 <Pressable
                     onPress={onPressDots}
                     hitSlop={12}
-                    style={{
-                        position: "absolute",
-                        top: 12,
-                        right: 12,
-                        width: 32,
-                        height: 32,
-                        borderRadius: 16,
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
+                    style={ui.upcomingHolidayMoreBtn}
                     accessibilityRole="button"
                     accessibilityLabel="More options"
                 >
