@@ -47,12 +47,7 @@ export default function TodayHolidayCarousel({
                 bounces={items.length > 1}
                 onMomentumScrollEnd={onMomentumEnd}
                 renderItem={({ item, index: i }) => (
-                    <View
-                        style={[
-                            ui.todayCarouselPage,
-                            { width: pageWidth, height },
-                        ]}
-                    >
+                    <View style={{ width: pageWidth, height }}>
                         {renderItem({ item, index: i })}
                     </View>
                 )}

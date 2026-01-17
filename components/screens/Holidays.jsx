@@ -7,13 +7,12 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 import { ui } from "../../styles/theme";
 import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
-import { parseLocalIso, formatGregorianLong } from "../../utils/datetime";
 import useTodayIsoDay from "../../hooks/useTodayIsoDay";
 
 import UpcomingHolidaysCarousel from "../UpcomingHolidaysCarousel";
 import HolidayBottomSheet from "../HolidayBottomSheet";
 import TodayHolidayCarousel from "../TodayHolidayCarousel";
-import { computeHolidaysInfo } from "../../lib/computeHolidaysinfo"
+import { computeHolidaysInfo } from "../../lib/computeHolidaysinfo";
 
 const TODAY_PAGER_HEIGHT = 420;
 const UPCOMING_HEIGHT = 120;
@@ -35,7 +34,7 @@ function TodayHolidayHeroSlide({ holiday, onAbout }) {
         >
             <Text style={ui.holidaysHeaderText}>Today is</Text>
 
-            <Text style={[ui.holidaysBigBoldText, { fontFamily: "ChutzBold" }]}>
+            <Text style={[ui.holidaysBigBoldText, ui.textChutz]}>
                 {holiday.title ?? ""}
             </Text>
 
@@ -114,7 +113,7 @@ export default function Holidays() {
     const singleHoliday = oneToday ? todayItems[0] : null;
 
     return (
-        <View style={ui.container}>
+        <View style={ui.safeArea}>
             <ScrollView
                 style={ui.screen}
                 contentContainerStyle={[
@@ -167,8 +166,8 @@ export default function Holidays() {
                                 <Text
                                     style={[
                                         ui.holidaysBigBoldText,
+                                        ui.textChutz,
                                         {
-                                            fontFamily: "ChutzBold",
                                             textAlign: "center",
                                         },
                                     ]}
@@ -184,12 +183,7 @@ export default function Holidays() {
                 <View style={ui.holidaysComingUpSection}>
                     <Text style={ui.holidaysSecondHeaderText}>Coming up</Text>
 
-                    <View
-                        style={[
-                            ui.holidaysUpcomingCarouselSlot,
-                            { height: UPCOMING_HEIGHT },
-                        ]}
-                    >
+                    <View style={{ height: UPCOMING_HEIGHT }}>
                         <UpcomingHolidaysCarousel
                             holidays={upcoming}
                             height={UPCOMING_HEIGHT}
@@ -203,12 +197,7 @@ export default function Holidays() {
             <HolidayBottomSheet
                 visible={aboutOpen}
                 onClose={closeAbout}
-                dateLeft={
-                    aboutHoliday?.date
-                        ? formatGregorianLong(parseLocalIso(aboutHoliday.date))
-                        : ""
-                }
-                dateRight={aboutHoliday?.hebrewDate ?? ""}
+                isoDate={aboutHoliday?.date ?? ""}
                 nameLeft={aboutHoliday?.title ?? ""}
                 nameRight={aboutHoliday?.hebrewTitle ?? ""}
                 description={

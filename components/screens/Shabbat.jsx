@@ -172,7 +172,7 @@ export default function Shabbat() {
         : dash;
 
     return (
-        <View style={ui.container}>
+        <View style={ui.safeArea}>
             <ScrollView
                 style={ui.screen}
                 showsVerticalScrollIndicator={false}
@@ -193,7 +193,7 @@ export default function Shabbat() {
                                 <Text
                                     style={[
                                         ui.cardTitle,
-                                        { fontFamily: "ChutzBold" },
+                                        ui.textChutz
                                     ]}
                                 >
                                     Erev Shabbat
@@ -227,7 +227,7 @@ export default function Shabbat() {
                                 <Text
                                     style={[
                                         ui.cardTitle,
-                                        { fontFamily: "ChutzBold" },
+                                        ui.textChutz,
                                     ]}
                                 >
                                     Yom Shabbat

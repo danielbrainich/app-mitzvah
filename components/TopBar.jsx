@@ -116,7 +116,7 @@ export function TopBar({ todayIso }) {
                     <Pressable
                         onPress={openDev}
                         hitSlop={12}
-                        style={[ui.topBarIconBtn, ui.topBarKebabBtn]}
+                        style={[ui.iconBtn, ui.topBarKebabBtn]}
                     >
                         <Entypo
                             name="dots-three-vertical"
@@ -133,7 +133,7 @@ export function TopBar({ todayIso }) {
                         navigation.navigate("Settings");
                     }}
                     hitSlop={12}
-                    style={[ui.topBarIconBtn, ui.topBarGearBtn]}
+                    style={[ui.iconBtn, ui.topBarGearBtn]}
                 >
                     <Entypo name="cog" size={22} color="#fff" />
                 </Pressable>
@@ -152,7 +152,7 @@ export function TopBar({ todayIso }) {
                     <View style={ui.devModalCard}>
                         <Text style={ui.devModalTitle}>Set Debug Date</Text>
 
-                        <View style={ui.devModalSpacer10} />
+                        <View style={{ height: 10 }} />
 
                         <DateTimePicker
                             value={pickerDate}
@@ -166,7 +166,7 @@ export function TopBar({ todayIso }) {
                             }}
                         />
 
-                        <View style={ui.devModalSpacer12} />
+                        <View style={{ height: 12 }} />
 
                         <View style={ui.devModalBtnRow}>
                             <Pressable

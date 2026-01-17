@@ -105,9 +105,9 @@ export default function Settings({ navigation }) {
     if (!fontsLoaded) return null;
 
     return (
-        <View style={ui.container}>
+        <View style={ui.safeArea}>
             <SafeAreaView
-                style={ui.settingsSafe}
+                style={ui.safeArea}
                 edges={["top", "left", "right"]}
             >
                 {/* Top-left back button */}
@@ -120,7 +120,7 @@ export default function Settings({ navigation }) {
                             );
                         }}
                         hitSlop={12}
-                        style={ui.settingsBackBtn}
+                        style={ui.iconBtnSm}
                     >
                         <Entypo name="chevron-left" size={22} color="white" />
                     </Pressable>
@@ -137,7 +137,7 @@ export default function Settings({ navigation }) {
                     {/* Holiday Options Card */}
                     <View style={ui.card}>
                         <Text
-                            style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}
+                            style={[ui.cardTitle, ui.textChutz]}
                         >
                             Holiday Options
                         </Text>
@@ -295,7 +295,7 @@ export default function Settings({ navigation }) {
                     {/* Support */}
                     <View style={ui.card}>
                         <Text
-                            style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}
+                            style={[ui.cardTitle, ui.textChutz]}
                         >
                             Support
                         </Text>

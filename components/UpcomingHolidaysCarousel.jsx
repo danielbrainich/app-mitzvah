@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from "react";
 import { View, FlatList, useWindowDimensions } from "react-native";
 import UpcomingHolidayCard from "./UpcomingHolidayCard";
-import { ui } from "../styles/theme"; // adjust path if needed
+import { ui } from "../styles/theme";
 
 export default function UpcomingHolidaysCarousel({
     holidays = [],
@@ -21,19 +21,12 @@ export default function UpcomingHolidaysCarousel({
     );
     const snapInterval = useMemo(() => cardWidth + gap, [cardWidth, gap]);
 
-    const Separator = useCallback(
-        () => (
-            <View
-                style={[ui.holidaysUpcomingCarouselSeparator, { width: gap }]}
-            />
-        ),
-        [gap]
-    );
+    const Separator = useCallback(() => <View style={{ width: gap }} />, [gap]);
 
     if (!holidays.length) return null;
 
     return (
-        <View style={[ui.holidaysUpcomingCarouselWrap, { height }]}>
+        <View style={{ height }}>
             <FlatList
                 data={holidays}
                 keyExtractor={(item) => item.id}
@@ -50,12 +43,7 @@ export default function UpcomingHolidaysCarousel({
                 ]}
                 ItemSeparatorComponent={Separator}
                 renderItem={({ item }) => (
-                    <View
-                        style={[
-                            ui.holidaysUpcomingCarouselItemWrap,
-                            { width: cardWidth },
-                        ]}
-                    >
+                    <View style={{ width: cardWidth }}>
                         <UpcomingHolidayCard
                             holiday={item}
                             formatDate={formatDate}

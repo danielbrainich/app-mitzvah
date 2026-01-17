@@ -1,12 +1,14 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { HDate } from "@hebcal/core";
 import { parseLocalIso, formatGregorianLongFromIso } from "../utils/datetime";
-import { ui } from "../styles/theme";
+import { ui, colors } from "../styles/theme";
 import * as Haptics from "expo-haptics";
 import { Entypo } from "@expo/vector-icons";
 
 export default function UpcomingHolidayCard({ holiday, hebrewDate, onAbout }) {
+    const [showHebrew, setShowHebrew] = useState(Boolean(hebrewDate));
+
     const gregLabel = useMemo(() => {
         if (!holiday?.date) return "";
         return formatGregorianLongFromIso(holiday.date);
@@ -18,17 +20,19 @@ export default function UpcomingHolidayCard({ holiday, hebrewDate, onAbout }) {
         return new HDate(d).toString();
     }, [holiday?.date]);
 
+    const toggleDate = useCallback(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setShowHebrew((v) => !v);
+    }, []);
+
     const onPressDots = useCallback(() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         onAbout?.(holiday);
     }, [onAbout, holiday]);
 
     return (
-        <View style={ui.upcomingHolidayCard}>
-            <Text style={ui.upcomingHolidayDate}>
-                {hebrewDate ? hebLabel : gregLabel}
-            </Text>
-
+        <View style={[ui.card]}>
+            <Text style={ui.textMeta}>{gregLabel}</Text>
             <Text
                 style={ui.upcomingHolidayTitle}
                 numberOfLines={1}
@@ -47,9 +51,7 @@ export default function UpcomingHolidayCard({ holiday, hebrewDate, onAbout }) {
                 <Pressable
                     onPress={onPressDots}
                     hitSlop={12}
-                    style={ui.upcomingHolidayMoreBtn}
-                    accessibilityRole="button"
-                    accessibilityLabel="More options"
+                    style={[ui.iconBtn, ui.upcomingHolidayMoreBtnPos]}
                 >
                     <Entypo
                         name="dots-three-vertical"

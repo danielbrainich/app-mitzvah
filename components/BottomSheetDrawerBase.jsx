@@ -51,7 +51,7 @@ export default function BottomSheetDrawerBase({
             backgroundStyle={ui.bottomSheetBg}
             handleIndicatorStyle={ui.bottomSheetHandle}
             backdropComponent={renderBackdrop}
-            enableDynamicSizing={false} 
+            enableDynamicSizing={false}
         >
             <BottomSheetView style={ui.bottomSheetContent}>
                 {/* Top row: close button only */}
