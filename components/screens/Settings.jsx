@@ -7,9 +7,10 @@ import {
     Pressable,
     TouchableOpacity,
     Alert,
+    ActivityIndicator,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import React, { useMemo, useCallback, useState } from "react";
+import React, { useMemo, useCallback, useState, useEffect } from "react";
 import Slider from "@react-native-community/slider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Entypo } from "@expo/vector-icons";
@@ -26,19 +27,12 @@ import {
     setHavdalahTimeToggle,
 } from "../../store/actions";
 import { LayoutAnimation } from "react-native";
+import { useTipsIap } from "../../iap/useTipsIap";
 
 const DEFAULT_CANDLE = 0;
 const DEFAULT_HAVDALAH = 0;
 const MIN_MINS = 0;
 const MAX_MINS = 60;
-
-// Placeholder until I wire in IAP:
-const handleTip = (amount) => {
-    Alert.alert(
-        "Tip (In-App Purchase)",
-        `Selected: $${amount}\n\nNext step: create IAP products (tip_1, tip_2, tip_5, tip_10, tip_18) and call purchase().`
-    );
-};
 
 export default function Settings({ navigation }) {
     const [fontsLoaded] = useFonts({
@@ -57,6 +51,15 @@ export default function Settings({ navigation }) {
 
     const dispatch = useDispatch();
     const [amount, setAmount] = useState(5);
+
+    const {
+        tipProducts,
+        ready: iapReady,
+        loading: iapLoading,
+        tip,
+    } = useTipsIap();
+
+    const onTipPress = useCallback(() => tip(amount), [tip, amount]);
 
     const candleValue = useMemo(() => {
         if (!candleLightingToggle) return DEFAULT_CANDLE;
@@ -106,10 +109,7 @@ export default function Settings({ navigation }) {
 
     return (
         <View style={ui.safeArea}>
-            <SafeAreaView
-                style={ui.safeArea}
-                edges={["top", "left", "right"]}
-            >
+            <SafeAreaView style={ui.safeArea} edges={["top", "left", "right"]}>
                 {/* Top-left back button */}
                 <View style={ui.settingsTopBar}>
                     <Pressable
@@ -136,9 +136,7 @@ export default function Settings({ navigation }) {
                 >
                     {/* Holiday Options Card */}
                     <View style={ui.card}>
-                        <Text
-                            style={[ui.cardTitle, ui.textChutz]}
-                        >
+                        <Text style={[ui.cardTitle, ui.textChutz]}>
                             Holiday Options
                         </Text>
 
@@ -294,9 +292,7 @@ export default function Settings({ navigation }) {
 
                     {/* Support */}
                     <View style={ui.card}>
-                        <Text
-                            style={[ui.cardTitle, ui.textChutz]}
-                        >
+                        <Text style={[ui.cardTitle, ui.textChutz]}>
                             Support
                         </Text>
 
@@ -305,6 +301,7 @@ export default function Settings({ navigation }) {
                             a tip!
                         </Text>
 
+                        {/* Tier selector */}
                         <View style={ui.infoTiersRow}>
                             {[1, 2, 5, 10, 18].map((v) => {
                                 const selected = v === amount;
@@ -341,19 +338,20 @@ export default function Settings({ navigation }) {
                             })}
                         </View>
 
+                        {/* Tip button */}
                         <TouchableOpacity
                             style={ui.primaryButton}
-                            onPress={() => {
-                                handleTip(amount);
-                                Haptics.impactAsync(
-                                    Haptics.ImpactFeedbackStyle.Light
-                                );
-                            }}
+                            onPress={onTipPress}
                             activeOpacity={0.85}
+                            disabled={iapLoading}
                         >
-                            <Text style={ui.primaryButtonText}>
-                                Tip ${amount}
-                            </Text>
+                            {iapLoading ? (
+                                <ActivityIndicator />
+                            ) : (
+                                <Text style={ui.primaryButtonText}>
+                                    Tip ${amount}
+                                </Text>
+                            )}
                         </TouchableOpacity>
                     </View>
                 </ScrollView>

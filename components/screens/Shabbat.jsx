@@ -233,7 +233,7 @@ export default function Shabbat() {
                                     Yom Shabbat
                                 </Text>
 
-                                <Text style={ui.shabbatSentence}>
+                                <Text>
                                     {formatGregorianLong(shabbatInfo.saturday)}
                                 </Text>
 
