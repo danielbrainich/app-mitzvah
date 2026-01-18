@@ -7,8 +7,6 @@ import {
     BottomSheetBackdrop,
     BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import { Entypo } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
 import { ui } from "../styles/theme";
 
 export default function BottomSheetDrawerBase({
@@ -56,7 +54,7 @@ export default function BottomSheetDrawerBase({
             <BottomSheetView style={ui.bottomSheetContent}>
                 {/* Top row: close button only */}
                 <View style={ui.sheetTopRow}>
-                    <Pressable
+                    {/* <Pressable
                         onPress={() => {
                             modalRef.current?.dismiss();
                             Haptics.impactAsync(
@@ -69,7 +67,7 @@ export default function BottomSheetDrawerBase({
                         style={ui.bottomSheetCloseBtn}
                     >
                         <Entypo name="cross" size={24} color="white" />
-                    </Pressable>
+                    </Pressable> */}
                 </View>
 
                 <BottomSheetScrollView

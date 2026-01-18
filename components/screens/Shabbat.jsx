@@ -18,18 +18,14 @@ import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
+import { Entypo } from "@expo/vector-icons";
 
 import useAppLocation from "../../hooks/useAppLocation";
 import useTodayIsoDay from "../../hooks/useTodayIsoDay";
-import { ui } from "../../styles/theme";
+import { ui, colors } from "../../styles/theme";
 import LocationBottomSheet from "../LocationBottomSheet";
 
-import {
-    parseLocalIso,
-    formatTime12h,
-    formatGregorianLong,
-} from "../../utils/datetime";
-
+import { parseLocalIso, formatTime12h } from "../../utils/datetime";
 import { computeShabbatInfo } from "../../lib/computeShabbatInfo";
 
 export default function Shabbat() {
@@ -119,11 +115,6 @@ export default function Shabbat() {
         havdalahMins,
     ]);
 
-    // Recompute when:
-    // - location permission changes
-    // - lat/lon/elev changes
-    // - user settings for mins change
-    // - day changes
     useEffect(() => {
         fetchShabbatInfo();
     }, [
@@ -140,7 +131,6 @@ export default function Shabbat() {
         const st = await requestPermission();
 
         if (st !== "granted") {
-            // If user chose "Don't Allow" permanently, send to settings.
             openSettings();
             return;
         }
@@ -148,11 +138,11 @@ export default function Shabbat() {
         setShowLocationDetails(false);
     }, [requestPermission, openSettings]);
 
-    if (!fontsLoaded) return null;
+    const [showHebrewFri, setShowHebrewFri] = useState(false);
+    const [showHebrewSat, setShowHebrewSat] = useState(false);
 
     const MAX_WIDTH = 520;
     const tabBarHeight = useBottomTabBarHeight();
-
     const dash = "—";
 
     const candleValue = shabbatInfo?.candleTime
@@ -170,6 +160,8 @@ export default function Shabbat() {
     const satSundownValue = shabbatInfo?.saturdaySunset
         ? formatTime12h(shabbatInfo.saturdaySunset)
         : dash;
+
+    if (!fontsLoaded) return null;
 
     return (
         <View style={ui.safeArea}>
@@ -190,18 +182,36 @@ export default function Shabbat() {
                         <>
                             {/* Erev Shabbat */}
                             <View style={ui.card}>
-                                <Text
-                                    style={[
-                                        ui.cardTitle,
-                                        ui.textChutz
-                                    ]}
-                                >
+                                <Text style={[ui.cardTitle, ui.textChutz]}>
                                     Erev Shabbat
                                 </Text>
 
-                                <Text style={ui.shabbatSentence}>
-                                    {formatGregorianLong(shabbatInfo.friday)}
-                                </Text>
+                                <Pressable
+                                    onPress={() => {
+                                        Haptics.impactAsync(
+                                            Haptics.ImpactFeedbackStyle.Light
+                                        );
+                                        setShowHebrewFri((v) => !v);
+                                    }}
+                                    hitSlop={12}
+                                    style={ui.shabbatDateTogglePressable}
+                                >
+                                    <View style={ui.shabbatDateToggleRow}>
+                                        <Entypo
+                                            name="cycle"
+                                            size={13}
+                                            color={colors.muted}
+                                        />
+                                        <Text
+                                            style={ui.shabbatDateToggleText}
+                                            numberOfLines={1}
+                                        >
+                                            {showHebrewFri
+                                                ? shabbatInfo.erevShabbatHebrewDate
+                                                : shabbatInfo.erevShabbatGregDate}
+                                        </Text>
+                                    </View>
+                                </Pressable>
 
                                 <View style={ui.shabbatSheetLine}>
                                     <Text style={ui.shabbatSheetLabel}>
@@ -224,18 +234,36 @@ export default function Shabbat() {
 
                             {/* Yom Shabbat */}
                             <View style={ui.card}>
-                                <Text
-                                    style={[
-                                        ui.cardTitle,
-                                        ui.textChutz,
-                                    ]}
-                                >
+                                <Text style={[ui.cardTitle, ui.textChutz]}>
                                     Yom Shabbat
                                 </Text>
 
-                                <Text>
-                                    {formatGregorianLong(shabbatInfo.saturday)}
-                                </Text>
+                                <Pressable
+                                    onPress={() => {
+                                        Haptics.impactAsync(
+                                            Haptics.ImpactFeedbackStyle.Light
+                                        );
+                                        setShowHebrewSat((v) => !v);
+                                    }}
+                                    hitSlop={12}
+                                    style={ui.shabbatDateTogglePressable}
+                                >
+                                    <View style={ui.shabbatDateToggleRow}>
+                                        <Entypo
+                                            name="cycle"
+                                            size={13}
+                                            color={colors.muted}
+                                        />
+                                        <Text
+                                            style={ui.shabbatDateToggleText}
+                                            numberOfLines={1}
+                                        >
+                                            {showHebrewSat
+                                                ? shabbatInfo.yomShabbatHebrewDate
+                                                : shabbatInfo.yomShabbatGregDate}
+                                        </Text>
+                                    </View>
+                                </Pressable>
 
                                 <View style={ui.shabbatSheetLine}>
                                     <Text style={ui.shabbatSheetLabel}>
@@ -258,12 +286,7 @@ export default function Shabbat() {
 
                             {/* Parasha */}
                             <View style={ui.card}>
-                                <Text
-                                    style={[
-                                        ui.cardTitle,
-                                        { fontFamily: "ChutzBold" },
-                                    ]}
-                                >
+                                <Text style={[ui.cardTitle, ui.textChutz]}>
                                     Parasha
                                 </Text>
 
@@ -382,7 +405,6 @@ export default function Shabbat() {
                                 Location Services for this app.
                             </Text>
 
-                            {/* Smaller "More Info" style button */}
                             <TouchableOpacity
                                 onPress={() => {
                                     handleEnableLocation();

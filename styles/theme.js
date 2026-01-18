@@ -256,7 +256,7 @@ export const ui = StyleSheet.create({
         borderRadius: 18,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "rgba(255,255,255,0.06)",
+        backgroundColor: COLORS.card,
     },
 
     // ===========================================================================
@@ -335,6 +335,11 @@ export const ui = StyleSheet.create({
         textAlign: "right",
     },
 
+    shabbatSheetDate: {
+        ...TEXT.meta,
+        marginBottom: SPACE.sm,
+    },
+
     shabbatLocationChip: {
         flexDirection: "row",
         alignItems: "center",
@@ -365,6 +370,15 @@ export const ui = StyleSheet.create({
         opacity: 0.9,
     },
 
+    shabbatDateTogglePressable: { alignSelf: "flex-start", marginBottom: 10 },
+
+    shabbatDateToggleRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+    },
+    shabbatDateToggleText: { color: "rgba(255,255,255,0.78)", fontSize: 14 },
+
     // ===========================================================================
     // SETTINGS SCREEN
     // ===========================================================================
@@ -381,8 +395,8 @@ export const ui = StyleSheet.create({
     settingsDivider: {
         height: 1,
         backgroundColor: "rgba(255,255,255,0.08)",
-        marginTop: SPACE.xl,
-        marginHorizontal: SPACE.xs,
+        marginTop: SPACE.lg,
+        marginHorizontal: SPACE.lg,
     },
 
     settingsRowLabel: {
@@ -469,18 +483,19 @@ export const ui = StyleSheet.create({
     upcomingHolidayTitle: {
         ...TEXT.titleAccent,
         fontSize: TYPE["3xl"],
-        marginTop: SPACE.xs,
+        marginTop: SPACE.sm,
         marginBottom: SPACE.xs,
     },
 
     upcomingHolidayHebrew: {
         ...TEXT.subtitleAccent,
-        marginBottom: SPACE.sm,
         textAlign: "left",
         writingDirection: "rtl",
     },
 
-    upcomingHolidayDate: { ...TEXT.meta },
+    upcomingHolidayDate: {
+        ...TEXT.meta,
+    },
 
     holidaysUpcomingCarouselContent: { paddingLeft: 0 },
 
@@ -510,17 +525,24 @@ export const ui = StyleSheet.create({
 
     bottomSheetCloseBtn: { alignItems: "center", justifyContent: "center" },
 
-    sheetHeader: { paddingBottom: SPACE.xl },
-    sheetBody: { paddingHorizontal: SPACE["2xl"] },
+    sheetHeader: {
+        paddingBottom: SPACE.xs,
+    },
+
+    sheetBody: {
+        paddingHorizontal: SPACE["2xl"],
+    },
 
     sheetBodyText: {
         ...TEXT.body,
         lineHeight: 21,
+        paddingTop: SPACE.xs,
     },
 
     sheetTitleEnglish: {
         ...TEXT.titleAccent,
-        marginTop: SPACE.md,
+        marginTop: SPACE.sm,
+        marginBottom: SPACE.xs,
     },
 
     sheetTitleHebrew: {
@@ -529,10 +551,26 @@ export const ui = StyleSheet.create({
         writingDirection: "rtl",
     },
 
-    // For date pill inside sheet: reuse the shared pill styles
-    sheetDatePillPressable: { alignSelf: "flex-start", marginBottom: SPACE.md },
-    sheetDatePill: { ...PILL.base },
-    sheetDatePillText: { ...PILL.text },
+    sheetDateInlinePressable: {
+        alignSelf: "flex-start",
+    },
+
+    sheetDateInlineRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+    },
+
+    sheetDateInlineText: {
+        color: "white",
+        fontSize: 14,
+    },
+
+    sheetDivider: {
+        height: 1,
+        backgroundColor: "rgba(255,255,255,0.08)",
+        marginVertical: 8,
+    },
 
     // ===========================================================================
     // LOCATION SHEET

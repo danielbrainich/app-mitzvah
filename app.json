@@ -17,9 +17,10 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show you accurate Havdalah and Shabbat candle lighting times."
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show you accurate Havdalah and Shabbat candle lighting times.",
+        "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.danielbrainich.appmitzvah"
+      "bundleIdentifier": "com.danielbrainich.appmitzvah.dev"
     },
     "android": {
       "adaptiveIcon": {

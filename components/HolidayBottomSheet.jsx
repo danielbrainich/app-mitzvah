@@ -56,36 +56,39 @@ export default function HolidayBottomSheet({
             contentContainerStyle={ui.sheetBody}
         >
             {hasHeader ? (
-                <View style={ui.sheetHeader}>
-                    {!!isoDay ? (
-                        <Pressable
-                            onPress={onToggleDate}
-                            hitSlop={12}
-                            style={ui.sheetDatePillPressable}
-                        >
-                            <View style={ui.sheetDatePill}>
-                                <Entypo
-                                    name="cycle"
-                                    size={14}
-                                    color={colors.muted}
-                                />
-                                <Text
-                                    style={ui.sheetDatePillText}
-                                    numberOfLines={1}
-                                >
-                                    {dateLabel}
-                                </Text>
-                            </View>
-                        </Pressable>
-                    ) : null}
+                <>
+                    <View style={ui.sheetHeader}>
+                        {!!isoDay ? (
+                            <Pressable
+                                onPress={onToggleDate}
+                                hitSlop={12}
+                                style={ui.sheetDateInlinePressable}
+                            >
+                                <View style={ui.sheetDateInlineRow}>
+                                    <Entypo
+                                        name="cycle"
+                                        size={13}
+                                        color={colors.muted}
+                                    />
+                                    <Text
+                                        style={ui.sheetDateInlineText}
+                                        numberOfLines={1}
+                                    >
+                                        {dateLabel}
+                                    </Text>
+                                </View>
+                            </Pressable>
+                        ) : null}
 
-                    {!!nameLeft && (
-                        <Text style={ui.sheetTitleEnglish}>{nameLeft}</Text>
-                    )}
-                    {!!nameRight && (
-                        <Text style={ui.sheetTitleHebrew}>{nameRight}</Text>
-                    )}
-                </View>
+                        {!!nameLeft && (
+                            <Text style={ui.sheetTitleEnglish}>{nameLeft}</Text>
+                        )}
+                        {!!nameRight && (
+                            <Text style={ui.sheetTitleHebrew}>{nameRight}</Text>
+                        )}
+                    </View>
+                    <View style={ui.sheetDivider} />
+                </>
             ) : null}
 
             <Text style={ui.sheetBodyText}>{description ?? ""}</Text>
