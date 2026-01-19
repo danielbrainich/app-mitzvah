@@ -115,12 +115,10 @@ const TEXT = {
     subtitleAccent: {
         color: COLORS.accent,
         fontSize: TYPE.base,
-        opacity: 0.9,
     },
     meta: {
         color: COLORS.white,
         fontSize: TYPE.sm,
-        opacity: 0.9,
     },
     body: {
         color: COLORS.white,
@@ -178,7 +176,6 @@ export const ui = StyleSheet.create({
     textMeta: {
         color: COLORS.white,
         fontSize: 13,
-        opacity: 0.85,
     },
 
     // ===========================================================================
@@ -367,7 +364,6 @@ export const ui = StyleSheet.create({
     shabbatLocationChipText: {
         color: COLORS.white,
         fontSize: TYPE.sm,
-        opacity: 0.9,
     },
 
     shabbatDateTogglePressable: { alignSelf: "flex-start", marginBottom: 10 },
@@ -375,9 +371,110 @@ export const ui = StyleSheet.create({
     shabbatDateToggleRow: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 8,
+        gap: 4,
     },
     shabbatDateToggleText: { color: "rgba(255,255,255,0.78)", fontSize: 14 },
+
+    // HERO (centered title + big date)
+    shabbatHeroWrap: {
+        alignItems: "center",
+        paddingTop: 8,
+        paddingBottom: 10,
+    },
+
+    shabbatHeroTitle: {
+        fontSize: 20,
+        color: colors.text,
+        marginBottom: 10,
+    },
+
+    // Big blue lines (reuse your brand blue if you have it; I used colors.accent if present)
+    shabbatHeroMonth: {
+        fontSize: 42,
+        lineHeight: 44,
+        color: colors.accent ?? "#82CBFF",
+    },
+
+    shabbatHeroDays: {
+        fontSize: 52,
+        lineHeight: 54,
+        color: colors.accent ?? "#82CBFF",
+        marginTop: 2,
+    },
+
+    shabbatHeroSub: {
+        fontSize: 22,
+        lineHeight: 26,
+        color: colors.accent ?? "#82CBFF",
+        marginTop: 8,
+    },
+
+    // COUNTDOWN
+    shabbatCountdownCard: {
+        borderRadius: 16,
+        backgroundColor: colors.card,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 12,
+    },
+
+    shabbatCountdownItem: {
+        width: "24%",
+        alignItems: "center",
+    },
+
+    shabbatCountdownNumber: {
+        fontSize: 22,
+        color: colors.accent ?? "#82CBFF",
+        fontFamily: "ChutzBold", // if you want it to match the mockup numerals
+    },
+
+    shabbatCountdownLabel: {
+        fontSize: 12,
+        color: colors.muted,
+        marginTop: 2,
+    },
+
+    // CONSOLIDATED CARD HEADERS
+    shabbatSectionHeaderRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginVertical: 12,
+    },
+
+    shabbatSectionHeaderLeft: {
+        fontSize: 22,
+        color: colors.accent ?? "#82CBFF",
+        fontFamily: "ChutzBold",
+    },
+
+    shabbatSectionHeaderRight: {
+        fontSize: 13,
+        color: colors.muted,
+    },
+
+    shabbatParshaLeft: {
+        fontSize: 14,
+        color: colors.text,
+    },
+
+    shabbatParshaRight: {
+        fontSize: 14,
+        color: colors.text,
+    },
+
+    shabbatSectionHeaderDatePressable: {
+        alignSelf: "flex-end",
+    },
+
+    shabbatSectionHeaderDateRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+    },
 
     // ===========================================================================
     // SETTINGS SCREEN
@@ -422,7 +519,7 @@ export const ui = StyleSheet.create({
         fontSize: TYPE.hero,
         lineHeight: 64,
         textAlign: "center",
-        marginTop: SPACE.xl,
+        marginTop: SPACE.lg,
         marginBottom: SPACE.md,
     },
 
@@ -455,9 +552,10 @@ export const ui = StyleSheet.create({
     // TODAY HOLIDAY CARD
     // ===========================================================================
     todayHolidayHebrew: {
-        ...TEXT.titleAccent,
+        ...TEXT.meta,
         fontSize: TYPE["2xl"],
         marginTop: 0,
+        color: COLORS.accent,
     },
 
     todayHolidayMoreInfoButton: {
@@ -494,7 +592,8 @@ export const ui = StyleSheet.create({
     },
 
     upcomingHolidayDate: {
-        ...TEXT.meta,
+        color: COLORS.muted,
+        fontSize: 14,
     },
 
     holidaysUpcomingCarouselContent: { paddingLeft: 0 },
@@ -562,7 +661,7 @@ export const ui = StyleSheet.create({
     },
 
     sheetDateInlineText: {
-        color: "white",
+        color: COLORS.muted,
         fontSize: 14,
     },
 
@@ -583,10 +682,7 @@ export const ui = StyleSheet.create({
     locationSheetTitle: {
         ...TEXT.titleAccent,
         fontSize: TYPE.xl,
-        marginBottom: SPACE.xl,
     },
-
-    locationSheetSpacer: { height: 12 },
 
     // ===========================================================================
     // TOP BAR (shared)

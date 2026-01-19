@@ -19,7 +19,7 @@ export default function LocationBottomSheet({
             contentContainerStyle={ui.locationSheetBody}
         >
             <Text style={ui.locationSheetTitle}>{title}</Text>
-            <View style={ui.locationSheetSpacer} />
+            <View style={ui.sheetDivider} />
             {children}
         </BottomSheetDrawerBase>
     );

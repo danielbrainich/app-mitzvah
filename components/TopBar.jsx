@@ -102,7 +102,7 @@ export function TopBar({ todayIso }) {
                     style={ui.topBarDatePressable}
                 >
                     <View style={ui.topBarDatePill}>
-                        <Entypo name="cycle" size={14} color={colors.muted} />
+                        <Entypo name="cycle" size={14} color="#fff" />
                         <Text style={ui.topBarDateText} numberOfLines={1}>
                             {label}
                         </Text>

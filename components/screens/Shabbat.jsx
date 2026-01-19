@@ -26,7 +26,28 @@ import { ui, colors } from "../../styles/theme";
 import LocationBottomSheet from "../LocationBottomSheet";
 
 import { parseLocalIso, formatTime12h } from "../../utils/datetime";
-import { computeShabbatInfo } from "../../lib/computeShabbatInfo";
+import {
+    computeShabbatInfo,
+    buildShabbatViewModel,
+} from "../../lib/computeShabbatInfo";
+
+function RowLine({ label, value }) {
+    return (
+        <View style={ui.shabbatSheetLine}>
+            <Text style={ui.shabbatSheetLabel}>{label}</Text>
+            <Text style={ui.shabbatSheetValue}>{value}</Text>
+        </View>
+    );
+}
+
+function SectionHeader({ left, right }) {
+    return (
+        <View style={ui.shabbatSectionHeaderRow}>
+            <Text style={ui.shabbatSectionHeaderLeft}>{left}</Text>
+            <Text style={ui.shabbatSectionHeaderRight}>{right}</Text>
+        </View>
+    );
+}
 
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
@@ -55,7 +76,6 @@ export default function Shabbat() {
     } = useAppLocation();
     const hasLocation = locationStatus === "granted" && !!location;
 
-    // Primitives to avoid dependency loops on object identity
     const lat = location?.latitude ?? null;
     const lon = location?.longitude ?? null;
     const elev = location?.elevation ?? null;
@@ -71,7 +91,6 @@ export default function Shabbat() {
         );
     }, []);
 
-    // Guard against setting state after unmount
     const aliveRef = useRef(true);
     useEffect(() => {
         aliveRef.current = true;
@@ -129,21 +148,33 @@ export default function Shabbat() {
 
     const handleEnableLocation = useCallback(async () => {
         const st = await requestPermission();
-
         if (st !== "granted") {
             openSettings();
             return;
         }
-
         setShowLocationDetails(false);
     }, [requestPermission, openSettings]);
 
+    // Countdown ticker (UI-only)
+    const [now, setNow] = useState(() => new Date());
+    useEffect(() => {
+        const t = setInterval(() => setNow(new Date()), 1000);
+        return () => clearInterval(t);
+    }, []);
+
+    const tabBarHeight = useBottomTabBarHeight();
+    const MAX_WIDTH = 520;
+    const dash = "—";
+
+    // Date toggles (UI-only)
     const [showHebrewFri, setShowHebrewFri] = useState(false);
     const [showHebrewSat, setShowHebrewSat] = useState(false);
 
-    const MAX_WIDTH = 520;
-    const tabBarHeight = useBottomTabBarHeight();
-    const dash = "—";
+    // ✅ One computed view model from the module (all “compute” stuff moved out)
+    const vm = useMemo(
+        () => buildShabbatViewModel(shabbatInfo, now),
+        [shabbatInfo, now]
+    );
 
     const candleValue = shabbatInfo?.candleTime
         ? formatTime12h(shabbatInfo.candleTime)
@@ -178,12 +209,77 @@ export default function Shabbat() {
                 ]}
             >
                 <View style={{ width: "100%", maxWidth: MAX_WIDTH }}>
+                    {/* HERO */}
+                    <View style={ui.shabbatHeroWrap}>
+                        <Text style={ui.shabbatHeroTitle}>{vm.hero.title}</Text>
+
+                        {!vm.status.isDuring ? (
+                            <>
+                                <Text
+                                    style={[ui.shabbatHeroMonth, ui.textChutz]}
+                                    numberOfLines={1}
+                                >
+                                    {vm.range.monthLine}
+                                </Text>
+                                <Text
+                                    style={[ui.shabbatHeroDays, ui.textChutz]}
+                                    numberOfLines={1}
+                                >
+                                    {vm.range.dayLine}
+                                </Text>
+                            </>
+                        ) : (
+                            <Text style={[ui.shabbatHeroSub, ui.textChutz]}>
+                                Shabbat ends at {endsValue}
+                            </Text>
+                        )}
+                    </View>
+
+                    {/* COUNTDOWN CARD */}
+                    {vm.countdown.show ? (
+                        <View style={ui.shabbatCountdownCard}>
+                            <View style={ui.shabbatCountdownItem}>
+                                <Text style={ui.shabbatCountdownNumber}>
+                                    {vm.countdown.parts.days}
+                                </Text>
+                                <Text style={ui.shabbatCountdownLabel}>
+                                    Days
+                                </Text>
+                            </View>
+                            <View style={ui.shabbatCountdownItem}>
+                                <Text style={ui.shabbatCountdownNumber}>
+                                    {vm.countdown.parts.hours}
+                                </Text>
+                                <Text style={ui.shabbatCountdownLabel}>
+                                    Hours
+                                </Text>
+                            </View>
+                            <View style={ui.shabbatCountdownItem}>
+                                <Text style={ui.shabbatCountdownNumber}>
+                                    {vm.countdown.parts.mins}
+                                </Text>
+                                <Text style={ui.shabbatCountdownLabel}>
+                                    Minutes
+                                </Text>
+                            </View>
+                            <View style={ui.shabbatCountdownItem}>
+                                <Text style={ui.shabbatCountdownNumber}>
+                                    {vm.countdown.parts.secs}
+                                </Text>
+                                <Text style={ui.shabbatCountdownLabel}>
+                                    Seconds
+                                </Text>
+                            </View>
+                        </View>
+                    ) : null}
+
+                    {/* CONSOLIDATED DETAILS CARD */}
                     {shabbatInfo ? (
-                        <>
-                            {/* Erev Shabbat */}
-                            <View style={ui.card}>
-                                <Text style={[ui.cardTitle, ui.textChutz]}>
-                                    Erev Shabbat
+                        <View style={ui.card}>
+                            {/* Friday */}
+                            <View style={ui.shabbatSectionHeaderRow}>
+                                <Text style={ui.shabbatSectionHeaderLeft}>
+                                    Friday
                                 </Text>
 
                                 <Pressable
@@ -194,16 +290,18 @@ export default function Shabbat() {
                                         setShowHebrewFri((v) => !v);
                                     }}
                                     hitSlop={12}
-                                    style={ui.shabbatDateTogglePressable}
+                                    style={ui.shabbatSectionHeaderDatePressable}
                                 >
-                                    <View style={ui.shabbatDateToggleRow}>
+                                    <View
+                                        style={ui.shabbatSectionHeaderDateRow}
+                                    >
                                         <Entypo
                                             name="cycle"
                                             size={13}
                                             color={colors.muted}
                                         />
                                         <Text
-                                            style={ui.shabbatDateToggleText}
+                                            style={ui.shabbatSectionHeaderRight}
                                             numberOfLines={1}
                                         >
                                             {showHebrewFri
@@ -212,30 +310,20 @@ export default function Shabbat() {
                                         </Text>
                                     </View>
                                 </Pressable>
-
-                                <View style={ui.shabbatSheetLine}>
-                                    <Text style={ui.shabbatSheetLabel}>
-                                        Candle lighting
-                                    </Text>
-                                    <Text style={ui.shabbatSheetValue}>
-                                        {candleValue}
-                                    </Text>
-                                </View>
-
-                                <View style={ui.shabbatSheetLine}>
-                                    <Text style={ui.shabbatSheetLabel}>
-                                        Sundown
-                                    </Text>
-                                    <Text style={ui.shabbatSheetValue}>
-                                        {friSundownValue}
-                                    </Text>
-                                </View>
                             </View>
 
-                            {/* Yom Shabbat */}
-                            <View style={ui.card}>
-                                <Text style={[ui.cardTitle, ui.textChutz]}>
-                                    Yom Shabbat
+                            <RowLine
+                                label="Candle lighting"
+                                value={candleValue}
+                            />
+                            <RowLine label="Sundown" value={friSundownValue} />
+
+                            <View style={ui.settingsDivider} />
+
+                            {/* Saturday */}
+                            <View style={ui.shabbatSectionHeaderRow}>
+                                <Text style={ui.shabbatSectionHeaderLeft}>
+                                    Saturday
                                 </Text>
 
                                 <Pressable
@@ -246,16 +334,18 @@ export default function Shabbat() {
                                         setShowHebrewSat((v) => !v);
                                     }}
                                     hitSlop={12}
-                                    style={ui.shabbatDateTogglePressable}
+                                    style={ui.shabbatSectionHeaderDatePressable}
                                 >
-                                    <View style={ui.shabbatDateToggleRow}>
+                                    <View
+                                        style={ui.shabbatSectionHeaderDateRow}
+                                    >
                                         <Entypo
                                             name="cycle"
                                             size={13}
                                             color={colors.muted}
                                         />
                                         <Text
-                                            style={ui.shabbatDateToggleText}
+                                            style={ui.shabbatSectionHeaderRight}
                                             numberOfLines={1}
                                         >
                                             {showHebrewSat
@@ -264,52 +354,35 @@ export default function Shabbat() {
                                         </Text>
                                     </View>
                                 </Pressable>
-
-                                <View style={ui.shabbatSheetLine}>
-                                    <Text style={ui.shabbatSheetLabel}>
-                                        Shabbat ends
-                                    </Text>
-                                    <Text style={ui.shabbatSheetValue}>
-                                        {endsValue}
-                                    </Text>
-                                </View>
-
-                                <View style={ui.shabbatSheetLine}>
-                                    <Text style={ui.shabbatSheetLabel}>
-                                        Sundown
-                                    </Text>
-                                    <Text style={ui.shabbatSheetValue}>
-                                        {satSundownValue}
-                                    </Text>
-                                </View>
                             </View>
+
+                            <RowLine label="Shabbat ends" value={endsValue} />
+                            <RowLine label="Sundown" value={satSundownValue} />
+
+                            <View style={ui.settingsDivider} />
 
                             {/* Parasha */}
-                            <View style={ui.card}>
-                                <Text style={[ui.cardTitle, ui.textChutz]}>
-                                    Parasha
-                                </Text>
+                            <SectionHeader left="Parasha" right="" />
 
-                                {shabbatInfo.parshaEnglish &&
-                                !shabbatInfo.parshaReplacedByHoliday ? (
-                                    <View style={ui.shabbatSheetLine}>
-                                        <Text style={ui.shabbatSheetLabel}>
-                                            {shabbatInfo.parshaEnglish}
-                                        </Text>
-                                        {shabbatInfo.parshaHebrew ? (
-                                            <Text style={ui.shabbatSheetValue}>
-                                                {shabbatInfo.parshaHebrew}
-                                            </Text>
-                                        ) : null}
-                                    </View>
-                                ) : (
-                                    <Text style={ui.shabbatSentenceSmall}>
-                                        This week’s holiday Torah reading
-                                        replaces the parasha.
+                            {shabbatInfo.parshaEnglish &&
+                            !shabbatInfo.parshaReplacedByHoliday ? (
+                                <View style={ui.shabbatSheetLine}>
+                                    <Text style={ui.shabbatParshaLeft}>
+                                        {shabbatInfo.parshaEnglish}
                                     </Text>
-                                )}
-                            </View>
-                        </>
+                                    {shabbatInfo.parshaHebrew ? (
+                                        <Text style={ui.shabbatParshaRight}>
+                                            {shabbatInfo.parshaHebrew}
+                                        </Text>
+                                    ) : null}
+                                </View>
+                            ) : (
+                                <Text style={ui.shabbatSentenceSmall}>
+                                    This week’s holiday Torah reading replaces
+                                    the parasha.
+                                </Text>
+                            )}
+                        </View>
                     ) : (
                         <View style={ui.card}>
                             <Text style={ui.shabbatSentence}>

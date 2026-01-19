@@ -32,7 +32,7 @@ export default function UpcomingHolidayCard({ holiday, hebrewDate, onAbout }) {
 
     return (
         <View style={[ui.card]}>
-            <Text style={ui.textMeta}>{gregLabel}</Text>
+            <Text style={ui.upcomingHolidayDate}>{gregLabel}</Text>
             <Text
                 style={ui.upcomingHolidayTitle}
                 numberOfLines={1}
