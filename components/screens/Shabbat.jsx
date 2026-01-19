@@ -257,42 +257,43 @@ export default function Shabbat() {
                             }}
                         >
                             {/* HERO */}
-                            <View
-                                style={[
-                                    ui.shabbatHeroWrap,
-                                    { paddingBottom: 8 },
-                                ]}
-                            >
-                                <Text style={ui.shabbatHeroTitle}>
-                                    {vm.status.isDuring
-                                        ? "Shabbat Shalom"
-                                        : "Shabbat this week begins"}
-                                </Text>
-
-                                {!vm.status.isDuring ? (
+                            <View style={ui.shabbatHeroWrap}>
+                                {vm.status.isDuring ? (
+                                    // DURING SHABBAT
                                     <Text
                                         style={[
-                                            ui.shabbatHeroDate,
-                                            ui.textChutz,
+                                            ui.shabbatHeroTitle,
+                                            {
+                                                fontSize: 42,
+                                                lineHeight: 46,
+                                                marginVertical: 12,
+                                            },
                                         ]}
-                                        numberOfLines={1}
                                     >
-                                        {shabbatInfo?.erevShabbatShort ?? ""}
+                                        Shabbat Shalom
                                     </Text>
                                 ) : (
-                                    <Text
-                                        style={[
-                                            ui.shabbatHeroSub,
-                                            ui.textChutz,
-                                        ]}
-                                    >
-                                        Shabbat ends at {endsValue}
-                                    </Text>
+                                    // BEFORE / AFTER SHABBAT
+                                    <>
+                                        <Text style={ui.shabbatHeroTitle}>
+                                            Shabbat this week begins
+                                        </Text>
+
+                                        <Text
+                                            style={[
+                                                ui.shabbatHeroDate,
+                                                ui.textChutz,
+                                            ]}
+                                            numberOfLines={1}
+                                        >
+                                            {shabbatInfo?.erevShabbatShort}
+                                        </Text>
+                                    </>
                                 )}
                             </View>
 
                             {/* COUNTDOWN CARD (always shown if vm.countdown.show; override forces show=true) */}
-                            {vm.countdown?.show ? (
+                            {vm.countdown?.show && !vm.status.isDuring ? (
                                 <View
                                     style={[
                                         ui.shabbatCountdownCard,
