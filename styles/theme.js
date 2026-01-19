@@ -319,7 +319,7 @@ export const ui = StyleSheet.create({
     shabbatParshaSmall: {
         color: COLORS.muted,
         fontSize: 14,
-        marginLeft: -2 // This spacing should be tightened up everywhere
+        marginLeft: -2, // This spacing should be tightened up everywhere
     },
 
     shabbatFooter: { marginTop: SPACE.xs },
@@ -389,7 +389,6 @@ export const ui = StyleSheet.create({
         paddingBottom: 10,
     },
 
-    // ✅ FIX: was colors.text (undefined)
     shabbatHeroTitle: {
         fontSize: 20,
         color: COLORS.textPrimary,
@@ -474,7 +473,7 @@ export const ui = StyleSheet.create({
         gap: 6,
     },
 
-    // ✅ NEW: inline toggle styles used by your Shabbat screen
+    // inline toggle styles used by your Shabbat screen
     shabbatInlineTogglePressable: {
         alignSelf: "flex-start",
         marginBottom: 10,
@@ -496,16 +495,36 @@ export const ui = StyleSheet.create({
         marginTop: 2,
     },
 
-    // ✅ FIX: was colors.text (undefined)
     shabbatParshaName: {
         color: COLORS.textPrimary,
-        fontSize: 14, // match sentence
+        fontSize: 14,
         lineHeight: 18,
     },
 
     shabbatParshaHebrew: {
         writingDirection: "rtl",
         textAlign: "right",
+    },
+
+    shabbatHeroDate: {
+        fontSize: 36,
+        lineHeight: 40,
+        color: COLORS.accent,
+        marginTop: 2,
+    },
+
+    shabbatHeroDate: {
+        fontSize: 26,
+        lineHeight: 30,
+        color: colors.accent ?? "#82CBFF",
+        marginTop: 2,
+        textAlign: "center",
+    },
+
+    shabbatParshaSmall: {
+        color: colors.textPrimary ?? "rgba(255,255,255,0.92)",
+        fontSize: 16,
+        lineHeight: 22,
     },
 
     // ===========================================================================
