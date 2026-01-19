@@ -318,7 +318,8 @@ export const ui = StyleSheet.create({
 
     shabbatParshaSmall: {
         color: COLORS.muted,
-        fontSize: TYPE.base,
+        fontSize: 14,
+        marginLeft: -2 // This spacing should be tightened up everywhere
     },
 
     shabbatFooter: { marginTop: SPACE.xs },

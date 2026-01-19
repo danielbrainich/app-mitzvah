@@ -186,7 +186,7 @@ export default function Shabbat() {
         !!shabbatInfo?.parshaHebrew &&
         !shabbatInfo?.parshaReplacedByHoliday;
 
-    // ✅ One computed view model from module
+    // One computed view model from module
     const vm = useMemo(
         () => buildShabbatViewModel(shabbatInfo, now),
         [shabbatInfo, now]
@@ -390,6 +390,11 @@ export default function Shabbat() {
                                         }}
                                     >
 
+                                        <Entypo
+                                            name="cycle"
+                                            size={13}
+                                            color={colors.muted}
+                                        />
                                         <Text
                                             style={[
                                                 ui.shabbatParshaSmall,
@@ -401,11 +406,6 @@ export default function Shabbat() {
                                                 ? shabbatInfo.parshaHebrew
                                                 : shabbatInfo.parshaEnglish}
                                         </Text>
-                                                <Entypo
-                                                    name="cycle"
-                                                    size={13}
-                                                    color={colors.muted}
-                                                />
                                     </Pressable>
                                 </View>
                             ) : (
