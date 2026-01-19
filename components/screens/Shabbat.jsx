@@ -40,15 +40,6 @@ function RowLine({ label, value }) {
     );
 }
 
-function SectionHeader({ left, right }) {
-    return (
-        <View style={ui.shabbatSectionHeaderRow}>
-            <Text style={ui.shabbatSectionHeaderLeft}>{left}</Text>
-            <Text style={ui.shabbatSectionHeaderRight}>{right}</Text>
-        </View>
-    );
-}
-
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
         ChutzBold: require("../../assets/fonts/Chutz-Bold.otf"),
@@ -57,6 +48,11 @@ export default function Shabbat() {
     const [loading, setLoading] = useState(true);
     const [shabbatInfo, setShabbatInfo] = useState(null);
     const [showLocationDetails, setShowLocationDetails] = useState(false);
+
+    // Date toggles (UI-only)
+    const [showHebrewFri, setShowHebrewFri] = useState(false);
+    const [showHebrewSat, setShowHebrewSat] = useState(false);
+    const [showParshaHeb, setShowParshaHeb] = useState(false);
 
     const { candleLightingTime, havdalahTime } = useSelector(
         (state) => state.settings
@@ -74,8 +70,10 @@ export default function Shabbat() {
         location,
         requestPermission,
     } = useAppLocation();
+
     const hasLocation = locationStatus === "granted" && !!location;
 
+    // Primitives to avoid dependency loops on object identity
     const lat = location?.latitude ?? null;
     const lon = location?.longitude ?? null;
     const elev = location?.elevation ?? null;
@@ -91,6 +89,7 @@ export default function Shabbat() {
         );
     }, []);
 
+    // Guard against setting state after unmount
     const aliveRef = useRef(true);
     useEffect(() => {
         aliveRef.current = true;
@@ -166,16 +165,6 @@ export default function Shabbat() {
     const MAX_WIDTH = 520;
     const dash = "—";
 
-    // Date toggles (UI-only)
-    const [showHebrewFri, setShowHebrewFri] = useState(false);
-    const [showHebrewSat, setShowHebrewSat] = useState(false);
-
-    // ✅ One computed view model from the module (all “compute” stuff moved out)
-    const vm = useMemo(
-        () => buildShabbatViewModel(shabbatInfo, now),
-        [shabbatInfo, now]
-    );
-
     const candleValue = shabbatInfo?.candleTime
         ? formatTime12h(shabbatInfo.candleTime)
         : dash;
@@ -191,6 +180,17 @@ export default function Shabbat() {
     const satSundownValue = shabbatInfo?.saturdaySunset
         ? formatTime12h(shabbatInfo.saturdaySunset)
         : dash;
+
+    const canShowParsha =
+        !!shabbatInfo?.parshaEnglish &&
+        !!shabbatInfo?.parshaHebrew &&
+        !shabbatInfo?.parshaReplacedByHoliday;
+
+    // ✅ One computed view model from module
+    const vm = useMemo(
+        () => buildShabbatViewModel(shabbatInfo, now),
+        [shabbatInfo, now]
+    );
 
     if (!fontsLoaded) return null;
 
@@ -273,10 +273,10 @@ export default function Shabbat() {
                         </View>
                     ) : null}
 
-                    {/* CONSOLIDATED DETAILS CARD */}
+                    {/* DETAILS CARD */}
                     {shabbatInfo ? (
                         <View style={ui.card}>
-                            {/* Friday */}
+                            {/* Friday header row (date is tappable toggle) */}
                             <View style={ui.shabbatSectionHeaderRow}>
                                 <Text style={ui.shabbatSectionHeaderLeft}>
                                     Friday
@@ -320,7 +320,7 @@ export default function Shabbat() {
 
                             <View style={ui.settingsDivider} />
 
-                            {/* Saturday */}
+                            {/* Saturday header row (date is tappable toggle) */}
                             <View style={ui.shabbatSectionHeaderRow}>
                                 <Text style={ui.shabbatSectionHeaderLeft}>
                                     Saturday
@@ -356,25 +356,57 @@ export default function Shabbat() {
                                 </Pressable>
                             </View>
 
-                            <RowLine label="Shabbat ends" value={endsValue} />
                             <RowLine label="Sundown" value={satSundownValue} />
+                            <RowLine label="Shabbat ends" value={endsValue} />
 
                             <View style={ui.settingsDivider} />
 
                             {/* Parasha */}
-                            <SectionHeader left="Parasha" right="" />
-
-                            {shabbatInfo.parshaEnglish &&
-                            !shabbatInfo.parshaReplacedByHoliday ? (
-                                <View style={ui.shabbatSheetLine}>
-                                    <Text style={ui.shabbatParshaLeft}>
-                                        {shabbatInfo.parshaEnglish}
+                            {canShowParsha ? (
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        flexWrap: "wrap",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <Text style={ui.shabbatSentenceSmall}>
+                                        This week’s parasha is{" "}
                                     </Text>
-                                    {shabbatInfo.parshaHebrew ? (
-                                        <Text style={ui.shabbatParshaRight}>
-                                            {shabbatInfo.parshaHebrew}
+
+                                    <Pressable
+                                        onPress={() => {
+                                            Haptics.impactAsync(
+                                                Haptics.ImpactFeedbackStyle
+                                                    .Light
+                                            );
+                                            setShowParshaHeb((v) => !v);
+                                        }}
+                                        hitSlop={12}
+                                        style={{
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            gap: 6,
+                                        }}
+                                    >
+
+                                        <Text
+                                            style={[
+                                                ui.shabbatParshaSmall,
+                                                showParshaHeb &&
+                                                ui.shabbatParshaHebrew,
+                                            ]}
+                                        >
+                                            {showParshaHeb
+                                                ? shabbatInfo.parshaHebrew
+                                                : shabbatInfo.parshaEnglish}
                                         </Text>
-                                    ) : null}
+                                                <Entypo
+                                                    name="cycle"
+                                                    size={13}
+                                                    color={colors.muted}
+                                                />
+                                    </Pressable>
                                 </View>
                             ) : (
                                 <Text style={ui.shabbatSentenceSmall}>

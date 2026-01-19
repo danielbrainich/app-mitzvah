@@ -1,3 +1,4 @@
+// styles/theme.js
 import { StyleSheet } from "react-native";
 
 /**
@@ -315,6 +316,11 @@ export const ui = StyleSheet.create({
         marginBottom: SPACE.sm,
     },
 
+    shabbatParshaSmall: {
+        color: COLORS.muted,
+        fontSize: TYPE.base,
+    },
+
     shabbatFooter: { marginTop: SPACE.xs },
 
     shabbatSheetLine: {
@@ -382,37 +388,38 @@ export const ui = StyleSheet.create({
         paddingBottom: 10,
     },
 
+    // ✅ FIX: was colors.text (undefined)
     shabbatHeroTitle: {
         fontSize: 20,
-        color: colors.text,
+        color: COLORS.textPrimary,
         marginBottom: 10,
     },
 
-    // Big blue lines (reuse your brand blue if you have it; I used colors.accent if present)
+    // Big blue lines
     shabbatHeroMonth: {
         fontSize: 42,
         lineHeight: 44,
-        color: colors.accent ?? "#82CBFF",
+        color: COLORS.accent,
     },
 
     shabbatHeroDays: {
         fontSize: 52,
         lineHeight: 54,
-        color: colors.accent ?? "#82CBFF",
+        color: COLORS.accent,
         marginTop: 2,
     },
 
     shabbatHeroSub: {
         fontSize: 22,
         lineHeight: 26,
-        color: colors.accent ?? "#82CBFF",
+        color: COLORS.accent,
         marginTop: 8,
     },
 
     // COUNTDOWN
     shabbatCountdownCard: {
         borderRadius: 16,
-        backgroundColor: colors.card,
+        backgroundColor: COLORS.card,
         paddingVertical: 12,
         paddingHorizontal: 12,
         flexDirection: "row",
@@ -427,13 +434,13 @@ export const ui = StyleSheet.create({
 
     shabbatCountdownNumber: {
         fontSize: 22,
-        color: colors.accent ?? "#82CBFF",
-        fontFamily: "ChutzBold", // if you want it to match the mockup numerals
+        color: COLORS.accent,
+        fontFamily: "ChutzBold",
     },
 
     shabbatCountdownLabel: {
         fontSize: 12,
-        color: colors.muted,
+        color: COLORS.muted,
         marginTop: 2,
     },
 
@@ -447,23 +454,13 @@ export const ui = StyleSheet.create({
 
     shabbatSectionHeaderLeft: {
         fontSize: 22,
-        color: colors.accent ?? "#82CBFF",
+        color: COLORS.accent,
         fontFamily: "ChutzBold",
     },
 
     shabbatSectionHeaderRight: {
         fontSize: 13,
-        color: colors.muted,
-    },
-
-    shabbatParshaLeft: {
-        fontSize: 14,
-        color: colors.text,
-    },
-
-    shabbatParshaRight: {
-        fontSize: 14,
-        color: colors.text,
+        color: COLORS.muted,
     },
 
     shabbatSectionHeaderDatePressable: {
@@ -474,6 +471,40 @@ export const ui = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 6,
+    },
+
+    // ✅ NEW: inline toggle styles used by your Shabbat screen
+    shabbatInlineTogglePressable: {
+        alignSelf: "flex-start",
+        marginBottom: 10,
+    },
+
+    shabbatInlineToggleRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+    },
+
+    shabbatInlineToggleText: {
+        color: COLORS.muted,
+        fontSize: 14,
+    },
+
+    // Parasha
+    shabbatParshaBlock: {
+        marginTop: 2,
+    },
+
+    // ✅ FIX: was colors.text (undefined)
+    shabbatParshaName: {
+        color: COLORS.textPrimary,
+        fontSize: 14, // match sentence
+        lineHeight: 18,
+    },
+
+    shabbatParshaHebrew: {
+        writingDirection: "rtl",
+        textAlign: "right",
     },
 
     // ===========================================================================
@@ -489,6 +520,7 @@ export const ui = StyleSheet.create({
 
     settingsScrollContent: { flexGrow: 1, paddingTop: 10 },
 
+    // ✅ OPTIONAL tweak: set marginHorizontal to 0 for full-width divider in cards
     settingsDivider: {
         height: 1,
         backgroundColor: "rgba(255,255,255,0.08)",
@@ -577,7 +609,6 @@ export const ui = StyleSheet.create({
     // ===========================================================================
     // UPCOMING HOLIDAY CARD
     // ===========================================================================
-    // Use shared text tokens + only keep spacing differences here.
     upcomingHolidayTitle: {
         ...TEXT.titleAccent,
         fontSize: TYPE["3xl"],
