@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     Alert,
     Pressable,
+    ScrollView,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
@@ -125,7 +126,7 @@ export default function Shabbat() {
             setNow(frozen);
             return;
         }
-        const t = setInterval(() => setNow(new Date()), 1000);
+        const t = setInterval(() => setNow(new Date()), 10000);
         return () => clearInterval(t);
     }, [isDevOverride, todayIso]);
 
@@ -155,7 +156,7 @@ export default function Shabbat() {
                     : null,
                 candleMins,
                 havdalahMins,
-                now, // ✅ important for "Saturday after end => next Shabbat" + override freeze
+                now, // important for "Saturday after end => next Shabbat" + override freeze
             });
 
             if (aliveRef.current) setShabbatInfo(result);
@@ -214,7 +215,7 @@ export default function Shabbat() {
     const vm = useMemo(() => {
         const base = buildShabbatViewModel(shabbatInfo, now, { isDevOverride });
 
-        // You asked: override should freeze countdown, but NOT hide it.
+        // Override should freeze countdown, but NOT hide it.
         if (isDevOverride) {
             return {
                 ...base,
@@ -234,251 +235,145 @@ export default function Shabbat() {
         return base;
     }, [shabbatInfo, now, isDevOverride]);
 
+    function unitLabel(paddedStr, singular, plural) {
+        const n = Number(paddedStr); // "01" -> 1
+        return n === 1 ? singular : plural;
+    }
+
     if (!fontsLoaded) return null;
 
     return (
         <View style={ui.safeArea}>
-            <View
-                style={[
-                    ui.screen,
-                    { flex: 1, paddingBottom: tabBarHeight + 10 },
-                ]}
+            <ScrollView
+                style={ui.screen}
+                contentContainerStyle={{
+                    flexGrow: 1,
+                    paddingBottom: tabBarHeight + 10,
+                }}
+                showsVerticalScrollIndicator={false}
+                bounces
+                alwaysBounceVertical
             >
-                <View style={{ flex: 1, width: "100%", alignItems: "center" }}>
                     <View
-                        style={{ flex: 1, width: "100%", maxWidth: MAX_WIDTH }}
+                        style={{ flex: 1, width: "100%", alignItems: "center" }}
                     >
-                        {/* ===== TOP (Centered hero + countdown in remaining space) ===== */}
                         <View
                             style={{
                                 flex: 1,
-                                justifyContent: "center",
-                                paddingTop: 8,
+                                width: "100%",
+                                maxWidth: MAX_WIDTH,
                             }}
                         >
-                            {/* HERO */}
-                            <View style={ui.shabbatHeroWrap}>
-                                {vm.status.isDuring ? (
-                                    // DURING SHABBAT
-                                    <Text
-                                        style={[
-                                            ui.shabbatHeroTitle,
-                                            {
-                                                fontSize: 42,
-                                                lineHeight: 46,
-                                                marginVertical: 12,
-                                            },
-                                        ]}
-                                    >
-                                        Shabbat Shalom
-                                    </Text>
-                                ) : (
-                                    // BEFORE / AFTER SHABBAT
-                                    <>
-                                        <Text style={ui.shabbatHeroTitle}>
-                                            Shabbat this week begins
-                                        </Text>
-
+                            {/* ===== TOP (Centered hero + countdown in remaining space) ===== */}
+                            <View
+                                style={{
+                                    flex: 1,
+                                    justifyContent: "center",
+                                    paddingTop: 8,
+                                }}
+                            >
+                                {/* HERO */}
+                                <View style={ui.shabbatHeroWrap}>
+                                    {vm.status.isDuring ? (
+                                        // DURING SHABBAT
                                         <Text
                                             style={[
-                                                ui.shabbatHeroDate,
+                                                ui.holidaysBigBoldText,
                                                 ui.textChutz,
                                             ]}
-                                            numberOfLines={1}
                                         >
-                                            {shabbatInfo?.erevShabbatShort}
+                                            Shabbat Shalom
                                         </Text>
-                                    </>
-                                )}
+                                    ) : (
+                                        // BEFORE / AFTER SHABBAT
+                                        <>
+                                            <Text style={ui.holidaysHeaderText}>
+                                                Shabbat begins in
+                                            </Text>
+                                        </>
+                                    )}
+                                </View>
+
+                                {/* COUNTDOWN CARD (always shown if vm.countdown.show; override forces show=true) */}
+                                {vm.countdown?.show && !vm.status.isDuring ? (
+                                    <View style={ui.shabbatCountdownCard}>
+                                        <View style={ui.shabbatCountdownItem}>
+                                            <Text
+                                                style={
+                                                    ui.shabbatCountdownNumber
+                                                }
+                                            >
+                                                {vm.countdown.parts.days}
+                                            </Text>
+                                            <Text
+                                                style={ui.shabbatCountdownLabel}
+                                            >
+                                                {unitLabel(
+                                                    vm.countdown.parts.days,
+                                                    "Day",
+                                                    "Days"
+                                                )}
+                                            </Text>
+                                        </View>
+
+                                        <View style={ui.shabbatCountdownItem}>
+                                            <Text
+                                                style={
+                                                    ui.shabbatCountdownNumber
+                                                }
+                                            >
+                                                {vm.countdown.parts.hours}
+                                            </Text>
+                                            <Text
+                                                style={ui.shabbatCountdownLabel}
+                                            >
+                                                {unitLabel(
+                                                    vm.countdown.parts.hours,
+                                                    "Hour",
+                                                    "Hours"
+                                                )}
+                                            </Text>
+                                        </View>
+
+                                        <View style={ui.shabbatCountdownItem}>
+                                            <Text
+                                                style={
+                                                    ui.shabbatCountdownNumber
+                                                }
+                                            >
+                                                {vm.countdown.parts.mins}
+                                            </Text>
+                                            <Text
+                                                style={ui.shabbatCountdownLabel}
+                                            >
+                                                {unitLabel(
+                                                    vm.countdown.parts.mins,
+                                                    "Minute",
+                                                    "Minutes"
+                                                )}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                ) : null}
                             </View>
 
-                            {/* COUNTDOWN CARD (always shown if vm.countdown.show; override forces show=true) */}
-                            {vm.countdown?.show && !vm.status.isDuring ? (
-                                <View
-                                    style={[
-                                        ui.shabbatCountdownCard,
-                                        { marginBottom: 18 },
-                                    ]}
-                                >
-                                    <View style={ui.shabbatCountdownItem}>
-                                        <Text style={ui.shabbatCountdownNumber}>
-                                            {vm.countdown.parts.days}
-                                        </Text>
-                                        <Text style={ui.shabbatCountdownLabel}>
-                                            Days
-                                        </Text>
-                                    </View>
-                                    <View style={ui.shabbatCountdownItem}>
-                                        <Text style={ui.shabbatCountdownNumber}>
-                                            {vm.countdown.parts.hours}
-                                        </Text>
-                                        <Text style={ui.shabbatCountdownLabel}>
-                                            Hours
-                                        </Text>
-                                    </View>
-                                    <View style={ui.shabbatCountdownItem}>
-                                        <Text style={ui.shabbatCountdownNumber}>
-                                            {vm.countdown.parts.mins}
-                                        </Text>
-                                        <Text style={ui.shabbatCountdownLabel}>
-                                            Minutes
-                                        </Text>
-                                    </View>
-                                    <View style={ui.shabbatCountdownItem}>
-                                        <Text style={ui.shabbatCountdownNumber}>
-                                            {vm.countdown.parts.secs}
-                                        </Text>
-                                        <Text style={ui.shabbatCountdownLabel}>
-                                            Seconds
-                                        </Text>
-                                    </View>
-                                </View>
-                            ) : null}
-                        </View>
-
-                        {/* ===== BOTTOM STACK: Details card above chip, chip above nav ===== */}
-                        <View style={{ width: "100%" }}>
-                            {/* DETAILS CARD */}
-                            {shabbatInfo ? (
-                                <View style={[ui.card, { marginBottom: 10 }]}>
-                                    {/* Friday header */}
+                            {/* ===== BOTTOM STACK: Details card above chip, chip above nav ===== */}
+                            <View style={{ width: "100%" }}>
+                                {/* DETAILS CARD */}
+                                {shabbatInfo ? (
                                     <View
-                                        style={[
-                                            ui.shabbatSectionHeaderRow,
-                                            { marginVertical: 10 },
-                                        ]}
+                                        style={[ui.card, { marginBottom: 10 }]}
                                     >
-                                        <Text
-                                            style={ui.shabbatSectionHeaderLeft}
-                                        >
-                                            Friday
-                                        </Text>
-
-                                        <Pressable
-                                            onPress={() => {
-                                                Haptics.impactAsync(
-                                                    Haptics.ImpactFeedbackStyle
-                                                        .Light
-                                                );
-                                                setShowHebrewFri((v) => !v);
-                                            }}
-                                            hitSlop={12}
-                                            style={
-                                                ui.shabbatSectionHeaderDatePressable
-                                            }
-                                        >
-                                            <View
-                                                style={
-                                                    ui.shabbatSectionHeaderDateRow
-                                                }
-                                            >
-                                                <Entypo
-                                                    name="cycle"
-                                                    size={13}
-                                                    color={colors.muted}
-                                                />
-                                                <Text
-                                                    style={
-                                                        ui.shabbatSectionHeaderRight
-                                                    }
-                                                    numberOfLines={1}
-                                                >
-                                                    {showHebrewFri
-                                                        ? shabbatInfo.erevShabbatHebrewDate
-                                                        : shabbatInfo.erevShabbatGregDate}
-                                                </Text>
-                                            </View>
-                                        </Pressable>
-                                    </View>
-
-                                    <RowLine
-                                        label="Candle lighting"
-                                        value={candleValue}
-                                    />
-                                    <RowLine
-                                        label="Sundown"
-                                        value={friSundownValue}
-                                    />
-
-                                    <View style={ui.settingsDivider} />
-
-                                    {/* Saturday header */}
-                                    <View
-                                        style={[
-                                            ui.shabbatSectionHeaderRow,
-                                            { marginVertical: 10 },
-                                        ]}
-                                    >
-                                        <Text
-                                            style={ui.shabbatSectionHeaderLeft}
-                                        >
-                                            Saturday
-                                        </Text>
-
-                                        <Pressable
-                                            onPress={() => {
-                                                Haptics.impactAsync(
-                                                    Haptics.ImpactFeedbackStyle
-                                                        .Light
-                                                );
-                                                setShowHebrewSat((v) => !v);
-                                            }}
-                                            hitSlop={12}
-                                            style={
-                                                ui.shabbatSectionHeaderDatePressable
-                                            }
-                                        >
-                                            <View
-                                                style={
-                                                    ui.shabbatSectionHeaderDateRow
-                                                }
-                                            >
-                                                <Entypo
-                                                    name="cycle"
-                                                    size={13}
-                                                    color={colors.muted}
-                                                />
-                                                <Text
-                                                    style={
-                                                        ui.shabbatSectionHeaderRight
-                                                    }
-                                                    numberOfLines={1}
-                                                >
-                                                    {showHebrewSat
-                                                        ? shabbatInfo.yomShabbatHebrewDate
-                                                        : shabbatInfo.yomShabbatGregDate}
-                                                </Text>
-                                            </View>
-                                        </Pressable>
-                                    </View>
-
-                                    <RowLine
-                                        label="Sundown"
-                                        value={satSundownValue}
-                                    />
-                                    <RowLine
-                                        label="Shabbat ends"
-                                        value={endsValue}
-                                    />
-
-                                    <View style={ui.settingsDivider} />
-
-                                    {/* Parasha (same line, toggle on name) */}
-                                    {canShowParsha ? (
+                                        {/* Friday header */}
                                         <View
-                                            style={{
-                                                flexDirection: "row",
-                                                flexWrap: "wrap",
-                                                alignItems: "center",
-                                            }}
+                                            style={[ui.shabbatSectionHeaderRow]}
                                         >
                                             <Text
-                                                style={[
-                                                    ui.shabbatSentenceSmall,
-                                                    { marginBottom: 0 },
-                                                ]}
+                                                style={
+                                                    ui.shabbatSectionHeaderLeft
+                                                }
                                             >
-                                                This week’s parasha is{" "}
+                                                Friday
                                             </Text>
 
                                             <Pressable
@@ -488,98 +383,234 @@ export default function Shabbat() {
                                                             .ImpactFeedbackStyle
                                                             .Light
                                                     );
-                                                    setShowParshaHeb((v) => !v);
+                                                    setShowHebrewFri((v) => !v);
                                                 }}
                                                 hitSlop={12}
-                                                style={{
-                                                    flexDirection: "row",
-                                                    alignItems: "center",
-                                                    gap: 6,
-                                                    paddingVertical: 6,
-                                                }}
+                                                style={
+                                                    ui.shabbatSectionHeaderDatePressable
+                                                }
                                             >
-                                                <Entypo
-                                                    name="cycle"
-                                                    size={13}
-                                                    color={colors.muted}
-                                                />
-                                                <Text
-                                                    style={[
-                                                        ui.shabbatParshaSmall,
-                                                        showParshaHeb
-                                                            ? ui.shabbatParshaHebrew
-                                                            : null,
-                                                    ]}
+                                                <View
+                                                    style={
+                                                        ui.shabbatSectionHeaderDateRow
+                                                    }
                                                 >
-                                                    {showParshaHeb
-                                                        ? shabbatInfo.parshaHebrew
-                                                        : shabbatInfo.parshaEnglish}
-                                                </Text>
+                                                    <Entypo
+                                                        name="cycle"
+                                                        size={13}
+                                                        color={colors.muted}
+                                                    />
+                                                    <Text
+                                                        style={
+                                                            ui.shabbatSectionHeaderRight
+                                                        }
+                                                        numberOfLines={1}
+                                                    >
+                                                        {showHebrewFri
+                                                            ? shabbatInfo.erevShabbatHebrewDate
+                                                            : shabbatInfo.erevShabbatGregDate}
+                                                    </Text>
+                                                </View>
                                             </Pressable>
                                         </View>
-                                    ) : (
-                                        <Text
-                                            style={[
-                                                ui.shabbatSentenceSmall,
-                                                { marginBottom: 0 },
-                                            ]}
-                                        >
-                                            This week’s holiday Torah reading
-                                            replaces the parasha.
-                                        </Text>
-                                    )}
-                                </View>
-                            ) : (
-                                <View style={[ui.card, { marginBottom: 10 }]}>
-                                    <Text style={ui.shabbatSentence}>
-                                        {loading
-                                            ? "Loading Shabbat info..."
-                                            : "No Shabbat info."}
-                                    </Text>
-                                </View>
-                            )}
 
-                            {/* Location chip pinned just above bottom nav */}
-                            <View style={{ paddingBottom: 8 }}>
-                                <Pressable
-                                    onPress={() => {
-                                        setShowLocationDetails(true);
-                                        Haptics.impactAsync(
-                                            Haptics.ImpactFeedbackStyle.Light
-                                        );
-                                    }}
-                                    style={[
-                                        ui.shabbatLocationChip,
-                                        { alignSelf: "flex-start" },
-                                    ]}
-                                    hitSlop={12}
-                                >
+                                        <RowLine
+                                            label="Candle lighting"
+                                            value={candleValue}
+                                        />
+                                        <RowLine
+                                            label="Sundown"
+                                            value={friSundownValue}
+                                        />
+
+                                        <View style={ui.sheetDivider} />
+
+                                        {/* Saturday header */}
+                                        <View
+                                            style={[ui.shabbatSectionHeaderRow]}
+                                        >
+                                            <Text
+                                                style={
+                                                    ui.shabbatSectionHeaderLeft
+                                                }
+                                            >
+                                                Saturday
+                                            </Text>
+
+                                            <Pressable
+                                                onPress={() => {
+                                                    Haptics.impactAsync(
+                                                        Haptics
+                                                            .ImpactFeedbackStyle
+                                                            .Light
+                                                    );
+                                                    setShowHebrewSat((v) => !v);
+                                                }}
+                                                hitSlop={12}
+                                                style={
+                                                    ui.shabbatSectionHeaderDatePressable
+                                                }
+                                            >
+                                                <View
+                                                    style={
+                                                        ui.shabbatSectionHeaderDateRow
+                                                    }
+                                                >
+                                                    <Entypo
+                                                        name="cycle"
+                                                        size={13}
+                                                        color={colors.muted}
+                                                    />
+                                                    <Text
+                                                        style={
+                                                            ui.shabbatSectionHeaderRight
+                                                        }
+                                                        numberOfLines={1}
+                                                    >
+                                                        {showHebrewSat
+                                                            ? shabbatInfo.yomShabbatHebrewDate
+                                                            : shabbatInfo.yomShabbatGregDate}
+                                                    </Text>
+                                                </View>
+                                            </Pressable>
+                                        </View>
+
+                                        <RowLine
+                                            label="Sundown"
+                                            value={satSundownValue}
+                                        />
+                                        <RowLine
+                                            label="Shabbat ends"
+                                            value={endsValue}
+                                        />
+
+                                        <View style={ui.sheetDivider} />
+
+                                        {canShowParsha ? (
+                                            <View
+                                                style={{
+                                                    flexDirection: "row",
+                                                    flexWrap: "wrap",
+                                                    alignItems: "center",
+                                                }}
+                                            >
+                                                <Text
+                                                    style={[
+                                                        ui.shabbatSentenceSmall,
+                                                    ]}
+                                                >
+                                                    This week’s parasha is{" "}
+                                                </Text>
+
+                                                <Pressable
+                                                    onPress={() => {
+                                                        Haptics.impactAsync(
+                                                            Haptics
+                                                                .ImpactFeedbackStyle
+                                                                .Light
+                                                        );
+                                                        setShowParshaHeb(
+                                                            (v) => !v
+                                                        );
+                                                    }}
+                                                    hitSlop={12}
+                                                    style={{
+                                                        flexDirection: "row",
+                                                        alignItems: "center",
+                                                        gap: 6,
+                                                        paddingVertical: 6,
+                                                    }}
+                                                >
+                                                    <Entypo
+                                                        name="cycle"
+                                                        size={13}
+                                                        color={colors.muted}
+                                                    />
+                                                    <Text
+                                                        style={[
+                                                            ui.shabbatParshaSmall,
+                                                            showParshaHeb
+                                                                ? ui.shabbatParshaHebrew
+                                                                : null,
+                                                        ]}
+                                                    >
+                                                        {showParshaHeb
+                                                            ? shabbatInfo.parshaHebrew
+                                                            : shabbatInfo.parshaEnglish}
+                                                    </Text>
+                                                </Pressable>
+                                            </View>
+                                        ) : (
+                                            <Text
+                                                style={[
+                                                    ui.shabbatSentenceSmall,
+                                                    { marginBottom: 0 },
+                                                ]}
+                                            >
+                                                This week’s holiday Torah
+                                                reading replaces the parasha.
+                                            </Text>
+                                        )}
+                                    </View>
+                                ) : (
                                     <View
+                                        style={[ui.card, { marginBottom: 10 }]}
+                                    >
+                                        <Text style={ui.shabbatSentence}>
+                                            {loading
+                                                ? "Loading Shabbat info..."
+                                                : "No Shabbat info."}
+                                        </Text>
+                                    </View>
+                                )}
+
+                                {/* Location chip pinned just above bottom nav */}
+                                <View style={{ paddingBottom: 8 }}>
+                                    <Pressable
+                                        onPress={() => {
+                                            setShowLocationDetails(true);
+                                            Haptics.impactAsync(
+                                                Haptics.ImpactFeedbackStyle
+                                                    .Light
+                                            );
+                                        }}
                                         style={[
-                                            ui.shabbatGreenDot,
-                                            !hasLocation
-                                                ? { backgroundColor: "#ff3b30" }
-                                                : null,
+                                            ui.shabbatLocationChip,
+                                            { alignSelf: "flex-start" },
                                         ]}
-                                    />
-                                    <Text style={ui.shabbatLocationChipText}>
-                                        {hasLocation
-                                            ? "Location on"
-                                            : "Location off"}
-                                    </Text>
-                                </Pressable>
+                                        hitSlop={12}
+                                    >
+                                        <View
+                                            style={[
+                                                ui.shabbatGreenDot,
+                                                !hasLocation
+                                                    ? {
+                                                          backgroundColor:
+                                                              "#ff3b30",
+                                                      }
+                                                    : null,
+                                            ]}
+                                        />
+                                        <Text
+                                            style={ui.shabbatLocationChipText}
+                                        >
+                                            {hasLocation
+                                                ? "Location on"
+                                                : "Location off"}
+                                        </Text>
+                                    </Pressable>
+                                </View>
                             </View>
                         </View>
                     </View>
-                </View>
-            </View>
+            </ScrollView>
 
             {/* Location bottom sheet */}
             <LocationBottomSheet
                 visible={showLocationDetails}
                 onClose={() => setShowLocationDetails(false)}
                 title="Location"
-                snapPoints={["35%", "65%"]}
+                snapPoints={["25%", "55%"]}
             >
                 {hasLocation ? (
                     <>

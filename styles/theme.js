@@ -110,8 +110,8 @@ export const nav = {
 const TEXT = {
     titleAccent: {
         color: COLORS.accent,
-        fontFamily: "ChutzBold",
         fontSize: TYPE["2xl"],
+        fontWeight: 600,
     },
     subtitleAccent: {
         color: COLORS.accent,
@@ -316,18 +316,12 @@ export const ui = StyleSheet.create({
         marginBottom: SPACE.sm,
     },
 
-    shabbatParshaSmall: {
-        color: COLORS.muted,
-        fontSize: 14,
-        marginLeft: -2, // This spacing should be tightened up everywhere
-    },
-
     shabbatFooter: { marginTop: SPACE.xs },
 
     shabbatSheetLine: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: SPACE.lg,
+        marginBottom: SPACE.sm,
     },
 
     shabbatSheetLabel: { color: COLORS.white, fontSize: TYPE.base },
@@ -389,12 +383,6 @@ export const ui = StyleSheet.create({
         paddingBottom: 10,
     },
 
-    shabbatHeroTitle: {
-        fontSize: 20,
-        color: COLORS.textPrimary,
-        marginBottom: 10,
-    },
-
     // Big blue lines
     shabbatHeroMonth: {
         fontSize: 42,
@@ -418,28 +406,25 @@ export const ui = StyleSheet.create({
 
     // COUNTDOWN
     shabbatCountdownCard: {
-        borderRadius: 16,
-        backgroundColor: COLORS.card,
-        paddingVertical: 12,
-        paddingHorizontal: 12,
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 12,
+        marginVertical: 12,
+        marginHorizontal: 72,
     },
 
     shabbatCountdownItem: {
-        width: "24%",
+        width: "33.33%",
         alignItems: "center",
     },
 
     shabbatCountdownNumber: {
-        fontSize: 22,
+        fontSize: 40,
         color: COLORS.accent,
         fontFamily: "ChutzBold",
     },
 
     shabbatCountdownLabel: {
-        fontSize: 12,
+        fontSize: 14,
         color: COLORS.muted,
         marginTop: 2,
     },
@@ -449,13 +434,12 @@ export const ui = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginVertical: 12,
+        marginBottom: SPACE.md,
     },
 
     shabbatSectionHeaderLeft: {
-        fontSize: 22,
-        color: COLORS.accent,
-        fontFamily: "ChutzBold",
+        ...TEXT.titleAccent,
+        fontSize: TYPE["xl"],
     },
 
     shabbatSectionHeaderRight: {
@@ -507,13 +491,6 @@ export const ui = StyleSheet.create({
     },
 
     shabbatHeroDate: {
-        fontSize: 36,
-        lineHeight: 40,
-        color: COLORS.accent,
-        marginTop: 2,
-    },
-
-    shabbatHeroDate: {
         fontSize: 26,
         lineHeight: 30,
         color: colors.accent ?? "#82CBFF",
@@ -540,24 +517,33 @@ export const ui = StyleSheet.create({
 
     settingsScrollContent: { flexGrow: 1, paddingTop: 10 },
 
-    // ✅ OPTIONAL tweak: set marginHorizontal to 0 for full-width divider in cards
-    settingsDivider: {
-        height: 1,
-        backgroundColor: "rgba(255,255,255,0.08)",
-        marginTop: SPACE.lg,
-        marginHorizontal: SPACE.lg,
-    },
-
     settingsRowLabel: {
-        color: COLORS.white,
-        fontSize: TYPE.lg,
-        lineHeight: 22,
+        color: COLORS.textPrimary,
+        fontSize: TYPE.base,
+        lineHeight: 20,
+        fontWeight: "500",
     },
     settingsSubLabel: {
-        color: "rgba(255,255,255,0.72)",
+        color: COLORS.muted,
         fontSize: TYPE.sm,
-        marginTop: SPACE.sm,
+        marginTop: 4,
+        lineHeight: 18,
     },
+
+    settingsRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingVertical: 8, // was 10
+    },
+
+    settingsCardTitle: {
+        ...TEXT.titleAccent,
+        fontSize: TYPE["xl"],
+        marginBottom: SPACE.sm,
+        fontWeight: "700",
+      },
+
     settingsSliderBlock: { paddingBottom: 10 },
 
     // ===========================================================================
@@ -631,7 +617,7 @@ export const ui = StyleSheet.create({
     // ===========================================================================
     upcomingHolidayTitle: {
         ...TEXT.titleAccent,
-        fontSize: TYPE["3xl"],
+        fontSize: TYPE["xl"],
         marginTop: SPACE.sm,
         marginBottom: SPACE.xs,
     },
@@ -689,10 +675,15 @@ export const ui = StyleSheet.create({
         paddingTop: SPACE.xs,
     },
 
+    sheetBodyContent: {
+        paddingTop: SPACE.xs,
+    },
+
     sheetTitleEnglish: {
         ...TEXT.titleAccent,
         marginTop: SPACE.sm,
         marginBottom: SPACE.xs,
+        fontSize: TYPE["xl"],
     },
 
     sheetTitleHebrew: {
@@ -720,19 +711,6 @@ export const ui = StyleSheet.create({
         height: 1,
         backgroundColor: "rgba(255,255,255,0.08)",
         marginVertical: 8,
-    },
-
-    // ===========================================================================
-    // LOCATION SHEET
-    // ===========================================================================
-    locationSheetBody: {
-        paddingHorizontal: 16,
-        paddingBottom: 22,
-    },
-
-    locationSheetTitle: {
-        ...TEXT.titleAccent,
-        fontSize: TYPE.xl,
     },
 
     // ===========================================================================

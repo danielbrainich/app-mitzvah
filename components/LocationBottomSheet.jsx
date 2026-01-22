@@ -1,13 +1,14 @@
 import React from "react";
 import { View, Text } from "react-native";
-import BottomSheetDrawerBase from "./BottomSheetDrawerBase";
 import { ui } from "../styles/theme";
+import BottomSheetDrawerBase from "./BottomSheetDrawerBase";
 
 export default function LocationBottomSheet({
     visible,
     onClose,
-    title = "Your Location",
-    snapPoints = ["35%", "65%"],
+    snapPoints,
+    defaultIndex = 0,
+    title = "Location",
     children,
 }) {
     return (
@@ -15,12 +16,16 @@ export default function LocationBottomSheet({
             visible={visible}
             onClose={onClose}
             snapPoints={snapPoints}
-            defaultIndex={0}
-            contentContainerStyle={ui.locationSheetBody}
+            defaultIndex={defaultIndex}
+            contentContainerStyle={ui.sheetBody}
         >
-            <Text style={ui.locationSheetTitle}>{title}</Text>
+            <View>
+                <Text style={ui.sheetTitleEnglish}>{title}</Text>
+            </View>
+
             <View style={ui.sheetDivider} />
-            {children}
+
+            <View style={ui.sheetBodyContent}>{children}</View>
         </BottomSheetDrawerBase>
     );
 }

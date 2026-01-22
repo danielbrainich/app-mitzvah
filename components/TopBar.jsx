@@ -102,7 +102,7 @@ export function TopBar({ todayIso }) {
                     style={ui.topBarDatePressable}
                 >
                     <View style={ui.topBarDatePill}>
-                        <Entypo name="cycle" size={14} color="#fff" />
+                        <Entypo name="cycle" size={14} color={colors.muted} />
                         <Text style={ui.topBarDateText} numberOfLines={1}>
                             {label}
                         </Text>
@@ -110,21 +110,6 @@ export function TopBar({ todayIso }) {
                         {showDevBadge ? <View style={ui.topBarDevDot} /> : null}
                     </View>
                 </Pressable>
-
-                {/* DEV kebab (only in dev) */}
-                {__DEV__ ? (
-                    <Pressable
-                        onPress={openDev}
-                        hitSlop={12}
-                        style={[ui.iconBtn, ui.topBarKebabBtn]}
-                    >
-                        <Entypo
-                            name="dots-three-vertical"
-                            size={18}
-                            color="#fff"
-                        />
-                    </Pressable>
-                ) : null}
 
                 {/* RIGHT: Gear */}
                 <Pressable
@@ -167,7 +152,6 @@ export function TopBar({ todayIso }) {
                         />
 
                         <View style={{ height: 12 }} />
-
                         <View style={ui.devModalBtnRow}>
                             <Pressable
                                 onPress={resetDev}

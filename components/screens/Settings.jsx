@@ -136,11 +136,11 @@ export default function Settings({ navigation }) {
                 >
                     {/* Holiday Options Card */}
                     <View style={ui.card}>
-                        <Text style={[ui.cardTitle, ui.textChutz]}>
+                        <Text style={ui.settingsCardTitle}>
                             Holiday Options
                         </Text>
 
-                        <View style={ui.row}>
+                        <View style={ui.settingsRow}>
                             <Text style={ui.settingsRowLabel}>
                                 Include modern holidays
                             </Text>
@@ -158,7 +158,7 @@ export default function Settings({ navigation }) {
                             />
                         </View>
 
-                        <View style={ui.row}>
+                        <View style={ui.settingsRow}>
                             <Text style={ui.settingsRowLabel}>
                                 Include minor fasts
                             </Text>
@@ -176,7 +176,7 @@ export default function Settings({ navigation }) {
                             />
                         </View>
 
-                        <View style={ui.row}>
+                        <View style={ui.settingsRow}>
                             <Text style={ui.settingsRowLabel}>
                                 Include roshei chodesh
                             </Text>
@@ -198,13 +198,13 @@ export default function Settings({ navigation }) {
                     {/* Shabbat Options Card */}
                     <View style={ui.card}>
                         <Text
-                            style={[ui.cardTitle, { fontFamily: "ChutzBold" }]}
+                            style={ui.settingsCardTitle}
                         >
                             Shabbat Options
                         </Text>
 
                         {/* Candle Lighting */}
-                        <View style={ui.row}>
+                        <View style={ui.settingsRow}>
                             <View style={ui.rowLeft}>
                                 <Text style={ui.settingsRowLabel}>
                                     Custom candle lighting
@@ -244,12 +244,12 @@ export default function Settings({ navigation }) {
                                     }
                                 />
 
-                                <View style={ui.settingsDivider} />
+                                <View style={ui.sheetDivider} />
                             </View>
                         ) : null}
 
                         {/* Havdalah */}
-                        <View style={ui.row}>
+                        <View style={ui.settingsRow}>
                             <View style={ui.rowLeft}>
                                 <Text style={ui.settingsRowLabel}>
                                     Custom shabbat end
@@ -292,7 +292,7 @@ export default function Settings({ navigation }) {
 
                     {/* Support */}
                     <View style={ui.card}>
-                        <Text style={[ui.cardTitle, ui.textChutz]}>
+                        <Text style={ui.settingsCardTitle}>
                             Support
                         </Text>
 
