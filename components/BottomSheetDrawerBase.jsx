@@ -1,6 +1,4 @@
-// components/BottomSheetDrawerBase.js
 import React, { useEffect, useMemo, useRef, useCallback } from "react";
-import { View, Pressable } from "react-native";
 import {
     BottomSheetModal,
     BottomSheetView,
@@ -13,7 +11,7 @@ export default function BottomSheetDrawerBase({
     visible,
     onClose,
     snapPoints = ["35%", "65%"],
-    defaultIndex = 0, // 0 = shorter (first snap point), 1 = taller (second snap point)
+    defaultIndex = 0,
     children,
     contentContainerStyle,
 }) {
@@ -52,24 +50,6 @@ export default function BottomSheetDrawerBase({
             enableDynamicSizing={false}
         >
             <BottomSheetView style={ui.bottomSheetContent}>
-                {/* Top row: close button only */}
-                <View style={ui.sheetTopRow}>
-                    {/* <Pressable
-                        onPress={() => {
-                            modalRef.current?.dismiss();
-                            Haptics.impactAsync(
-                                Haptics.ImpactFeedbackStyle.Light
-                            );
-                        }}
-                        hitSlop={12}
-                        accessibilityRole="button"
-                        accessibilityLabel="Close"
-                        style={ui.bottomSheetCloseBtn}
-                    >
-                        <Entypo name="cross" size={24} color="white" />
-                    </Pressable> */}
-                </View>
-
                 <BottomSheetScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={contentContainerStyle}

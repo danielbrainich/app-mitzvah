@@ -479,12 +479,6 @@ export const ui = StyleSheet.create({
         marginTop: 2,
     },
 
-    shabbatParshaName: {
-        color: COLORS.textPrimary,
-        fontSize: 14,
-        lineHeight: 18,
-    },
-
     shabbatParshaHebrew: {
         writingDirection: "rtl",
         textAlign: "right",
@@ -499,9 +493,8 @@ export const ui = StyleSheet.create({
     },
 
     shabbatParshaSmall: {
-        color: colors.textPrimary ?? "rgba(255,255,255,0.92)",
-        fontSize: 16,
-        lineHeight: 22,
+        color: colors.muted,
+        fontSize: 14,
     },
 
     // ===========================================================================
@@ -542,7 +535,7 @@ export const ui = StyleSheet.create({
         fontSize: TYPE["xl"],
         marginBottom: SPACE.sm,
         fontWeight: "700",
-      },
+    },
 
     settingsSliderBlock: { paddingBottom: 10 },
 
