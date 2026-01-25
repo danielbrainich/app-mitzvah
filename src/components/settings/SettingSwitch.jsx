@@ -11,9 +11,9 @@ export default function SettingSwitch({
     return (
         <View style={ui.row}>
             <View style={ui.rowLeft}>
-                <Text style={ui.settingsRowLabel}>{label}</Text>
+                <Text style={ui.paragraph}>{label}</Text>
                 {sublabel && (
-                    <Text style={ui.settingsSubLabel}>{sublabel}</Text>
+                    <Text style={ui.label}>{sublabel}</Text>
                 )}
             </View>
 

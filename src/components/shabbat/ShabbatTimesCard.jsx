@@ -7,14 +7,8 @@ import { formatTime12h } from "../../utils/datetime";
 function RowLine({ label, value }) {
     return (
         <View style={ui.row}>
-            <Text style={[ui.textBase, ui.textWhite]}>{label}</Text>
-            <Text
-                style={[
-                    ui.textBase,
-                    ui.textWhite,
-                    { maxWidth: "60%", textAlign: "right" },
-                ]}
-            >
+            <Text style={ui.paragraph}>{label}</Text>
+            <Text style={[ui.paragraph, { maxWidth: "60%", textAlign: "right" }]}>
                 {value}
             </Text>
         </View>
@@ -46,11 +40,11 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
         !shabbatInfo?.parshaReplacedByHoliday;
 
     return (
-        <View style={[ui.card, { marginBottom: 10 }]}>
+        <View style={ui.card}>
             {/* Friday Section */}
             <View style={ui.shabbatSectionHeaderRow}>
                 <Text style={[ui.h5, ui.textBrand]}>Friday</Text>
-                <Text style={[ui.textSmall, ui.textMuted]} numberOfLines={1}>
+                <Text style={ui.label} numberOfLines={1}>
                     {shabbatInfo.erevShabbatGregDate}
                 </Text>
             </View>
@@ -62,8 +56,8 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
 
             {/* Saturday Section */}
             <View style={ui.shabbatSectionHeaderRow}>
-                <Text style={ui.shabbatSectionHeaderLeft}>Saturday</Text>
-                <Text style={[ui.textSmall, ui.textMuted]} numberOfLines={1}>
+                <Text style={[ui.h5, ui.textBrand]}>Saturday</Text>
+                <Text style={ui.label} numberOfLines={1}>
                     {shabbatInfo.yomShabbatGregDate}
                 </Text>
             </View>
@@ -89,11 +83,11 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
                             flexShrink: 1,
                         }}
                     >
-                        <Text style={[ui.textBody, ui.textSecondary]}>
+                        <Text style={ui.paragraph}>
                             Torah portion:{" "}
                         </Text>
                         <Pressable onPress={onParshaPress} hitSlop={12}>
-                            <Text style={[ui.textBase, ui.textMuted]}>
+                            <Text style={ui.paragraph}>
                                 {shabbatInfo.parshaEnglish}
                             </Text>
                         </Pressable>
@@ -112,7 +106,7 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
                     </Pressable>
                 </View>
             ) : (
-                <Text style={[ui.shabbatSentenceSmall, { marginBottom: 0 }]}>
+                <Text style={[ui.textBase, ui.textWhite]}>
                     This week's holiday Torah reading replaces the parasha.
                 </Text>
             )}

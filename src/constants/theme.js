@@ -17,7 +17,6 @@ export const colors = {
     muted: tokenColors.text.muted,
     textPrimary: tokenColors.text.secondary,
     textBody: tokenColors.text.body,
-    textMuted: tokenColors.text.muted,
     accent: tokenColors.brand.primary,
     accentBorder: tokenColors.brand.light,
     accentBg: tokenColors.brand.bg,
@@ -100,7 +99,6 @@ export const ui = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingVertical: spacing[4],
     },
 
     rowLeft: {
@@ -170,10 +168,6 @@ export const ui = StyleSheet.create({
         color: tokenColors.text.primary,
     },
 
-    textMuted: {
-        color: tokenColors.text.muted,
-    },
-
     textSecondary: {
         color: tokenColors.text.secondary,
     },
@@ -190,6 +184,23 @@ export const ui = StyleSheet.create({
     textHebrew: {
         writingDirection: "rtl",
         textAlign: "right",
+    },
+
+    paragraph: {
+        color: tokenColors.text.primary,
+        fontSize: typography.size.md,
+        lineHeight: 22,
+    },
+
+    textWithMargin: {
+        marginBottom: spacing[3],
+    },
+
+    label: {
+        fontSize: typography.size.base,
+        color: tokenColors.text.muted,
+        marginTop: spacing[1],
+        marginBottom: spacing[1],
     },
 
     // ==========================================
@@ -327,7 +338,7 @@ export const ui = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         marginVertical: spacing[5],
-        marginHorizontal: 72,
+        marginHorizontal: 80,
     },
 
     shabbatCountdownItem: {
@@ -336,7 +347,7 @@ export const ui = StyleSheet.create({
     },
 
     shabbatCountdownNumber: {
-        fontSize: 40,
+        fontSize: 44,
         color: tokenColors.brand.primary,
         fontFamily: "ChutzBold",
     },
@@ -404,10 +415,6 @@ export const ui = StyleSheet.create({
         paddingTop: spacing[4],
     },
 
-    settingsSliderBlock: {
-        paddingBottom: spacing[4],
-    },
-
     // ==========================================
     // TIP SELECTOR
     // ==========================================
@@ -440,6 +447,38 @@ export const ui = StyleSheet.create({
     },
 
     tipTextSelected: {
+        color: tokenColors.brand.primary,
+    },
+
+    infoTiersRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: spacing[7],
+        marginTop: spacing[1],
+    },
+
+    infoTierPill: {
+        width: 56,
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: tokenColors.border.light,
+        borderRadius: radii.full,
+        paddingVertical: spacing[3],
+        backgroundColor: "transparent",
+    },
+
+    infoTierPillSelected: {
+        borderColor: tokenColors.brand.light,
+        backgroundColor: tokenColors.brand.bg,
+    },
+
+    infoTierText: {
+        color: tokenColors.text.muted,
+        fontSize: typography.size.sm,
+        fontWeight: typography.weight.bold,
+    },
+
+    infoTierTextSelected: {
         color: tokenColors.brand.primary,
     },
 

@@ -74,7 +74,7 @@ export default function HolidayBottomSheet({
                                         color={colors.muted}
                                     />
                                     <Text
-                                        style={[ui.textBase, ui.textMuted]}
+                                        style={ui.label}
                                         numberOfLines={1}
                                     >
                                         {dateLabel}
@@ -104,7 +104,7 @@ export default function HolidayBottomSheet({
                 </>
             ) : null}
 
-            <Text style={[ui.textBody, ui.textWhite]}>{description ?? ""}</Text>
+            <Text style={ui.paragraph}>{description ?? ""}</Text>
         </BottomSheetDrawerBase>
     );
 }

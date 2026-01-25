@@ -150,7 +150,7 @@ export default function Settings({ navigation }) {
                         />
 
                         <TouchableOpacity
-                            style={[ui.button, ui.buttonPrimary]}
+                            style={[ui.button, ui.buttonOutline]}
                             onPress={onTipPress}
                             activeOpacity={0.85}
                             disabled={iapLoading}

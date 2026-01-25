@@ -1,10 +1,6 @@
 import React, { useMemo, useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
-import { HDate } from "@hebcal/core";
-import {
-    parseLocalIso,
-    formatGregorianLongFromIso,
-} from "../../utils/datetime";
+import { formatGregorianLongFromIso } from "../../utils/datetime";
 import { ui } from "../../constants/theme";
 import * as Haptics from "expo-haptics";
 import { Entypo } from "@expo/vector-icons";
@@ -21,8 +17,8 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
     }, [onAbout, holiday]);
 
     return (
-        <View style={[ui.card]}>
-            <Text style={[ui.textBase, ui.textMuted]}>{gregLabel}</Text>
+        <View style={ui.card}>
+            <Text style={ui.label}>{gregLabel}</Text>
             <Text
                 style={[ui.h5, ui.textBrand]}
                 numberOfLines={1}

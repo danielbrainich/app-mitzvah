@@ -116,7 +116,6 @@ export const colorsFlat = {
     muted: colors.text.muted,
     textPrimary: colors.text.secondary,
     textBody: colors.text.body,
-    textMuted: colors.text.muted,
 
     // Brand
     accent: colors.brand.primary,

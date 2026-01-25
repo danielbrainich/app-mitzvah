@@ -11,7 +11,7 @@ export default function SettingSlider({
     showDivider = false,
 }) {
     return (
-        <View style={ui.settingsSliderBlock}>
+        <View>
             <Slider
                 value={value}
                 minimumValue={minimumValue}

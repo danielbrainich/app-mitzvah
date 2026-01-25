@@ -67,13 +67,13 @@ export default function ParshaBottomSheet({
             ) : null}
 
             {!!verses ? (
-                <Text style={[ui.textBase, ui.textMuted, { marginBottom: 8 }]}>
+                <Text style={ui.label}>
                     {verses}
                 </Text>
             ) : null}
 
             {!!blurb ? (
-                <Text style={[ui.textBody, ui.textWhite, { paddingTop: 0 }]}>
+                <Text style={ui.paragraph}>
                     {blurb}
                 </Text>
             ) : null}

@@ -88,7 +88,7 @@ export default function LocationBottomSheet({
                     <>
                         <Text
                             style={[
-                                ui.shabbatSentenceSmall,
+                                ui.paragraph,
                                 { marginBottom: 12 },
                             ]}
                         >

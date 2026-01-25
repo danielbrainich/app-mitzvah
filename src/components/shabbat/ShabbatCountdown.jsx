@@ -12,7 +12,7 @@ function CountdownUnit({ value, label }) {
     return (
         <View style={ui.shabbatCountdownItem}>
             <Text style={ui.shabbatCountdownNumber}>{value}</Text>
-            <Text style={ui.shabbatCountdownLabel}>{displayLabel}</Text>
+            <Text style={ui.label}>{displayLabel}</Text>
         </View>
     );
 }
