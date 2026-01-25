@@ -25,7 +25,8 @@ export function useShabbatCountdown(todayIso) {
             setNow(frozen);
             return;
         }
-        const interval = setInterval(() => setNow(new Date()), 10000);
+        // Update every 60 seconds since countdown only shows minutes
+        const interval = setInterval(() => setNow(new Date()), 60000);
         return () => clearInterval(interval);
     }, [isDevOverride, todayIso]);
 
