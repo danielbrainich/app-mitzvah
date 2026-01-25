@@ -8,7 +8,7 @@ import Holidays from "../screens/Holidays";
 import Shabbat from "../screens/Shabbat";
 import { colors, nav, ui } from "../constants/theme";
 import useTodayIsoDay from "../hooks/useTodayIsoDay";
-import { TopBar } from "../components/TopBar";
+import { TopBar } from "../components/common/TopBar";
 
 const Tab = createBottomTabNavigator();
 

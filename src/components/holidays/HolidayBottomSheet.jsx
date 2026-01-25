@@ -4,7 +4,7 @@ import { Entypo } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { HDate } from "@hebcal/core";
 
-import BottomSheetDrawerBase from "../BottomSheetDrawerBase";
+import BottomSheetDrawerBase from "../common/BottomSheetDrawerBase";
 import { ui, colors } from "../../constants/theme";
 import {
     parseLocalIso,

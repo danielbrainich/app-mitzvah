@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { View, Text } from "react-native";
-import BottomSheetDrawerBase from "../BottomSheetDrawerBase";
+import BottomSheetDrawerBase from "../common/BottomSheetDrawerBase";
 import { ui } from "../../constants/theme";
 
 function stripParshaEnglish(name) {
