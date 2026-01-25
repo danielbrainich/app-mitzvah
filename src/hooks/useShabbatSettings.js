@@ -6,7 +6,7 @@ import {
     setHavdalahTime,
     setCandleLightingToggle,
     setHavdalahTimeToggle,
-} from "../store/actions";
+} from "../store/slices/settingsSlice";
 
 const DEFAULT_CANDLE = 18;
 const DEFAULT_HAVDALAH = 42;

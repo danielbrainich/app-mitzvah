@@ -18,7 +18,7 @@ import {
     toggleMinorFasts,
     toggleRosheiChodesh,
     toggleModernHolidays,
-} from "../store/actions";
+} from "../store/slices/settingsSlice";
 import { useTipsIap } from "../services/iap/useTipsIap";
 import { useShabbatSettings } from "../hooks/useShabbatSettings";
 

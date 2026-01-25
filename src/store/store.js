@@ -11,7 +11,7 @@ import {
     REGISTER,
 } from "redux-persist";
 
-import settingsReducer from "./reducers/settingsReducer";
+import settingsReducer from "./slices/settingsSlice";
 
 const rootReducer = combineReducers({
     settings: settingsReducer,
