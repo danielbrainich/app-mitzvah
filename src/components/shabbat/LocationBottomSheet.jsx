@@ -27,19 +27,19 @@ export default function LocationBottomSheet({
                 <Text style={ui.sheetTitleEnglish}>{title}</Text>
             </View>
 
-            <View style={ui.sheetDivider} />
+            <View style={ui.divider} />
 
             <View style={ui.sheetBodyContent}>
                 {hasLocation ? (
                     <>
-                        <View style={ui.shabbatSheetLine}>
+                        <View style={ui.row}>
                             <Text style={ui.shabbatSheetLabel}>Timezone</Text>
                             <Text style={ui.shabbatSheetValue}>
                                 {timezone?.replace(/_/g, " ") || "Unknown"}
                             </Text>
                         </View>
 
-                        <View style={ui.shabbatSheetLine}>
+                        <View style={ui.row}>
                             <Text style={ui.shabbatSheetLabel}>
                                 Coordinates
                             </Text>
@@ -53,7 +53,7 @@ export default function LocationBottomSheet({
                             </Text>
                         </View>
 
-                        <View style={ui.shabbatSheetLine}>
+                        <View style={ui.row}>
                             <Text style={ui.shabbatSheetLabel}>Elevation</Text>
                             <Text style={ui.shabbatSheetValue}>
                                 {Number.isFinite(location?.elevation)

@@ -6,7 +6,7 @@ import { formatTime12h } from "../../utils/datetime";
 
 function RowLine({ label, value }) {
     return (
-        <View style={ui.shabbatSheetLine}>
+        <View style={ui.row}>
             <Text style={ui.shabbatSheetLabel}>{label}</Text>
             <Text style={ui.shabbatSheetValue}>{value}</Text>
         </View>
@@ -50,7 +50,7 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
             <RowLine label="Candle lighting" value={candleValue} />
             <RowLine label="Sundown" value={friSundownValue} />
 
-            <View style={ui.sheetDivider} />
+            <View style={ui.divider} />
 
             {/* Saturday Section */}
             <View style={ui.shabbatSectionHeaderRow}>
@@ -63,7 +63,7 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
             <RowLine label="Sundown" value={satSundownValue} />
             <RowLine label="Shabbat ends" value={endsValue} />
 
-            <View style={ui.sheetDivider} />
+            <View style={ui.divider} />
 
             {/* Parasha Section */}
             {canShowParsha ? (

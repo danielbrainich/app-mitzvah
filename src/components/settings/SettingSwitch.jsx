@@ -9,7 +9,7 @@ export default function SettingSwitch({
     onValueChange,
 }) {
     return (
-        <View style={ui.settingsRow}>
+        <View style={ui.row}>
             <View style={ui.rowLeft}>
                 <Text style={ui.settingsRowLabel}>{label}</Text>
                 {sublabel && (

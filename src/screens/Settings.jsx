@@ -68,7 +68,7 @@ export default function Settings({ navigation }) {
                             );
                         }}
                         hitSlop={12}
-                        style={ui.iconBtnSm}
+                        style={ui.iconButtonSmall}
                     >
                         <Entypo name="chevron-left" size={22} color="white" />
                     </Pressable>
@@ -150,7 +150,7 @@ export default function Settings({ navigation }) {
                         />
 
                         <TouchableOpacity
-                            style={ui.primaryButton}
+                            style={[ui.button, ui.buttonPrimary]}
                             onPress={onTipPress}
                             activeOpacity={0.85}
                             disabled={iapLoading}
@@ -158,7 +158,7 @@ export default function Settings({ navigation }) {
                             {iapLoading ? (
                                 <ActivityIndicator />
                             ) : (
-                                <Text style={ui.primaryButtonText}>
+                                <Text style={ui.buttonText}>
                                     Tip ${tipAmount}
                                 </Text>
                             )}

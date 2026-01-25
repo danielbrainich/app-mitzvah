@@ -90,7 +90,7 @@ export default function HolidayBottomSheet({
                             <Text style={ui.sheetTitleHebrew}>{nameRight}</Text>
                         )}
                     </View>
-                    <View style={ui.sheetDivider} />
+                    <View style={ui.divider} />
                 </>
             ) : null}
 

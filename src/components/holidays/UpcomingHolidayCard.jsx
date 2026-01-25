@@ -41,7 +41,7 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
                 <Pressable
                     onPress={onPressDots}
                     hitSlop={12}
-                    style={[ui.iconBtn, ui.upcomingHolidayMoreBtnPos]}
+                    style={[ui.iconButton, ui.upcomingHolidayMoreBtnPos]}
                 >
                     <Entypo
                         name="dots-three-vertical"

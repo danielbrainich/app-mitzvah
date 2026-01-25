@@ -56,7 +56,7 @@ export default function ParshaBottomSheet({
                         ) : null}
                     </View>
 
-                    <View style={ui.sheetDivider} />
+                    <View style={ui.divider} />
                 </>
             ) : null}
 

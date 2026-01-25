@@ -118,7 +118,7 @@ export function TopBar({ todayIso }) {
                         navigation.navigate("Settings");
                     }}
                     hitSlop={12}
-                    style={[ui.iconBtn, ui.topBarGearBtn]}
+                    style={[ui.iconButton, ui.topBarGearBtn]}
                 >
                     <Entypo name="cog" size={22} color="#fff" />
                 </Pressable>

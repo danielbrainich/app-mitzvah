@@ -22,7 +22,7 @@ export default function SettingSlider({
                 thumbTintColor="#f4f3f4"
                 onValueChange={onValueChange}
             />
-            {showDivider && <View style={ui.sheetDivider} />}
+            {showDivider && <View style={ui.divider} />}
         </View>
     );
 }
