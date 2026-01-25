@@ -53,8 +53,7 @@ export default function Holidays() {
 
                 {/* Coming Up Section */}
                 <View style={ui.holidaysComingUpSection}>
-                    <Text style={ui.holidaysSecondHeaderText}>Coming up</Text>
-
+                    <Text style={[ui.h5, ui.textWhite]}>Coming up</Text>
                     <View style={{ height: UPCOMING_HEIGHT }}>
                         <UpcomingHolidaysCarousel
                             holidays={upcoming}

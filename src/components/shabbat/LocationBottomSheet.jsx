@@ -33,17 +33,31 @@ export default function LocationBottomSheet({
                 {hasLocation ? (
                     <>
                         <View style={ui.row}>
-                            <Text style={ui.shabbatSheetLabel}>Timezone</Text>
-                            <Text style={ui.shabbatSheetValue}>
+                            <Text style={[ui.textBase, ui.textWhite]}>
+                                Timezone
+                            </Text>
+                            <Text
+                                style={[
+                                    ui.textBase,
+                                    ui.textWhite,
+                                    { maxWidth: "60%", textAlign: "right" },
+                                ]}
+                            >
                                 {timezone?.replace(/_/g, " ") || "Unknown"}
                             </Text>
                         </View>
 
                         <View style={ui.row}>
-                            <Text style={ui.shabbatSheetLabel}>
+                            <Text style={[ui.textBase, ui.textWhite]}>
                                 Coordinates
                             </Text>
-                            <Text style={ui.shabbatSheetValue}>
+                            <Text
+                                style={[
+                                    ui.textBase,
+                                    ui.textWhite,
+                                    { maxWidth: "60%", textAlign: "right" },
+                                ]}
+                            >
                                 {location?.latitude != null &&
                                 location?.longitude != null
                                     ? `${location.latitude.toFixed(
@@ -54,8 +68,16 @@ export default function LocationBottomSheet({
                         </View>
 
                         <View style={ui.row}>
-                            <Text style={ui.shabbatSheetLabel}>Elevation</Text>
-                            <Text style={ui.shabbatSheetValue}>
+                            <Text style={[ui.textBase, ui.textWhite]}>
+                                Elevation
+                            </Text>
+                            <Text
+                                style={[
+                                    ui.textBase,
+                                    ui.textWhite,
+                                    { maxWidth: "60%", textAlign: "right" },
+                                ]}
+                            >
                                 {Number.isFinite(location?.elevation)
                                     ? `${location.elevation.toFixed(1)} meters`
                                     : "Unknown"}

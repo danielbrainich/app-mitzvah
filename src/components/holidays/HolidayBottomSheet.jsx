@@ -74,7 +74,7 @@ export default function HolidayBottomSheet({
                                         color={colors.muted}
                                     />
                                     <Text
-                                        style={ui.sheetDateInlineText}
+                                        style={[ui.textBase, ui.textMuted]}
                                         numberOfLines={1}
                                     >
                                         {dateLabel}
@@ -84,17 +84,27 @@ export default function HolidayBottomSheet({
                         ) : null}
 
                         {!!nameLeft && (
-                            <Text style={ui.sheetTitleEnglish}>{nameLeft}</Text>
+                            <Text style={[ui.h5, ui.textBrand]}>
+                                {nameLeft}
+                            </Text>
                         )}
                         {!!nameRight && (
-                            <Text style={ui.sheetTitleHebrew}>{nameRight}</Text>
+                            <Text
+                                style={[
+                                    ui.textBase,
+                                    ui.textBrand,
+                                    ui.textHebrew,
+                                ]}
+                            >
+                                {nameRight}
+                            </Text>
                         )}
                     </View>
                     <View style={ui.divider} />
                 </>
             ) : null}
 
-            <Text style={ui.sheetBodyText}>{description ?? ""}</Text>
+            <Text style={[ui.textBody, ui.textWhite]}>{description ?? ""}</Text>
         </BottomSheetDrawerBase>
     );
 }

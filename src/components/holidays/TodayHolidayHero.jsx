@@ -15,9 +15,9 @@ export default function TodayHolidayHero({ holiday, onAbout }) {
                 paddingHorizontal: 22,
             }}
         >
-            <Text style={ui.holidaysHeaderText}>Today is</Text>
+            <Text style={[ui.h2, ui.textWhite]}>Today is</Text>
 
-            <Text style={[ui.holidaysBigBoldText, ui.textChutz]}>
+            <Text style={[ui.h1, ui.textBrand, ui.textChutz, ui.textCenter]}>
                 {holiday.title ?? ""}
             </Text>
 

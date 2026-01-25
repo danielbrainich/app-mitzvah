@@ -7,8 +7,16 @@ import { formatTime12h } from "../../utils/datetime";
 function RowLine({ label, value }) {
     return (
         <View style={ui.row}>
-            <Text style={ui.shabbatSheetLabel}>{label}</Text>
-            <Text style={ui.shabbatSheetValue}>{value}</Text>
+            <Text style={[ui.textBase, ui.textWhite]}>{label}</Text>
+            <Text
+                style={[
+                    ui.textBase,
+                    ui.textWhite,
+                    { maxWidth: "60%", textAlign: "right" },
+                ]}
+            >
+                {value}
+            </Text>
         </View>
     );
 }
@@ -41,8 +49,8 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
         <View style={[ui.card, { marginBottom: 10 }]}>
             {/* Friday Section */}
             <View style={ui.shabbatSectionHeaderRow}>
-                <Text style={ui.shabbatSectionHeaderLeft}>Friday</Text>
-                <Text style={ui.shabbatSectionHeaderRight} numberOfLines={1}>
+                <Text style={[ui.h5, ui.textBrand]}>Friday</Text>
+                <Text style={[ui.textSmall, ui.textMuted]} numberOfLines={1}>
                     {shabbatInfo.erevShabbatGregDate}
                 </Text>
             </View>
@@ -55,7 +63,7 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
             {/* Saturday Section */}
             <View style={ui.shabbatSectionHeaderRow}>
                 <Text style={ui.shabbatSectionHeaderLeft}>Saturday</Text>
-                <Text style={ui.shabbatSectionHeaderRight} numberOfLines={1}>
+                <Text style={[ui.textSmall, ui.textMuted]} numberOfLines={1}>
                     {shabbatInfo.yomShabbatGregDate}
                 </Text>
             </View>
@@ -81,11 +89,11 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
                             flexShrink: 1,
                         }}
                     >
-                        <Text style={ui.shabbatSentenceSmall}>
+                        <Text style={[ui.textBody, ui.textSecondary]}>
                             Torah portion:{" "}
                         </Text>
                         <Pressable onPress={onParshaPress} hitSlop={12}>
-                            <Text style={ui.shabbatParshaSmall}>
+                            <Text style={[ui.textBase, ui.textMuted]}>
                                 {shabbatInfo.parshaEnglish}
                             </Text>
                         </Pressable>

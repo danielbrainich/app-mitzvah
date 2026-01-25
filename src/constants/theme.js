@@ -7,7 +7,9 @@ import {
     layout,
 } from "./design-tokens";
 
-// Backward compatible flat colors export
+/**
+ * Backward compatible flat colors export
+ */
 export const colors = {
     bg: tokenColors.background.primary,
     card: tokenColors.background.secondary,
@@ -69,9 +71,9 @@ export const nav = {
  * Main UI Stylesheet
  */
 export const ui = StyleSheet.create({
-    // ===========================================
+    // ==========================================
     // LAYOUT
-    // ===========================================
+    // ==========================================
     safeArea: {
         flex: 1,
         backgroundColor: tokenColors.background.primary,
@@ -85,77 +87,130 @@ export const ui = StyleSheet.create({
         flexGrow: 1,
     },
 
-    // ===========================================
-    // TYPOGRAPHY
-    // ===========================================
-    textPrimary: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.base,
+    container: {
+        flex: 1,
+        width: "100%",
+        maxWidth: layout.maxWidth,
     },
 
-    textSecondary: {
-        color: tokenColors.text.secondary,
+    // ==========================================
+    // ROWS & COLUMNS
+    // ==========================================
+    row: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingVertical: spacing[4],
+    },
+
+    rowLeft: {
+        flex: 1,
+        paddingRight: spacing[5],
+    },
+
+    // ==========================================
+    // TYPOGRAPHY - Headings
+    // ==========================================
+    h1: {
+        fontSize: typography.size.hero,
+        lineHeight: 64,
+        fontWeight: typography.weight.bold,
+    },
+
+    h2: {
+        fontSize: typography.size["5xl"],
+        fontWeight: typography.weight.bold,
+    },
+
+    h3: {
+        fontSize: typography.size["4xl"],
+        fontWeight: typography.weight.bold,
+    },
+
+    h4: {
+        fontSize: typography.size["2xl"],
+        fontWeight: typography.weight.semibold,
+    },
+
+    h5: {
+        fontSize: typography.size.xl,
+        fontWeight: typography.weight.semibold,
+    },
+
+    h6: {
+        fontSize: typography.size.lg,
+        fontWeight: typography.weight.semibold,
+    },
+
+    // Typography - Body Text Sizes
+    textBody: {
+        fontSize: typography.size.md,
+        lineHeight: 22,
+    },
+
+    textBase: {
         fontSize: typography.size.base,
+        lineHeight: 20,
+    },
+
+    textSmall: {
+        fontSize: typography.size.sm,
+    },
+
+    textXs: {
+        fontSize: typography.size.xs,
+    },
+
+    // Typography - Colors
+    textBrand: {
+        color: tokenColors.brand.primary,
+    },
+
+    textWhite: {
+        color: tokenColors.text.primary,
     },
 
     textMuted: {
         color: tokenColors.text.muted,
-        fontSize: typography.size.base,
     },
 
-    textMeta: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.sm,
+    textSecondary: {
+        color: tokenColors.text.secondary,
     },
 
-    paragraph: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.md,
-        lineHeight: 22,
-        marginBottom: spacing[4],
+    // Typography - Variants
+    textCenter: {
+        textAlign: "center",
     },
 
     textChutz: {
         fontFamily: "ChutzBold",
     },
 
-    // ===========================================
-    // HEADINGS
-    // ===========================================
-    heading1: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size.hero,
-        lineHeight: 64,
-        fontWeight: typography.weight.bold,
+    textHebrew: {
+        writingDirection: "rtl",
+        textAlign: "right",
     },
 
-    heading2: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size["5xl"],
-        fontWeight: typography.weight.bold,
-    },
+    // ==========================================
+    // SPACING UTILITIES
+    // ==========================================
+    mb1: { marginBottom: spacing[1] },
+    mb2: { marginBottom: spacing[2] },
+    mb3: { marginBottom: spacing[3] },
+    mb4: { marginBottom: spacing[4] },
+    mb5: { marginBottom: spacing[5] },
+    mb6: { marginBottom: spacing[6] },
 
-    heading3: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size["4xl"],
-        fontWeight: typography.weight.bold,
-    },
+    mt1: { marginTop: spacing[1] },
+    mt2: { marginTop: spacing[2] },
+    mt3: { marginTop: spacing[3] },
+    mt5: { marginTop: spacing[5] },
+    mt8: { marginTop: spacing[8] },
 
-    heading4: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size["2xl"],
-        fontWeight: typography.weight.semibold,
-    },
-
-    heading5: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size.xl,
-        fontWeight: typography.weight.semibold,
-    },
-
-    // ===========================================
+    // ==========================================
     // CARDS
-    // ===========================================
+    // ==========================================
     card: {
         backgroundColor: tokenColors.background.secondary,
         borderRadius: radii.lg,
@@ -163,16 +218,9 @@ export const ui = StyleSheet.create({
         marginBottom: spacing[7],
     },
 
-    cardTitle: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size["4xl"],
-        fontWeight: typography.weight.bold,
-        marginBottom: spacing[2],
-    },
-
-    // ===========================================
+    // ==========================================
     // BUTTONS
-    // ===========================================
+    // ==========================================
     button: {
         borderRadius: radii.md,
         paddingVertical: spacing[5],
@@ -181,7 +229,7 @@ export const ui = StyleSheet.create({
         justifyContent: "center",
     },
 
-    buttonPrimary: {
+    buttonOutline: {
         backgroundColor: "transparent",
         borderWidth: 0.5,
         borderColor: tokenColors.brand.primary,
@@ -211,9 +259,9 @@ export const ui = StyleSheet.create({
         backgroundColor: tokenColors.background.secondary,
     },
 
-    // ===========================================
-    // PILLS
-    // ===========================================
+    // ==========================================
+    // PILLS & CHIPS
+    // ==========================================
     pill: {
         flexDirection: "row",
         alignItems: "center",
@@ -229,33 +277,46 @@ export const ui = StyleSheet.create({
         fontSize: typography.size.sm,
     },
 
-    // ===========================================
-    // ROWS
-    // ===========================================
-    row: {
+    chip: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
+        gap: spacing[3],
         paddingVertical: spacing[4],
+        paddingHorizontal: spacing[5],
+        borderRadius: radii.full,
+        borderWidth: 1,
+        borderColor: tokenColors.border.medium,
     },
 
-    rowLeft: {
-        flex: 1,
-        paddingRight: spacing[5],
-    },
-
-    // ===========================================
+    // ==========================================
     // DIVIDERS
-    // ===========================================
+    // ==========================================
     divider: {
         height: 1,
         backgroundColor: tokenColors.border.default,
         marginVertical: spacing[3],
     },
 
-    // ===========================================
-    // SHABBAT SCREEN
-    // ===========================================
+    // ==========================================
+    // STATUS INDICATORS
+    // ==========================================
+    dotSuccess: {
+        width: 10,
+        height: 10,
+        borderRadius: radii.full,
+        backgroundColor: tokenColors.semantic.success,
+    },
+
+    dotError: {
+        width: 10,
+        height: 10,
+        borderRadius: radii.full,
+        backgroundColor: tokenColors.semantic.error,
+    },
+
+    // ==========================================
+    // SHABBAT SCREEN (truly unique styles only)
+    // ==========================================
     shabbatHeroWrap: {
         alignItems: "center",
         paddingTop: spacing[3],
@@ -280,87 +341,9 @@ export const ui = StyleSheet.create({
         fontFamily: "ChutzBold",
     },
 
-    shabbatCountdownLabel: {
-        fontSize: typography.size.base,
-        color: tokenColors.text.disabled,
-        marginTop: spacing[1],
-    },
-
-    shabbatSectionHeaderRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        marginBottom: spacing[3],
-    },
-
-    shabbatSectionHeaderLeft: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size.xl,
-        fontWeight: typography.weight.semibold,
-    },
-
-    shabbatSectionHeaderRight: {
-        fontSize: typography.size.sm,
-        color: tokenColors.text.muted,
-    },
-
-    shabbatSheetLabel: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.md,
-    },
-
-    shabbatSheetValue: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.md,
-        maxWidth: "60%",
-        textAlign: "right",
-    },
-
-    shabbatLocationChip: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: spacing[3],
-        paddingVertical: spacing[4],
-        paddingHorizontal: spacing[5],
-        borderRadius: radii.full,
-        borderWidth: 1,
-        borderColor: tokenColors.border.medium,
-        backgroundColor: tokenColors.background.primary,
-    },
-
-    shabbatLocationChipText: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.sm,
-    },
-
-    shabbatGreenDot: {
-        width: 10,
-        height: 10,
-        borderRadius: radii.full,
-        backgroundColor: tokenColors.semantic.success,
-    },
-
-    shabbatSentence: {
-        color: tokenColors.text.secondary,
-        fontSize: typography.size.sm,
-        marginBottom: spacing[6],
-    },
-
-    shabbatSentenceSmall: {
-        color: tokenColors.text.secondary,
-        fontSize: typography.size.md,
-        lineHeight: 22,
-        marginBottom: spacing[2],
-    },
-
-    shabbatParshaSmall: {
-        color: tokenColors.text.muted,
-        fontSize: typography.size.base,
-    },
-
-    // ===========================================
-    // HOLIDAYS SCREEN
-    // ===========================================
+    // ==========================================
+    // HOLIDAYS SCREEN (truly unique styles only)
+    // ==========================================
     holidaysTodaySection: {
         flexShrink: 1,
     },
@@ -370,31 +353,9 @@ export const ui = StyleSheet.create({
         paddingTop: spacing[2],
     },
 
-    holidaysHeaderText: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size["5xl"],
-        marginTop: spacing[8],
-        marginBottom: 0,
-    },
-
-    holidaysBigBoldText: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size.hero,
-        lineHeight: 64,
-        textAlign: "center",
-        marginTop: spacing[5],
-        marginBottom: spacing[3],
-    },
-
     holidaysComingUpSection: {
         marginTop: "auto",
         paddingTop: spacing[6],
-    },
-
-    holidaysSecondHeaderText: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.xl,
-        marginBottom: spacing[6],
     },
 
     holidaysUpcomingCarouselContent: {
@@ -421,59 +382,15 @@ export const ui = StyleSheet.create({
         backgroundColor: "rgba(130,203,255,0.95)",
     },
 
-    // Today Holiday Card
-    todayHolidayHebrew: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size["2xl"],
-        marginTop: 0,
-    },
-
-    todayHolidayMoreInfoButton: {
-        borderRadius: radii.lg,
-        padding: spacing[5],
-        alignItems: "center",
-        borderWidth: 0.5,
-        borderColor: tokenColors.text.primary,
-        backgroundColor: "transparent",
-        marginVertical: spacing[8],
-    },
-
-    todayHolidayMoreInfoButtonText: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.sm,
-        fontWeight: typography.weight.medium,
-    },
-
-    // Upcoming Holiday Card
-    upcomingHolidayTitle: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size.xl,
-        fontWeight: typography.weight.semibold,
-        marginTop: spacing[2],
-        marginBottom: spacing[1],
-    },
-
-    upcomingHolidayHebrew: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size.md,
-        textAlign: "left",
-        writingDirection: "rtl",
-    },
-
-    upcomingHolidayDate: {
-        color: tokenColors.text.muted,
-        fontSize: typography.size.base,
-    },
-
     upcomingHolidayMoreBtnPos: {
         position: "absolute",
         top: spacing[2],
         right: spacing[5],
     },
 
-    // ===========================================
+    // ==========================================
     // SETTINGS SCREEN
-    // ===========================================
+    // ==========================================
     settingsTopBar: {
         height: 44,
         paddingHorizontal: spacing[6],
@@ -487,34 +404,21 @@ export const ui = StyleSheet.create({
         paddingTop: spacing[4],
     },
 
-    settingsRowLabel: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.md,
-        lineHeight: 20,
-    },
-
-    settingsSubLabel: {
-        color: "rgba(255,255,255,0.72)",
-        fontSize: typography.size.xs,
-        lineHeight: 16,
-        marginTop: spacing[1],
-    },
-
     settingsSliderBlock: {
         paddingBottom: spacing[4],
     },
 
-    // ===========================================
+    // ==========================================
     // TIP SELECTOR
-    // ===========================================
-    infoTiersRow: {
+    // ==========================================
+    tipTiersRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: spacing[7],
         marginTop: spacing[1],
     },
 
-    infoTierPill: {
+    tipPill: {
         width: 56,
         alignItems: "center",
         borderWidth: 1,
@@ -524,24 +428,24 @@ export const ui = StyleSheet.create({
         backgroundColor: "transparent",
     },
 
-    infoTierPillSelected: {
+    tipPillSelected: {
         borderColor: tokenColors.brand.light,
         backgroundColor: tokenColors.brand.bg,
     },
 
-    infoTierText: {
+    tipText: {
         color: tokenColors.text.muted,
         fontSize: typography.size.sm,
         fontWeight: typography.weight.bold,
     },
 
-    infoTierTextSelected: {
+    tipTextSelected: {
         color: tokenColors.brand.primary,
     },
 
-    // ===========================================
+    // ==========================================
     // BOTTOM SHEETS
-    // ===========================================
+    // ==========================================
     bottomSheetBg: {
         backgroundColor: tokenColors.background.secondary,
         borderTopLeftRadius: radii.lg,
@@ -555,11 +459,6 @@ export const ui = StyleSheet.create({
 
     bottomSheetContent: {
         flex: 1,
-    },
-
-    bottomSheetCloseBtn: {
-        alignItems: "center",
-        justifyContent: "center",
     },
 
     sheetTopRow: {
@@ -576,40 +475,9 @@ export const ui = StyleSheet.create({
         paddingHorizontal: spacing[7],
     },
 
-    sheetBodyText: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.md,
-        lineHeight: 21,
-        paddingTop: spacing[1],
-    },
-
-    sheetBodyContent: {
-        paddingTop: spacing[1],
-    },
-
-    sheetTitleEnglish: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size.xl,
-        fontWeight: typography.weight.semibold,
-        marginTop: spacing[2],
-        marginBottom: spacing[1],
-    },
-
-    sheetTitleHebrew: {
-        color: tokenColors.brand.primary,
-        fontSize: typography.size.md,
-        textAlign: "left",
-        writingDirection: "rtl",
-    },
-
-    sheetDateInlineText: {
-        color: tokenColors.text.muted,
-        fontSize: typography.size.base,
-    },
-
-    // ===========================================
+    // ==========================================
     // TOP BAR
-    // ===========================================
+    // ==========================================
     topBarSafe: {
         position: "absolute",
         top: 0,
@@ -641,11 +509,6 @@ export const ui = StyleSheet.create({
         backgroundColor: tokenColors.background.secondary,
     },
 
-    topBarDateText: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.sm,
-    },
-
     topBarDevDot: {
         width: 6,
         height: 6,
@@ -664,9 +527,9 @@ export const ui = StyleSheet.create({
         right: spacing[6] + 38 + 10,
     },
 
-    // ===========================================
+    // ==========================================
     // DEV MODAL
-    // ===========================================
+    // ==========================================
     devModalBackdrop: {
         position: "absolute",
         top: 0,
@@ -684,18 +547,6 @@ export const ui = StyleSheet.create({
         padding: spacing[6],
         borderWidth: 1,
         borderColor: tokenColors.border.default,
-    },
-
-    devModalTitle: {
-        color: tokenColors.text.primary,
-        fontSize: typography.size.md,
-        fontWeight: typography.weight.semibold,
-    },
-
-    devModalHelper: {
-        color: tokenColors.text.disabled,
-        fontSize: typography.size.xs,
-        marginTop: spacing[4],
     },
 
     devModalBtnRow: {
@@ -716,10 +567,5 @@ export const ui = StyleSheet.create({
 
     devModalBtnPrimary: {
         backgroundColor: "#313131",
-    },
-
-    devModalBtnText: {
-        color: tokenColors.text.primary,
-        fontWeight: typography.weight.semibold,
     },
 });

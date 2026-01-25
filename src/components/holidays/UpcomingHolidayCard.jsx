@@ -22,9 +22,9 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
 
     return (
         <View style={[ui.card]}>
-            <Text style={ui.upcomingHolidayDate}>{gregLabel}</Text>
+            <Text style={[ui.textBase, ui.textMuted]}>{gregLabel}</Text>
             <Text
-                style={ui.upcomingHolidayTitle}
+                style={[ui.h5, ui.textBrand]}
                 numberOfLines={1}
                 ellipsizeMode="tail"
             >
@@ -32,7 +32,7 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
             </Text>
 
             {!!holiday?.hebrewTitle && (
-                <Text style={ui.upcomingHolidayHebrew}>
+                <Text style={[ui.textBase, ui.textBrand, ui.textHebrew]}>
                     {holiday.hebrewTitle}
                 </Text>
             )}

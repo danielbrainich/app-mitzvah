@@ -44,13 +44,19 @@ export default function ParshaBottomSheet({
                 <>
                     <View style={ui.sheetHeader}>
                         {!!nameLeft ? (
-                            <Text style={ui.sheetTitleEnglish}>
+                            <Text style={[ui.h5, ui.textBrand]}>
                                 {`Parashat ${nameLeft}`}
                             </Text>
                         ) : null}
 
                         {!!nameRight ? (
-                            <Text style={ui.sheetTitleHebrew}>
+                            <Text
+                                style={[
+                                    ui.textBase,
+                                    ui.textBrand,
+                                    ui.textHebrew,
+                                ]}
+                            >
                                 {`פרשת ${nameRight}`}
                             </Text>
                         ) : null}
@@ -61,13 +67,13 @@ export default function ParshaBottomSheet({
             ) : null}
 
             {!!verses ? (
-                <Text style={[ui.sheetDateInlineText, { marginBottom: 8 }]}>
+                <Text style={[ui.textBase, ui.textMuted, { marginBottom: 8 }]}>
                     {verses}
                 </Text>
             ) : null}
 
             {!!blurb ? (
-                <Text style={[ui.sheetBodyText, { paddingTop: 0 }]}>
+                <Text style={[ui.textBody, ui.textWhite, { paddingTop: 0 }]}>
                     {blurb}
                 </Text>
             ) : null}

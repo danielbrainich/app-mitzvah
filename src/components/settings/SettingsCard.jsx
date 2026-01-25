@@ -5,7 +5,7 @@ import { ui } from "../../constants/theme";
 export default function SettingsCard({ title, children }) {
     return (
         <View style={ui.card}>
-            <Text style={ui.cardTitle}>{title}</Text>
+            <Text style={[ui.h5, ui.textBrand]}>{title}</Text>
             {children}
         </View>
     );

@@ -12,14 +12,8 @@ export default function NoHolidayMessage() {
                 paddingHorizontal: 22,
             }}
         >
-            <Text style={ui.holidaysHeaderText}>Today is</Text>
-            <Text
-                style={[
-                    ui.holidaysBigBoldText,
-                    ui.textChutz,
-                    { textAlign: "center" },
-                ]}
-            >
+            <Text style={[ui.h2, ui.textWhite]}>Today is</Text>
+            <Text style={[ui.h1, ui.textBrand, ui.textChutz, ui.textCenter]}>
                 not a Jewish holiday
             </Text>
         </View>
