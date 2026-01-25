@@ -497,6 +497,26 @@ export const ui = StyleSheet.create({
         fontSize: 14,
     },
 
+    shabbatParshaRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+
+    shabbatParshaLeftWrap: {
+        flex: 1,
+        paddingRight: 10,
+        flexDirection: "row",
+        flexWrap: "wrap",
+        alignItems: "center",
+    },
+
+    shabbatParshaKebabPress: {
+        paddingLeft: 10,
+        paddingVertical: 6,
+        alignSelf: "flex-start",
+    },
+
     // ===========================================================================
     // SETTINGS SCREEN
     // ===========================================================================
@@ -511,23 +531,23 @@ export const ui = StyleSheet.create({
     settingsScrollContent: { flexGrow: 1, paddingTop: 10 },
 
     settingsRowLabel: {
-        color: COLORS.textPrimary,
+        color: COLORS.white,
         fontSize: TYPE.base,
         lineHeight: 20,
-        fontWeight: "500",
     },
+
     settingsSubLabel: {
-        color: COLORS.muted,
-        fontSize: TYPE.sm,
+        color: "rgba(255,255,255,0.72)",
+        fontSize: TYPE.xs,
+        lineHeight: 16,
         marginTop: 4,
-        lineHeight: 18,
     },
 
     settingsRow: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingVertical: 8, // was 10
+        paddingVertical: 8,
     },
 
     settingsCardTitle: {
