@@ -1,16 +1,13 @@
 import React, { useMemo, useCallback } from "react";
 import { View, FlatList, useWindowDimensions } from "react-native";
 import UpcomingHolidayCard from "./UpcomingHolidayCard";
-import { ui } from "../constants/theme";
+import { ui } from "../../constants/theme";
 
 export default function UpcomingHolidaysCarousel({
     holidays = [],
-    formatDate,
-    hebrewDate,
     peek = 24,
     gap = 16,
     height = 200,
-    todayIso,
     onAbout,
 }) {
     const { width } = useWindowDimensions();
@@ -44,13 +41,7 @@ export default function UpcomingHolidaysCarousel({
                 ItemSeparatorComponent={Separator}
                 renderItem={({ item }) => (
                     <View style={{ width: cardWidth }}>
-                        <UpcomingHolidayCard
-                            holiday={item}
-                            formatDate={formatDate}
-                            hebrewDate={hebrewDate}
-                            todayIso={todayIso}
-                            onAbout={onAbout}
-                        />
+                        <UpcomingHolidayCard holiday={item} onAbout={onAbout} />
                     </View>
                 )}
             />

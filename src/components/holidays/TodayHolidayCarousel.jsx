@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState, useCallback } from "react";
 import { View, FlatList, useWindowDimensions } from "react-native";
-import { ui } from "../constants/theme"
+import { ui } from "../../constants/theme";
 
 function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));

@@ -1,8 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import * as Haptics from "expo-haptics";
-import { ui } from "../constants/theme";
-import BottomSheetDrawerBase from "./BottomSheetDrawerBase";
+import { ui } from "../../constants/theme";
+import BottomSheetDrawerBase from "../BottomSheetDrawerBase";
 
 export default function LocationBottomSheet({
     visible,

@@ -1,29 +1,19 @@
-import React, { useMemo, useCallback, useState } from "react";
+import React, { useMemo, useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
 import { HDate } from "@hebcal/core";
-import { parseLocalIso, formatGregorianLongFromIso } from "../utils/datetime";
-import { ui } from "../constants/theme"
+import {
+    parseLocalIso,
+    formatGregorianLongFromIso,
+} from "../../utils/datetime";
+import { ui } from "../../constants/theme";
 import * as Haptics from "expo-haptics";
 import { Entypo } from "@expo/vector-icons";
 
-export default function UpcomingHolidayCard({ holiday, hebrewDate, onAbout }) {
-    const [showHebrew, setShowHebrew] = useState(Boolean(hebrewDate));
-
+export default function UpcomingHolidayCard({ holiday, onAbout }) {
     const gregLabel = useMemo(() => {
         if (!holiday?.date) return "";
         return formatGregorianLongFromIso(holiday.date);
     }, [holiday?.date]);
-
-    const hebLabel = useMemo(() => {
-        const d = parseLocalIso(holiday?.date);
-        if (!d) return "";
-        return new HDate(d).toString();
-    }, [holiday?.date]);
-
-    const toggleDate = useCallback(() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        setShowHebrew((v) => !v);
-    }, []);
 
     const onPressDots = useCallback(() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

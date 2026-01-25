@@ -16,8 +16,8 @@ import ShabbatCountdown from "../components/shabbat/ShabbatCountdown";
 import ShabbatTimesCard from "../components/shabbat/ShabbatTimesCard";
 import LocationChip from "../components/shabbat/LocationChip";
 import LoadingCard from "../components/shabbat/LoadingCard";
-import LocationBottomSheet from "../components/LocationBottomSheet";
-import ParshaBottomSheet from "../components/ParshaBottomSheet";
+import LocationBottomSheet from "../components/shabbat/LocationBottomSheet";
+import ParshaBottomSheet from "../components/shabbat/ParshaBottomSheet";
 
 import { buildShabbatViewModel } from "../lib/computeShabbatInfo";
 import { findParshaData } from "../utils/parshaHelpers";
