@@ -7,7 +7,7 @@ import {
     formatGregorianLongFromIso,
     formatHebrewLongFromIso,
 } from "../utils/datetime";
-import { ui, colors } from "../styles/theme";
+import { ui, colors } from "../constants/theme";
 import * as Haptics from "expo-haptics";
 import { Entypo } from "@expo/vector-icons";
 

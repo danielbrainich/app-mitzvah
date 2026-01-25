@@ -20,19 +20,19 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
 import { Entypo } from "@expo/vector-icons";
 
-import useAppLocation from "../../hooks/useAppLocation";
-import useTodayIsoDay from "../../hooks/useTodayIsoDay";
-import { ui, colors } from "../../styles/theme";
-import LocationBottomSheet from "../LocationBottomSheet";
-import ParshaBottomSheet from "../ParshaBottomSheet";
+import useAppLocation from "../hooks/useAppLocation";
+import useTodayIsoDay from "../hooks/useTodayIsoDay";
+import { ui, colors } from "../constants/theme";
+import LocationBottomSheet from "../components/LocationBottomSheet";
+import ParshaBottomSheet from "../components/ParshaBottomSheet";
 
-import { parseLocalIso, formatTime12h } from "../../utils/datetime";
+import { parseLocalIso, formatTime12h } from "../utils/datetime";
 import {
     computeShabbatInfo,
     buildShabbatViewModel,
-} from "../../lib/computeShabbatInfo";
+} from "../lib/computeShabbatInfo";
 
-import { getParshaDataByName } from "../../data/parshiot";
+import { getParshaDataByName } from "../data/parshiot";
 
 /** Small row for time lines */
 function RowLine({ label, value }) {

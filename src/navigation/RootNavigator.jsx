@@ -1,8 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
 import AppNavigator from "./AppNavigator";
-import Settings from "./screens/Settings";
+import Settings from "../screens/Settings";
 
 const Stack = createNativeStackNavigator();
 

@@ -5,14 +5,14 @@ import { useFonts } from "expo-font";
 import * as Haptics from "expo-haptics";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
-import { ui } from "../../styles/theme";
-import { getHolidayDetailsByName } from "../../utils/getHolidayDetails";
-import useTodayIsoDay from "../../hooks/useTodayIsoDay";
+import { ui } from "../constants/theme";
+import { getHolidayDetailsByName } from "../utils/getHolidayDetails";
+import useTodayIsoDay from "../hooks/useTodayIsoDay";
 
-import UpcomingHolidaysCarousel from "../UpcomingHolidaysCarousel";
-import HolidayBottomSheet from "../HolidayBottomSheet";
-import TodayHolidayCarousel from "../TodayHolidayCarousel";
-import { computeHolidaysInfo } from "../../lib/computeHolidaysinfo";
+import UpcomingHolidaysCarousel from "../components/UpcomingHolidaysCarousel";
+import HolidayBottomSheet from "../components/HolidayBottomSheet";
+import TodayHolidayCarousel from "../components/TodayHolidayCarousel";
+import { computeHolidaysInfo } from "../lib/computeHolidaysinfo";
 
 const TODAY_PAGER_HEIGHT = 420;
 const UPCOMING_HEIGHT = 120;

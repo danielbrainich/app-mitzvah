@@ -5,7 +5,7 @@ import * as Haptics from "expo-haptics";
 import { HDate } from "@hebcal/core";
 
 import BottomSheetDrawerBase from "./BottomSheetDrawerBase";
-import { ui, colors } from "../styles/theme";
+import { ui, colors } from "../constants/theme";
 import { parseLocalIso, formatGregorianLongFromIso } from "../utils/datetime";
 
 export default function HolidayBottomSheet({

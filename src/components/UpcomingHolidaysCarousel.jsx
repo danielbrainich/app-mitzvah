@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from "react";
 import { View, FlatList, useWindowDimensions } from "react-native";
 import UpcomingHolidayCard from "./UpcomingHolidayCard";
-import { ui } from "../styles/theme";
+import { ui } from "../constants/theme";
 
 export default function UpcomingHolidaysCarousel({
     holidays = [],

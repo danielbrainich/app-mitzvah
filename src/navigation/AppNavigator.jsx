@@ -4,12 +4,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 
-import Holidays from "./screens/Holidays";
-import Shabbat from "./screens/Shabbat";
-import { colors, nav } from "../styles/theme";
+import Holidays from "../screens/Holidays";
+import Shabbat from "../screens/Shabbat";
+import { colors, nav, ui } from "../constants/theme";
 import useTodayIsoDay from "../hooks/useTodayIsoDay";
-import { TopBar } from "./TopBar";
-import { ui } from "../styles/theme";
+import { TopBar } from "../components/TopBar";
 
 const Tab = createBottomTabNavigator();
 

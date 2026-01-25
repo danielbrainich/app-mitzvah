@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { ui } from "../styles/theme";
+import { ui } from "../constants/theme"
 import BottomSheetDrawerBase from "./BottomSheetDrawerBase";
 
 export default function LocationBottomSheet({

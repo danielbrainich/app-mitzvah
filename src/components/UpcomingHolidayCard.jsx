@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { HDate } from "@hebcal/core";
 import { parseLocalIso, formatGregorianLongFromIso } from "../utils/datetime";
-import { ui, colors } from "../styles/theme";
+import { ui } from "../constants/theme"
 import * as Haptics from "expo-haptics";
 import { Entypo } from "@expo/vector-icons";
 

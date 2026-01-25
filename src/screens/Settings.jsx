@@ -16,7 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Entypo } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 
-import { ui } from "../../styles/theme";
+import { ui } from "../constants/theme";
 import {
     toggleMinorFasts,
     toggleRosheiChodesh,
@@ -25,9 +25,9 @@ import {
     setHavdalahTime,
     setCandleLightingToggle,
     setHavdalahTimeToggle,
-} from "../../store/actions";
+} from "../store/actions";
 import { LayoutAnimation } from "react-native";
-import { useTipsIap } from "../../iap/useTipsIap";
+import { useTipsIap } from "../services/iap/useTipsIap";
 
 const DEFAULT_CANDLE = 0;
 const DEFAULT_HAVDALAH = 0;

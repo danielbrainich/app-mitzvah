@@ -5,7 +5,7 @@ import {
     BottomSheetBackdrop,
     BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import { ui } from "../styles/theme";
+import { ui } from "../constants/theme"
 
 export default function BottomSheetDrawerBase({
     visible,
