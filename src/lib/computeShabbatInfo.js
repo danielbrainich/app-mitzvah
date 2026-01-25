@@ -271,10 +271,6 @@ export function computeShabbatInfo({
     location,
     candleMins = 18,
     havdalahMins = 42,
-
-    // optional "now" for week switching logic (Saturday after Shabbat ends)
-    // In normal mode: pass new Date()
-    // In override mode: pass local-noon of the overridden date (or whatever you freeze to)
     now = new Date(),
 }) {
     if (!(today instanceof Date)) {
@@ -291,26 +287,28 @@ export function computeShabbatInfo({
         havdalahMins,
     });
 
-    // If it's Saturday night *after* Havdalah, switch to next Shabbat
-    const isSaturday = anchor.getDay() === 6;
-    const ended =
-        info.shabbatEnds instanceof Date &&
-        now instanceof Date &&
-        now.getTime() >= info.shabbatEnds.getTime();
+    // Only do Saturday night logic if we have shabbatEnds time (requires location)
+    if (location) {
+        const isSaturday = anchor.getDay() === 6;
+        const ended =
+            info.shabbatEnds instanceof Date &&
+            now instanceof Date &&
+            now.getTime() >= info.shabbatEnds.getTime();
 
-    if (isSaturday && ended) {
-        const nextDay = new Date(anchor);
-        nextDay.setDate(nextDay.getDate() + 1); // Sunday
-        const nextAnchor = normalizeToLocalNoon(nextDay);
+        if (isSaturday && ended) {
+            const nextDay = new Date(anchor);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const nextAnchor = normalizeToLocalNoon(nextDay);
 
-        info = computeForAnchor({
-            anchor: nextAnchor,
-            todayIso,
-            timezone,
-            location,
-            candleMins,
-            havdalahMins,
-        });
+            info = computeForAnchor({
+                anchor: nextAnchor,
+                todayIso,
+                timezone,
+                location,
+                candleMins,
+                havdalahMins,
+            });
+        }
     }
 
     return info;
@@ -330,7 +328,7 @@ function diffPartsNoSeconds(targetDate, now) {
     }
 
     const ms = Math.max(0, targetDate.getTime() - now.getTime());
-    const totalMins = Math.ceil(ms / 60000); // ✅ stable minute rounding
+    const totalMins = Math.ceil(ms / 60000);
 
     const days = Math.floor(totalMins / (24 * 60));
     const hours = Math.floor((totalMins % (24 * 60)) / 60);

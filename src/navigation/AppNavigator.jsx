@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View } from "react-native";
+import { View, Platform } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
@@ -39,14 +39,22 @@ export default function AppNavigator() {
     const hapticTabPress = useMemo(
         () => ({
             tabPress: () => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                // Haptics only work on iOS and Android
+                if (Platform.OS === "ios" || Platform.OS === "android") {
+                    Haptics.impactAsync(
+                        Haptics.ImpactFeedbackStyle.Light
+                    ).catch((err) => {
+                        // Silent fail - haptics are nice-to-have, not critical
+                        console.debug("Haptic feedback failed:", err);
+                    });
+                }
             },
         }),
         []
     );
 
     return (
-        <SafeAreaView style={ui.safeArea}>
+        <SafeAreaView style={ui.safeArea} edges={["top", "left", "right"]}>
             <View style={nav.topSpacer} />
 
             <Tab.Navigator screenOptions={screenOptions}>

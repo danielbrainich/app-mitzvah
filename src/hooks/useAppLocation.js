@@ -5,6 +5,7 @@ import { AppState } from "react-native";
 export default function useAppLocation() {
     const [status, setStatus] = useState("unknown"); // "granted" | "denied" | "undetermined" | "unknown"
     const [location, setLocation] = useState(null);
+    const [error, setError] = useState(null);
 
     // Prevent overlapping refresh calls
     const inFlightRef = useRef(false);
@@ -14,42 +15,68 @@ export default function useAppLocation() {
         inFlightRef.current = true;
 
         try {
+            setError(null);
             const perm = await Location.getForegroundPermissionsAsync();
             setStatus(perm.status);
 
             if (perm.status === "granted") {
-                const pos = await Location.getCurrentPositionAsync({});
-                setLocation({
-                    latitude: pos.coords.latitude,
-                    longitude: pos.coords.longitude,
-                    elevation: pos.coords.altitude ?? null,
+                const pos = await Location.getCurrentPositionAsync({
+                    accuracy: Location.Accuracy.Balanced,
                 });
+
+                if (pos?.coords) {
+                    setLocation({
+                        latitude: pos.coords.latitude,
+                        longitude: pos.coords.longitude,
+                        elevation: pos.coords.altitude ?? null,
+                    });
+                }
             } else {
                 setLocation(null);
             }
 
             return perm.status;
+        } catch (err) {
+            console.error("Error refreshing location:", err);
+            setError(err.message || "Failed to get location");
+            setStatus("unknown");
+            setLocation(null);
+            return "unknown";
         } finally {
             inFlightRef.current = false;
         }
     }, [status]);
 
     const requestPermission = useCallback(async () => {
-        const perm = await Location.requestForegroundPermissionsAsync();
-        setStatus(perm.status);
+        try {
+            setError(null);
+            const perm = await Location.requestForegroundPermissionsAsync();
+            setStatus(perm.status);
 
-        if (perm.status === "granted") {
-            const pos = await Location.getCurrentPositionAsync({});
-            setLocation({
-                latitude: pos.coords.latitude,
-                longitude: pos.coords.longitude,
-                elevation: pos.coords.altitude ?? null,
-            });
-        } else {
+            if (perm.status === "granted") {
+                const pos = await Location.getCurrentPositionAsync({
+                    accuracy: Location.Accuracy.Balanced,
+                });
+
+                if (pos?.coords) {
+                    setLocation({
+                        latitude: pos.coords.latitude,
+                        longitude: pos.coords.longitude,
+                        elevation: pos.coords.altitude ?? null,
+                    });
+                }
+            } else {
+                setLocation(null);
+            }
+
+            return perm.status;
+        } catch (err) {
+            console.error("Error requesting location permission:", err);
+            setError(err.message || "Failed to request permission");
+            setStatus("unknown");
             setLocation(null);
+            return "unknown";
         }
-
-        return perm.status;
     }, []);
 
     // Initial load
@@ -68,13 +95,12 @@ export default function useAppLocation() {
 
             // if iOS is set to "Ask Next Time", coming back to the app triggers a prompt.
             if (AUTO_REQUEST_ON_ACTIVE && st !== "granted") {
-                // requestForegroundPermissionsAsync is what triggers the prompt
                 await requestPermission();
             }
         });
 
-        return () => sub.remove();
+        return () => sub?.remove();
     }, [refresh, requestPermission]);
 
-    return { status, location, refresh, requestPermission };
+    return { status, location, error, refresh, requestPermission };
 }

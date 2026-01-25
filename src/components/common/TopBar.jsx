@@ -19,7 +19,7 @@ import {
 // Local helpers (small + only used here)
 function parseIsoToDate(iso) {
     const [y, m, d] = iso.split("-").map(Number);
-    return new Date(y, m - 1, d);
+    return new Date(y, m - 1, d, 12, 0, 0, 0);
 }
 
 function dateToIsoLocal(d) {
@@ -102,7 +102,7 @@ export function TopBar({ todayIso }) {
                     style={ui.topBarDatePressable}
                 >
                     <View style={ui.topBarDatePill}>
-                        <Entypo name="cycle" size={14} color={colors.muted} />
+                        <Entypo name="cycle" size={14} color={colors.white} />
                         <Text style={ui.topBarDateText} numberOfLines={1}>
                             {label}
                         </Text>
@@ -145,9 +145,20 @@ export function TopBar({ todayIso }) {
                             display={
                                 Platform.OS === "ios" ? "inline" : "default"
                             }
+                            themeVariant="dark"
                             onChange={(event, selectedDate) => {
                                 if (!selectedDate) return;
-                                setPickerDate(selectedDate);
+                                // selectedDate comes from picker, make sure we extract just the date part
+                                const localDate = new Date(
+                                    selectedDate.getFullYear(),
+                                    selectedDate.getMonth(),
+                                    selectedDate.getDate(),
+                                    12,
+                                    0,
+                                    0,
+                                    0
+                                );
+                                setPickerDate(localDate);
                             }}
                         />
 

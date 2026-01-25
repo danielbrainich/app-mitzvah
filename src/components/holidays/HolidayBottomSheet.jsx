@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Platform, StyleSheet } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { HDate } from "@hebcal/core";
@@ -22,7 +22,6 @@ export default function HolidayBottomSheet({
 }) {
     const [showHebrewDate, setShowHebrewDate] = useState(false);
 
-    // ✅ normalize in case you get "YYYY-MM-DDTHH:mm:ss..."
     const isoDay = useMemo(() => {
         if (typeof isoDate !== "string") return "";
         return isoDate.length >= 10 ? isoDate.slice(0, 10) : isoDate;
@@ -44,7 +43,11 @@ export default function HolidayBottomSheet({
 
     const onToggleDate = useCallback(() => {
         if (!isoDay) return;
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        if (Platform.OS === "ios" || Platform.OS === "android") {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+                () => {}
+            );
+        }
         setShowHebrewDate((v) => !v);
     }, [isoDay]);
 
@@ -58,53 +61,50 @@ export default function HolidayBottomSheet({
             defaultIndex={0}
             contentContainerStyle={ui.sheetBody}
         >
-            {hasHeader ? (
+            {hasHeader && (
                 <>
                     <View style={ui.sheetHeader}>
-                        {!!isoDay ? (
-                            <Pressable
-                                onPress={onToggleDate}
-                                hitSlop={12}
-                                style={ui.sheetDateInlinePressable}
-                            >
-                                <View style={ui.sheetDateInlineRow}>
+                        {!!isoDay && (
+                            <Pressable onPress={onToggleDate} hitSlop={12}>
+                                <View style={ui.sheetDateToggle}>
                                     <Entypo
                                         name="cycle"
                                         size={13}
                                         color={colors.muted}
                                     />
-                                    <Text
-                                        style={ui.label}
-                                        numberOfLines={1}
-                                    >
+                                    <Text style={ui.label} numberOfLines={1}>
                                         {dateLabel}
                                     </Text>
                                 </View>
                             </Pressable>
-                        ) : null}
+                        )}
 
                         {!!nameLeft && (
-                            <Text style={[ui.h5, ui.textBrand]}>
+                            <Text style={[ui.h6, ui.textBrand]}>
                                 {nameLeft}
                             </Text>
                         )}
                         {!!nameRight && (
-                            <Text
-                                style={[
-                                    ui.textBase,
-                                    ui.textBrand,
-                                    ui.textHebrew,
-                                ]}
-                            >
+                            <Text style={styles.hebrewText}>
                                 {nameRight}
                             </Text>
                         )}
                     </View>
                     <View style={ui.divider} />
                 </>
-            ) : null}
+            )}
 
             <Text style={ui.paragraph}>{description ?? ""}</Text>
         </BottomSheetDrawerBase>
     );
 }
+
+const styles = StyleSheet.create({
+    hebrewText: {
+        fontSize: 16,
+        color: "#82CBFF",
+        writingDirection: "rtl",
+        textAlign: "left",
+        marginTop: 3,
+    },
+});

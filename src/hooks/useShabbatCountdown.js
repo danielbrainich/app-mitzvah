@@ -2,6 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 import { parseLocalIso } from "../utils/datetime";
 
 function formatIsoLocal(d) {
+    if (!(d instanceof Date) || isNaN(d.getTime())) {
+        return "";
+    }
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
@@ -16,16 +19,19 @@ function localNoonFromIso(iso) {
 
 export function useShabbatCountdown(todayIso) {
     const realIso = useMemo(() => formatIsoLocal(new Date()), []);
-    const isDevOverride = todayIso !== realIso;
+    const isDevOverride = todayIso && todayIso !== realIso;
     const [now, setNow] = useState(() => new Date());
 
     useEffect(() => {
         if (isDevOverride) {
-            const frozen = localNoonFromIso(todayIso) ?? new Date();
-            setNow(frozen);
+            const frozen = localNoonFromIso(todayIso);
+            if (frozen) {
+                setNow(frozen);
+            }
             return;
         }
-        // Update every 60 seconds since countdown only shows minutes
+
+        setNow(new Date());
         const interval = setInterval(() => setNow(new Date()), 60000);
         return () => clearInterval(interval);
     }, [isDevOverride, todayIso]);

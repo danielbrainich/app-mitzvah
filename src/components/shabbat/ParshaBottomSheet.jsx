@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import BottomSheetDrawerBase from "../common/BottomSheetDrawerBase";
 import { ui } from "../../constants/theme";
 
@@ -40,43 +40,39 @@ export default function ParshaBottomSheet({
             defaultIndex={0}
             contentContainerStyle={ui.sheetBody}
         >
-            {hasHeader ? (
+            {hasHeader && (
                 <>
                     <View style={ui.sheetHeader}>
-                        {!!nameLeft ? (
-                            <Text style={[ui.h5, ui.textBrand]}>
+                        {!!nameLeft && (
+                            <Text style={[ui.h6, ui.textBrand]}>
                                 {`Parashat ${nameLeft}`}
                             </Text>
-                        ) : null}
+                        )}
 
-                        {!!nameRight ? (
-                            <Text
-                                style={[
-                                    ui.textBase,
-                                    ui.textBrand,
-                                    ui.textHebrew,
-                                ]}
-                            >
+                        {!!nameRight && (
+                            <Text style={styles.hebrewText}>
                                 {`פרשת ${nameRight}`}
                             </Text>
-                        ) : null}
+                        )}
                     </View>
 
                     <View style={ui.divider} />
                 </>
-            ) : null}
+            )}
 
-            {!!verses ? (
-                <Text style={ui.label}>
-                    {verses}
-                </Text>
-            ) : null}
+            {!!verses && <Text style={ui.label}>{verses}</Text>}
 
-            {!!blurb ? (
-                <Text style={ui.paragraph}>
-                    {blurb}
-                </Text>
-            ) : null}
+            {!!blurb && <Text style={ui.paragraph}>{blurb}</Text>}
         </BottomSheetDrawerBase>
     );
 }
+
+const styles = StyleSheet.create({
+    hebrewText: {
+        fontSize: 16,
+        color: "#82CBFF",
+        writingDirection: "rtl",
+        textAlign: "left",
+        marginTop: 3,
+    },
+});

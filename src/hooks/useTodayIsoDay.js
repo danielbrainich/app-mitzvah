@@ -17,7 +17,8 @@ export async function getDevOverrideIsoDate() {
     try {
         const v = await AsyncStorage.getItem(STORAGE_KEY);
         return v || null;
-    } catch {
+    } catch (err) {
+        console.error("Error reading dev override date:", err);
         return null;
     }
 }
@@ -31,8 +32,18 @@ export async function setDevOverrideIsoDate(isoOrNull) {
         if (!isoOrNull) {
             await AsyncStorage.removeItem(STORAGE_KEY);
         } else {
+            // Basic validation
+            if (
+                typeof isoOrNull !== "string" ||
+                !/^\d{4}-\d{2}-\d{2}$/.test(isoOrNull)
+            ) {
+                console.error("Invalid ISO date format:", isoOrNull);
+                return;
+            }
             await AsyncStorage.setItem(STORAGE_KEY, isoOrNull);
         }
+    } catch (err) {
+        console.error("Error setting dev override date:", err);
     } finally {
         emit(); // important: makes the app re-render immediately
     }
@@ -42,11 +53,15 @@ export async function setDevOverrideIsoDate(isoOrNull) {
  * Subscribe to override changes (internal)
  */
 function subscribe(cb) {
+    if (typeof cb !== "function") return () => {};
     listeners.add(cb);
     return () => listeners.delete(cb);
 }
 
 function formatIsoLocal(d) {
+    if (!(d instanceof Date) || isNaN(d.getTime())) {
+        return formatIsoLocal(new Date()); // fallback to now
+    }
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
@@ -58,7 +73,8 @@ function formatIsoLocal(d) {
  *
  * Priority:
  * 1) Dev override (from TopBar picker)
- * 2) real device date (local)
+ * 2) Debug ISO (for testing)
+ * 3) Real device date (local)
  */
 export default function useTodayIsoDay(debugIso) {
     const [overrideIso, setOverrideIso] = useState(null);
@@ -75,7 +91,7 @@ export default function useTodayIsoDay(debugIso) {
         load();
 
         const unsub = subscribe(() => {
-            load(); // reload from storage whenever TopBar sets/resets
+            if (mounted) load(); // reload from storage whenever TopBar sets/resets
         });
 
         return () => {
@@ -95,15 +111,20 @@ export default function useTodayIsoDay(debugIso) {
             midnight.setHours(0, 0, 1, 0);
             const ms = midnight.getTime() - now.getTime();
 
+            // Safety check: if calculation seems wrong, default to 24 hours
+            const safeMs = ms > 0 && ms < 86400000 ? ms : 86400000;
+
             return setTimeout(() => {
-                // force rerender by briefly setting state to same value (safe)
+                // force rerender by briefly setting state to trigger useMemo
                 setOverrideIso((v) => v);
                 timeoutId = scheduleMidnightTick();
-            }, ms);
+            }, safeMs);
         };
 
         let timeoutId = scheduleMidnightTick();
-        return () => clearTimeout(timeoutId);
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId);
+        };
     }, [overrideIso, debugIso]);
 
     const todayIso = useMemo(() => {

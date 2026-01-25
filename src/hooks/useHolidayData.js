@@ -13,16 +13,26 @@ export function useHolidayData() {
     const [holidays, setHolidays] = useState([]);
     const [todayHolidays, setTodayHolidays] = useState([]);
     const [upcoming, setUpcoming] = useState([]);
+    const [error, setError] = useState(null);
 
     const fetchHolidays = useCallback(() => {
-        const result = computeHolidaysInfo({
-            todayIso,
-            settings: { minorFasts, rosheiChodesh, modernHolidays },
-        });
+        if (!todayIso) return; // Wait for todayIso to be available
 
-        setHolidays(result.holidays);
-        setTodayHolidays(result.todayHolidays);
-        setUpcoming(result.upcoming);
+        try {
+            setError(null);
+            const result = computeHolidaysInfo({
+                todayIso,
+                settings: { minorFasts, rosheiChodesh, modernHolidays },
+            });
+
+            setHolidays(result.holidays || []);
+            setTodayHolidays(result.todayHolidays || []);
+            setUpcoming(result.upcoming || []);
+        } catch (err) {
+            console.error("Error computing holidays:", err);
+            setError(err.message || "Failed to compute holidays");
+            // Keep existing data on error rather than clearing it
+        }
     }, [todayIso, minorFasts, rosheiChodesh, modernHolidays]);
 
     useEffect(() => {
@@ -34,5 +44,6 @@ export function useHolidayData() {
         todayHolidays,
         upcoming,
         todayIso,
+        error,
     };
 }

@@ -7,11 +7,11 @@ import { PersistGate } from "redux-persist/integration/react";
 import { NavigationContainer } from "@react-navigation/native";
 import RootNavigator from "./src/navigation/RootNavigator";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { StatusBar } from "expo-status-bar";
 import * as Font from "expo-font";
 import { store, persistor } from "./src/store/store";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { colors } from "./src/constants/theme";
+import ErrorBoundary from "./src/components/common/ErrorBoundary";
 
 const Stack = createNativeStackNavigator();
 
@@ -46,16 +46,18 @@ export default function App() {
     if (!fontLoaded) return null;
 
     return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
-            <Provider store={store}>
-                <PersistGate loading={null} persistor={persistor}>
-                    <BottomSheetModalProvider>
-                        <NavigationContainer>
-                            <RootNavigator />
-                        </NavigationContainer>
-                    </BottomSheetModalProvider>
-                </PersistGate>
-            </Provider>
-        </GestureHandlerRootView>
+        <ErrorBoundary fallbackMessage="App Mitzvah encountered an error. Please restart.">
+            <GestureHandlerRootView style={{ flex: 1 }}>
+                <Provider store={store}>
+                    <PersistGate loading={null} persistor={persistor}>
+                        <BottomSheetModalProvider>
+                            <NavigationContainer>
+                                <RootNavigator />
+                            </NavigationContainer>
+                        </BottomSheetModalProvider>
+                    </PersistGate>
+                </Provider>
+            </GestureHandlerRootView>
+        </ErrorBoundary>
     );
 }

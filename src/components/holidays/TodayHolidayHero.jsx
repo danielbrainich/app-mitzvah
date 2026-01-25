@@ -1,20 +1,22 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 import { ui } from "../../constants/theme";
 
 export default function TodayHolidayHero({ holiday, onAbout }) {
     if (!holiday) return null;
 
+    const handlePress = () => {
+        if (Platform.OS === "ios" || Platform.OS === "android") {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+                () => {}
+            );
+        }
+        onAbout?.(holiday);
+    };
+
     return (
-        <View
-            style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 22,
-            }}
-        >
+        <View style={ui.centerContent}>
             <Text style={[ui.h2, ui.textWhite]}>Today is</Text>
 
             <Text style={[ui.h1, ui.textBrand, ui.textChutz, ui.textCenter]}>
@@ -22,19 +24,14 @@ export default function TodayHolidayHero({ holiday, onAbout }) {
             </Text>
 
             {holiday.hebrewTitle ? (
-                <Text style={ui.todayHolidayHebrew}>{holiday.hebrewTitle}</Text>
+                <Text style={ui.hebrewSubtitleCard}>{holiday.hebrewTitle}</Text>
             ) : null}
 
             <Pressable
-                onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    onAbout?.(holiday);
-                }}
-                style={ui.todayHolidayMoreInfoButton}
+                onPress={handlePress}
+                style={[ui.button, ui.buttonOutline]}
             >
-                <Text style={ui.todayHolidayMoreInfoButtonText}>
-                    About this holiday
-                </Text>
+                <Text style={ui.buttonText}>About this holiday</Text>
             </Pressable>
         </View>
     );

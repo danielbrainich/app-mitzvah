@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { LayoutAnimation } from "react-native";
+import { LayoutAnimation, Platform } from "react-native";
 import {
     setCandleLightingTime,
     setHavdalahTime,
@@ -19,7 +19,7 @@ export function useShabbatSettings(settings) {
         havdalahTime,
         candleLightingToggle,
         havdalahTimeToggle,
-    } = settings;
+    } = settings || {};
 
     const candleValue = useMemo(() => {
         if (!candleLightingToggle) return 0;
@@ -32,14 +32,19 @@ export function useShabbatSettings(settings) {
     }, [havdalahTimeToggle, havdalahTime]);
 
     const handleCandleLightingToggle = useCallback(() => {
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        if (Platform.OS !== "web") {
+            LayoutAnimation.configureNext(
+                LayoutAnimation.Presets.easeInEaseOut
+            );
+        }
+
         const newToggleState = !candleLightingToggle;
         dispatch(setCandleLightingToggle(newToggleState));
 
         if (newToggleState) {
             const v = Number.isFinite(candleLightingTime)
                 ? candleLightingTime
-                : 0;
+                : DEFAULT_CANDLE;
             dispatch(setCandleLightingTime(v));
         } else {
             dispatch(setCandleLightingTime(null));
@@ -47,12 +52,19 @@ export function useShabbatSettings(settings) {
     }, [dispatch, candleLightingToggle, candleLightingTime]);
 
     const handleHavdalahTimeToggle = useCallback(() => {
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        if (Platform.OS !== "web") {
+            LayoutAnimation.configureNext(
+                LayoutAnimation.Presets.easeInEaseOut
+            );
+        }
+
         const newToggleState = !havdalahTimeToggle;
         dispatch(setHavdalahTimeToggle(newToggleState));
 
         if (newToggleState) {
-            const v = Number.isFinite(havdalahTime) ? havdalahTime : 0;
+            const v = Number.isFinite(havdalahTime)
+                ? havdalahTime
+                : DEFAULT_HAVDALAH;
             dispatch(setHavdalahTime(v));
         } else {
             dispatch(setHavdalahTime(null));
@@ -61,6 +73,7 @@ export function useShabbatSettings(settings) {
 
     const handleCandleValueChange = useCallback(
         (v) => {
+            if (!Number.isFinite(v)) return;
             dispatch(setCandleLightingTime(Math.round(v)));
         },
         [dispatch]
@@ -68,6 +81,7 @@ export function useShabbatSettings(settings) {
 
     const handleHavdalahValueChange = useCallback(
         (v) => {
+            if (!Number.isFinite(v)) return;
             dispatch(setHavdalahTime(Math.round(v)));
         },
         [dispatch]

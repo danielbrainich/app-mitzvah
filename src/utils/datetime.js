@@ -9,11 +9,20 @@ import { HDate } from "@hebcal/core";
 export function formatHebrewLongFromIso(iso) {
     const d = parseLocalIso(iso);
     if (!d) return "";
-    return new HDate(d).toString(); // e.g. "17 Tevet 5786"
+    try {
+        return new HDate(d).toString(); // e.g. "17 Tevet 5786"
+    } catch (error) {
+        console.error("Error formatting Hebrew date:", error);
+        return "";
+    }
 }
 
 /** Format a Date as local YYYY-MM-DD. */
 export function localIsoDate(date) {
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+        console.error("Invalid date passed to localIsoDate:", date);
+        return "";
+    }
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, "0");
     const d = String(date.getDate()).padStart(2, "0");
@@ -27,15 +36,31 @@ export function localIsoToday() {
 
 /** Parse YYYY-MM-DD as a LOCAL Date at midnight. */
 export function parseLocalIso(iso) {
-    if (!iso) return null;
-    const [y, m, d] = String(iso).split("-").map(Number);
-    if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d))
+    if (!iso || typeof iso !== "string") return null;
+    const [y, m, d] = iso.split("-").map(Number);
+    if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) {
         return null;
-    return new Date(y, m - 1, d, 0, 0, 0, 0);
+    }
+    // Validate ranges
+    if (m < 1 || m > 12 || d < 1 || d > 31) {
+        return null;
+    }
+    const date = new Date(y, m - 1, d, 0, 0, 0, 0);
+    // Check if date is valid (catches things like Feb 31)
+    if (isNaN(date.getTime())) {
+        return null;
+    }
+    return date;
 }
 
 /** Compare two Date objects by local calendar day only (ignores time). */
 export function isSameLocalDate(a, b) {
+    if (!(a instanceof Date) || !(b instanceof Date)) {
+        return false;
+    }
+    if (isNaN(a.getTime()) || isNaN(b.getTime())) {
+        return false;
+    }
     return (
         a.getFullYear() === b.getFullYear() &&
         a.getMonth() === b.getMonth() &&
@@ -45,6 +70,14 @@ export function isSameLocalDate(a, b) {
 
 /** Add minutes without mutating the original Date. */
 export function addMinutes(date, mins) {
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+        console.error("Invalid date passed to addMinutes:", date);
+        return new Date(); // Return current date as fallback
+    }
+    if (!Number.isFinite(mins)) {
+        console.error("Invalid minutes passed to addMinutes:", mins);
+        return new Date(date);
+    }
     const d = new Date(date);
     d.setMinutes(d.getMinutes() + mins);
     return d;
@@ -55,6 +88,10 @@ export function addMinutes(date, mins) {
  * Useful because zmanim can include seconds/millis but UI wants clean times.
  */
 export function ceilToMinute(date) {
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+        console.error("Invalid date passed to ceilToMinute:", date);
+        return new Date();
+    }
     const d = new Date(date);
     const hadSeconds = d.getSeconds() > 0 || d.getMilliseconds() > 0;
     d.setSeconds(0, 0);
@@ -64,6 +101,10 @@ export function ceilToMinute(date) {
 
 /** Format a Date for display (12h clock). */
 export function formatTime12h(date) {
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+        console.error("Invalid date passed to formatTime12h:", date);
+        return "";
+    }
     const hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const amPm = hours >= 12 ? "pm" : "am";
@@ -94,6 +135,8 @@ export function formatGregorianLongFromIso(iso) {
  * Format a Date as "January 5, 2026".
  */
 export function formatGregorianLong(date) {
-    if (!(date instanceof Date)) return "";
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+        return "";
+    }
     return gregorianLongFormatter.format(date);
 }

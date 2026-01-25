@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Platform, StyleSheet } from "react-native";
 import { formatGregorianLongFromIso } from "../../utils/datetime";
 import { ui } from "../../constants/theme";
 import * as Haptics from "expo-haptics";
@@ -12,7 +12,9 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
     }, [holiday?.date]);
 
     const onPressDots = useCallback(() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        if (Platform.OS === 'ios' || Platform.OS === 'android') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+        }
         onAbout?.(holiday);
     }, [onAbout, holiday]);
 
@@ -20,7 +22,7 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
         <View style={ui.card}>
             <Text style={ui.label}>{gregLabel}</Text>
             <Text
-                style={[ui.h5, ui.textBrand]}
+                style={[ui.h6, ui.textBrand]} // Changed from h5 to h6
                 numberOfLines={1}
                 ellipsizeMode="tail"
             >
@@ -28,24 +30,39 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
             </Text>
 
             {!!holiday?.hebrewTitle && (
-                <Text style={[ui.textBase, ui.textBrand, ui.textHebrew]}>
+                <Text style={styles.hebrewText}>
                     {holiday.hebrewTitle}
                 </Text>
             )}
 
-            {onAbout ? (
+            {onAbout && (
                 <Pressable
                     onPress={onPressDots}
                     hitSlop={12}
-                    style={[ui.iconButton, ui.upcomingHolidayMoreBtnPos]}
+                    style={[ui.iconButton, styles.moreButton]}
                 >
                     <Entypo
                         name="dots-three-vertical"
-                        size={16}
+                        size={18}
                         color="white"
                     />
                 </Pressable>
-            ) : null}
+            )}
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    moreButton: {
+        position: "absolute",
+        top: 8,
+        right: 20,
+    },
+    hebrewText: {
+        fontSize: 16,
+        color: "#82CBFF",
+        writingDirection: "rtl",
+        textAlign: "left",
+        marginTop: 3,
+    },
+});

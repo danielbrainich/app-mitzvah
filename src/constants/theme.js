@@ -24,6 +24,7 @@ export const colors = {
     error: tokenColors.semantic.error,
     pillBorder: tokenColors.border.light,
     surface2: tokenColors.background.tertiary,
+    brand: tokenColors.brand.primary, // Add this for consistency
 };
 
 /**
@@ -92,6 +93,13 @@ export const ui = StyleSheet.create({
         maxWidth: layout.maxWidth,
     },
 
+    centerContent: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: spacing[7],
+    },
+
     // ==========================================
     // ROWS & COLUMNS
     // ==========================================
@@ -111,13 +119,13 @@ export const ui = StyleSheet.create({
     // ==========================================
     h1: {
         fontSize: typography.size.hero,
-        lineHeight: 64,
+        lineHeight: 70,
         fontWeight: typography.weight.bold,
     },
 
     h2: {
         fontSize: typography.size["5xl"],
-        fontWeight: typography.weight.bold,
+        marginBottom: spacing[2],
     },
 
     h3: {
@@ -132,7 +140,7 @@ export const ui = StyleSheet.create({
 
     h5: {
         fontSize: typography.size.xl,
-        fontWeight: typography.weight.semibold,
+        marginBottom: spacing[2],
     },
 
     h6: {
@@ -190,6 +198,7 @@ export const ui = StyleSheet.create({
         color: tokenColors.text.primary,
         fontSize: typography.size.md,
         lineHeight: 22,
+        marginTop: spacing[1],
     },
 
     textWithMargin: {
@@ -201,6 +210,22 @@ export const ui = StyleSheet.create({
         color: tokenColors.text.muted,
         marginTop: spacing[1],
         marginBottom: spacing[1],
+    },
+
+    hebrewSubtitle: {
+        fontSize: typography.size.lg,
+        color: tokenColors.brand.primary,
+        writingDirection: "rtl",
+        textAlign: "center",
+        marginTop: spacing[2],
+    },
+
+    hebrewSubtitleCard: {
+        fontSize: typography.size["2xl"],
+        color: tokenColors.brand.primary,
+        writingDirection: "rtl",
+        textAlign: "right",
+        marginTop: spacing[1],
     },
 
     // ==========================================
@@ -225,10 +250,9 @@ export const ui = StyleSheet.create({
     card: {
         backgroundColor: tokenColors.background.secondary,
         borderRadius: radii.lg,
-        padding: spacing[7],
-        marginBottom: spacing[7],
+        padding: spacing[5],
+        marginBottom: spacing[4],
     },
-
     // ==========================================
     // BUTTONS
     // ==========================================
@@ -238,18 +262,19 @@ export const ui = StyleSheet.create({
         paddingHorizontal: spacing[6],
         alignItems: "center",
         justifyContent: "center",
+        marginTop: spacing[6],
     },
 
     buttonOutline: {
         backgroundColor: "transparent",
-        borderWidth: 0.5,
-        borderColor: tokenColors.brand.primary,
+        borderWidth: 1,
+        borderColor: tokenColors.text.primary,
     },
 
     buttonText: {
         fontSize: typography.size.md,
-        fontWeight: typography.weight.extrabold,
-        color: tokenColors.brand.primary,
+        fontWeight: typography.weight.medium,
+        color: tokenColors.text.primary,
     },
 
     iconButton: {
@@ -326,7 +351,25 @@ export const ui = StyleSheet.create({
     },
 
     // ==========================================
-    // SHABBAT SCREEN (truly unique styles only)
+    // CAROUSEL / PAGINATION
+    // ==========================================
+    paginationDots: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        paddingVertical: spacing[4],
+    },
+
+    paginationDot: {
+        backgroundColor: tokenColors.border.light,
+    },
+
+    paginationDotActive: {
+        backgroundColor: "rgba(130,203,255,0.95)",
+    },
+
+    // ==========================================
+    // SHABBAT SCREEN
     // ==========================================
     shabbatHeroWrap: {
         alignItems: "center",
@@ -352,51 +395,72 @@ export const ui = StyleSheet.create({
         fontFamily: "ChutzBold",
     },
 
-    // ==========================================
-    // HOLIDAYS SCREEN (truly unique styles only)
-    // ==========================================
-    holidaysTodaySection: {
+    shabbatSectionHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: spacing[1], // 4px - less spacing
+    },
+
+    shabbatTimeRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: spacing[2],
+    },
+
+    shabbatTimeValue: {
+        fontSize: typography.size.md,
+        lineHeight: 22,
+        color: tokenColors.text.primary,
+        maxWidth: "60%",
+        textAlign: "right",
+    },
+
+    shabbatParshaRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+
+    shabbatParshaText: {
+        flexDirection: "row",
+        flexWrap: "wrap",
         flexShrink: 1,
     },
 
-    holidaysTodayPagerSlot: {
-        justifyContent: "center",
-        paddingTop: spacing[2],
+    shabbatParshaButton: {
+        paddingLeft: spacing[3],
     },
 
+    shabbatLocationChip: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing[2],
+        paddingVertical: spacing[2],
+        paddingHorizontal: spacing[4],
+        borderRadius: radii.full,
+        backgroundColor: tokenColors.background.secondary,
+    },
+
+    shabbatLocationChipText: {
+        fontSize: typography.size.sm,
+        color: tokenColors.text.primary,
+    },
+
+    shabbatGreenDot: {
+        width: 8,
+        height: 8,
+        borderRadius: radii.full,
+        backgroundColor: tokenColors.semantic.success,
+    },
+
+    // ==========================================
+    // HOLIDAYS SCREEN
+    // ==========================================
     holidaysComingUpSection: {
         marginTop: "auto",
         paddingTop: spacing[6],
-    },
-
-    holidaysUpcomingCarouselContent: {
-        paddingLeft: 0,
-    },
-
-    todayCarouselWrap: {
-        width: "100%",
-    },
-
-    carouselDotsRow: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: spacing[4],
-        marginBottom: spacing[1],
-    },
-
-    carouselDot: {
-        backgroundColor: tokenColors.border.light,
-    },
-
-    carouselDotActive: {
-        backgroundColor: "rgba(130,203,255,0.95)",
-    },
-
-    upcomingHolidayMoreBtnPos: {
-        position: "absolute",
-        top: spacing[2],
-        right: spacing[5],
     },
 
     // ==========================================
@@ -514,6 +578,12 @@ export const ui = StyleSheet.create({
         paddingHorizontal: spacing[7],
     },
 
+    sheetDateToggle: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing[2],
+    },
+
     // ==========================================
     // TOP BAR
     // ==========================================
@@ -566,6 +636,11 @@ export const ui = StyleSheet.create({
         right: spacing[6] + 38 + 10,
     },
 
+    topBarDateText: {
+        fontSize: typography.size.base,
+        color: tokenColors.text.primary,
+    },
+
     // ==========================================
     // DEV MODAL
     // ==========================================
@@ -606,5 +681,25 @@ export const ui = StyleSheet.create({
 
     devModalBtnPrimary: {
         backgroundColor: "#313131",
+    },
+
+    devModalTitle: {
+        fontSize: typography.size.xl,
+        fontWeight: typography.weight.semibold,
+        color: tokenColors.text.primary,
+        marginBottom: spacing[2],
+    },
+
+    devModalBtnText: {
+        fontSize: typography.size.md,
+        fontWeight: typography.weight.medium,
+        color: tokenColors.text.primary,
+    },
+
+    devModalHelper: {
+        fontSize: typography.size.sm,
+        color: tokenColors.text.muted,
+        marginTop: spacing[4],
+        textAlign: "center",
     },
 });

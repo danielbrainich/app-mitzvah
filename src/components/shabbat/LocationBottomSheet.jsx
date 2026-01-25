@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, Pressable, Platform, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { ui } from "../../constants/theme";
 import BottomSheetDrawerBase from "../common/BottomSheetDrawerBase";
@@ -15,6 +15,15 @@ export default function LocationBottomSheet({
     timezone,
     onEnableLocation,
 }) {
+    const handleEnablePress = () => {
+        if (Platform.OS === "ios" || Platform.OS === "android") {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+                () => {}
+            );
+        }
+        onEnableLocation();
+    };
+
     return (
         <BottomSheetDrawerBase
             visible={visible}
@@ -23,106 +32,68 @@ export default function LocationBottomSheet({
             defaultIndex={defaultIndex}
             contentContainerStyle={ui.sheetBody}
         >
-            <View>
-                <Text style={ui.sheetTitleEnglish}>{title}</Text>
+            <View style={ui.sheetHeader}>
+                <Text style={[ui.h6, ui.textBrand]}>{title}</Text>
             </View>
 
             <View style={ui.divider} />
 
-            <View style={ui.sheetBodyContent}>
-                {hasLocation ? (
-                    <>
-                        <View style={ui.row}>
-                            <Text style={[ui.textBase, ui.textWhite]}>
-                                Timezone
-                            </Text>
-                            <Text
-                                style={[
-                                    ui.textBase,
-                                    ui.textWhite,
-                                    { maxWidth: "60%", textAlign: "right" },
-                                ]}
-                            >
-                                {timezone?.replace(/_/g, " ") || "Unknown"}
-                            </Text>
-                        </View>
-
-                        <View style={ui.row}>
-                            <Text style={[ui.textBase, ui.textWhite]}>
-                                Coordinates
-                            </Text>
-                            <Text
-                                style={[
-                                    ui.textBase,
-                                    ui.textWhite,
-                                    { maxWidth: "60%", textAlign: "right" },
-                                ]}
-                            >
-                                {location?.latitude != null &&
-                                location?.longitude != null
-                                    ? `${location.latitude.toFixed(
-                                          3
-                                      )}, ${location.longitude.toFixed(3)}`
-                                    : "Unknown"}
-                            </Text>
-                        </View>
-
-                        <View style={ui.row}>
-                            <Text style={[ui.textBase, ui.textWhite]}>
-                                Elevation
-                            </Text>
-                            <Text
-                                style={[
-                                    ui.textBase,
-                                    ui.textWhite,
-                                    { maxWidth: "60%", textAlign: "right" },
-                                ]}
-                            >
-                                {Number.isFinite(location?.elevation)
-                                    ? `${location.elevation.toFixed(1)} meters`
-                                    : "Unknown"}
-                            </Text>
-                        </View>
-                    </>
-                ) : (
-                    <>
-                        <Text
-                            style={[
-                                ui.paragraph,
-                                { marginBottom: 12 },
-                            ]}
-                        >
-                            To calculate candle lighting, sundown, and Shabbat
-                            end times for your area, please enable Location
-                            Services for this app.
+            {hasLocation ? (
+                <>
+                    <View style={ui.shabbatTimeRow}>
+                        <Text style={ui.paragraph}>Timezone</Text>
+                        <Text style={styles.rowValue}>
+                            {timezone?.replace(/_/g, " ") || "Unknown"}
                         </Text>
+                    </View>
 
-                        <TouchableOpacity
-                            onPress={() => {
-                                onEnableLocation();
-                                Haptics.impactAsync(
-                                    Haptics.ImpactFeedbackStyle.Light
-                                );
-                            }}
-                            style={[
-                                ui.todayHolidayMoreInfoButton,
-                                {
-                                    paddingVertical: 8,
-                                    paddingHorizontal: 12,
-                                    borderRadius: 12,
-                                    alignSelf: "flex-start",
-                                    marginTop: 6,
-                                },
-                            ]}
-                            activeOpacity={0.85}
-                        >
-                            <Text style={ui.todayHolidayMoreInfoButtonText}>
-                                Enable Location
-                            </Text>
-                        </TouchableOpacity>
-                    </>
-                )}
-            </View>
+                    <View style={ui.shabbatTimeRow}>
+                        <Text style={ui.paragraph}>Coordinates</Text>
+                        <Text style={styles.rowValue}>
+                            {location?.latitude != null &&
+                            location?.longitude != null
+                                ? `${location.latitude.toFixed(
+                                      3
+                                  )}, ${location.longitude.toFixed(3)}`
+                                : "Unknown"}
+                        </Text>
+                    </View>
+
+                    <View style={ui.shabbatTimeRow}>
+                        <Text style={ui.paragraph}>Elevation</Text>
+                        <Text style={styles.rowValue}>
+                            {Number.isFinite(location?.elevation)
+                                ? `${location.elevation.toFixed(1)} meters`
+                                : "Unknown"}
+                        </Text>
+                    </View>
+                </>
+            ) : (
+                <>
+                    <Text style={ui.paragraph}>
+                        To calculate candle lighting, sundown, and Shabbat end
+                        times for your area, please enable Location Services for
+                        this app.
+                    </Text>
+
+                    <Pressable
+                        onPress={handleEnablePress}
+                        style={[ui.button, ui.buttonOutline]}
+                    >
+                        <Text style={ui.buttonText}>Enable Location</Text>
+                    </Pressable>
+                </>
+            )}
         </BottomSheetDrawerBase>
     );
 }
+
+const styles = StyleSheet.create({
+    rowValue: {
+        fontSize: 16,
+        lineHeight: 22,
+        color: "#fff",
+        maxWidth: "60%",
+        textAlign: "right",
+    },
+});

@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState, useCallback } from "react";
-import { View, FlatList, useWindowDimensions } from "react-native";
-import { ui } from "../../constants/theme";
+import { View, FlatList, useWindowDimensions, StyleSheet } from "react-native";
+import { ui, spacing } from "../../constants/theme";
 
 function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));
@@ -15,14 +15,11 @@ export default function TodayHolidayCarousel({
     items = [],
     renderItem,
     height = 320,
-    dotSize = 8,
-    dotGap = 8,
 }) {
     const { width: winW } = useWindowDimensions();
     const listRef = useRef(null);
     const [index, setIndex] = useState(0);
 
-    // matches ui.screen paddingHorizontal: 8 (=> 16 total)
     const pageWidth = useMemo(() => winW - 16, [winW]);
 
     const onMomentumEnd = useCallback(
@@ -36,7 +33,7 @@ export default function TodayHolidayCarousel({
     if (!items?.length) return null;
 
     return (
-        <View style={ui.todayCarouselWrap}>
+        <View style={styles.container}>
             <FlatList
                 ref={listRef}
                 data={items}
@@ -53,26 +50,32 @@ export default function TodayHolidayCarousel({
                 )}
             />
 
-            {/* Dots */}
-            {items.length > 1 ? (
-                <View style={ui.carouselDotsRow}>
+            {items.length > 1 && (
+                <View style={ui.paginationDots}>
                     {items.map((_, i) => (
                         <View
                             key={i}
                             style={[
-                                ui.carouselDot,
-                                {
-                                    width: dotSize,
-                                    height: dotSize,
-                                    borderRadius: dotSize / 2,
-                                    marginHorizontal: dotGap / 2,
-                                },
-                                i === index ? ui.carouselDotActive : null,
+                                styles.dot,
+                                ui.paginationDot,
+                                i === index && ui.paginationDotActive,
                             ]}
                         />
                     ))}
                 </View>
-            ) : null}
+            )}
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        width: "100%",
+    },
+    dot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        marginHorizontal: 4,
+    },
+});

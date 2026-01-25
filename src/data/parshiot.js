@@ -1,5 +1,79 @@
 // Offline parsha blurbs + Torah ranges (2–3 sentences each).
-// Keys are normalized to match a simple "parshaNameToKey" function (see utils/parshaKey.js).
+
+export const HEBCAL_PARSHA_NAMES = {
+    // Genesis
+    Bereshit: "bereshit",
+    Noach: "noach",
+    "Lech-Lecha": "lech_lecha",
+    Vayera: "vayera",
+    "Chayei Sara": "chayei_sarah",
+    Toldot: "toldot",
+    Vayetzei: "vayetze",
+    Vayishlach: "vayishlach",
+    Vayeshev: "vayeshev",
+    Miketz: "miketz",
+    Vayigash: "vayigash",
+    Vayechi: "vayechi",
+
+    // Exodus
+    Shemot: "shemot",
+    Vaera: "vaera",
+    Bo: "bo",
+    Beshalach: "beshalach",
+    Yitro: "yitro",
+    Mishpatim: "mishpatim",
+    Terumah: "terumah",
+    Tetzaveh: "tetzaveh",
+    "Ki Tisa": "ki_tisa",
+    Vayakhel: "vayakhel",
+    Pekudei: "pekudei",
+
+    // Leviticus
+    Vayikra: "vayikra",
+    Tzav: "tzav",
+    Shmini: "shemini",
+    Tazria: "tazria",
+    Metzora: "metzora",
+    "Achrei Mot": "acharei_mot",
+    Kedoshim: "kedoshim",
+    Emor: "emor",
+    Behar: "behar",
+    Bechukotai: "bechukotai",
+
+    // Numbers
+    Bamidbar: "bamidbar",
+    Nasso: "naso",
+    "Beha'alotcha": "behaalotecha",
+    "Sh'lach": "shelach_lecha",
+    Korach: "korach",
+    Chukat: "chukat",
+    Balak: "balak",
+    Pinchas: "pinchas",
+    Matot: "matot",
+    Masei: "masei",
+
+    // Deuteronomy
+    Devarim: "devarim",
+    Vaetchanan: "vaetchanan",
+    Eikev: "eikev",
+    "Re'eh": "reeh",
+    Shoftim: "shoftim",
+    "Ki Teitzei": "ki_tetzei",
+    "Ki Tavo": "ki_tavo",
+    Nitzavim: "nitzavim",
+    Vayeilech: "vayelech",
+    "Ha'Azinu": "haazinu",
+    "Vezot Haberakhah": "vezot_haberachah",
+
+    // Double parshiot (combined readings) - return FIRST parsha data
+    "Vayakhel-Pekudei": "vayakhel",
+    "Tazria-Metzora": "tazria",
+    "Achrei Mot-Kedoshim": "acharei_mot",
+    "Behar-Bechukotai": "behar",
+    "Chukat-Balak": "chukat",
+    "Matot-Masei": "matot",
+    "Nitzavim-Vayeilech": "nitzavim",
+};
 
 export const PARSHIOT = {
     bereshit: {
@@ -386,36 +460,22 @@ export const PARSHIOT = {
     },
 };
 
-// Optional: handle common alternate spellings from libraries and UI.
-export const PARSHA_ALIASES = {
-    // Hebcal sometimes uses different transliteration
-    vzot_haberachah: "vezot_haberachah",
-    v_zot_haberachah: "vezot_haberachah",
-    zot_haberachah: "vezot_haberachah",
-    ha_azinu: "haazinu",
-    haazinu: "haazinu",
-    behalotecha: "behaalotecha",
-    shelach: "shelach_lecha",
-    shlach_lecha: "shelach_lecha",
-    vaetchanan: "vaetchanan",
-    va_etchanan: "vaetchanan",
-};
+/**
+ * Look up parsha data by name (handles "Parashat X" format from Hebcal).
+ * Returns null if not found.
+ */
+export function getParshaDataByName(parshaName) {
+    if (!parshaName || typeof parshaName !== "string") return null;
 
-// Helper to fetch by any incoming name/key
-export function getParshaDataByName(parshaEnglishName) {
-    if (!parshaEnglishName) return null;
+    // Remove "Parashat " prefix if present
+    const cleanName = parshaName.replace(/^Parashat\s+/i, "").trim();
 
-    const raw = String(parshaEnglishName);
+    // Look up the key
+    const key = HEBCAL_PARSHA_NAMES[cleanName];
 
-    // normalize similarly to utils/parshaKey.js
-    let k = raw
-        .toLowerCase()
-        .replace(/[’']/g, "")
-        .replace(/–|—/g, "-")
-        .replace(/\s+/g, "_")
-        .replace(/-/g, "_");
+    if (key && PARSHIOT[key]) {
+        return PARSHIOT[key];
+    }
 
-    if (PARSHA_ALIASES[k]) k = PARSHA_ALIASES[k];
-
-    return PARSHIOT[k] || null;
+    return null;
 }

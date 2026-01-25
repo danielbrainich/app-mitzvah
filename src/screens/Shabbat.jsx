@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useMemo } from "react";
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, Linking } from "react-native";
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -20,7 +20,7 @@ import LocationBottomSheet from "../components/shabbat/LocationBottomSheet";
 import ParshaBottomSheet from "../components/shabbat/ParshaBottomSheet";
 
 import { buildShabbatViewModel } from "../lib/computeShabbatInfo";
-import { findParshaData } from "../utils/parshaHelpers";
+import { getParshaDataByName } from "../data/parshiot";
 
 export default function Shabbat() {
     const [fontsLoaded] = useFonts({
@@ -48,41 +48,25 @@ export default function Shabbat() {
         : 18;
     const havdalahMins = Number.isFinite(havdalahTime) ? havdalahTime : 42;
 
+    const { now, isDevOverride } = useShabbatCountdown(todayIso);
+
     // Custom hooks handle all the complex logic
     const { shabbatInfo, loading, timezone } = useShabbatData({
         location: hasLocation ? location : null,
         candleMins,
         havdalahMins,
+        now,
     });
-
-    const { now, isDevOverride } = useShabbatCountdown(todayIso);
 
     // Build view model for UI
     const vm = useMemo(() => {
-        const base = buildShabbatViewModel(shabbatInfo, now, { isDevOverride });
-
-        if (isDevOverride) {
-            return {
-                ...base,
-                countdown: {
-                    ...base.countdown,
-                    show: true,
-                    parts: base.countdown?.parts ?? {
-                        days: "00",
-                        hours: "00",
-                        mins: "00",
-                    },
-                },
-            };
-        }
-
-        return base;
+        return buildShabbatViewModel(shabbatInfo, now, { isDevOverride });
     }, [shabbatInfo, now, isDevOverride]);
 
     const handleParshaPress = useCallback(() => {
         if (!shabbatInfo?.parshaEnglish) return;
 
-        const data = findParshaData(shabbatInfo.parshaEnglish);
+        const data = getParshaDataByName(shabbatInfo.parshaEnglish);
         if (data) {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setActiveParsha(data);
@@ -91,8 +75,11 @@ export default function Shabbat() {
 
     const handleEnableLocation = useCallback(async () => {
         const status = await requestPermission();
+
         if (status === "granted") {
             setShowLocationDetails(false);
+        } else {
+            Linking.openSettings();
         }
     }, [requestPermission]);
 
@@ -125,23 +112,24 @@ export default function Shabbat() {
                                 paddingTop: 8,
                             }}
                         >
-                            <ShabbatHero isDuring={vm.status.isDuring} />
-
+                            <ShabbatHero
+                                isDuring={vm.status.isDuring}
+                                hasLocation={hasLocation}
+                                showCountdown={vm.countdown?.show}
+                            /> 
                             {vm.countdown?.show && !vm.status.isDuring && (
                                 <ShabbatCountdown parts={vm.countdown.parts} />
                             )}
                         </View>
 
                         {/* Times Card and Location */}
+                        {/* Times Card and Location */}
                         <View style={{ width: "100%" }}>
-                            {shabbatInfo ? (
-                                <ShabbatTimesCard
-                                    shabbatInfo={shabbatInfo}
-                                    onParshaPress={handleParshaPress}
-                                />
-                            ) : (
-                                <LoadingCard loading={loading} />
-                            )}
+                            <ShabbatTimesCard
+                                shabbatInfo={shabbatInfo}
+                                onParshaPress={handleParshaPress}
+                                loading={loading}
+                            />
 
                             <LocationChip
                                 hasLocation={hasLocation}

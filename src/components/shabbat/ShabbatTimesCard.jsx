@@ -1,23 +1,57 @@
 import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import { ui, colors } from "../../constants/theme";
+import { ui } from "../../constants/theme";
 import { formatTime12h } from "../../utils/datetime";
 
 function RowLine({ label, value }) {
     return (
-        <View style={ui.row}>
+        <View style={ui.shabbatTimeRow}>
             <Text style={ui.paragraph}>{label}</Text>
-            <Text style={[ui.paragraph, { maxWidth: "60%", textAlign: "right" }]}>
-                {value}
+            <Text style={ui.shabbatTimeValue}>{value}</Text>
+        </View>
+    );
+}
+
+function SectionHeader({ day, date }) {
+    return (
+        <View style={ui.shabbatSectionHeader}>
+            <Text style={[ui.h6, ui.textBrand]}>{day}</Text>
+            <Text style={ui.label} numberOfLines={1}>
+                {date}
             </Text>
         </View>
     );
 }
 
-export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
+export default function ShabbatTimesCard({
+    shabbatInfo,
+    onParshaPress,
+    loading,
+}) {
     const dash = "—";
 
+    // Show loading state
+    if (loading) {
+        return (
+            <View style={ui.card}>
+                <Text style={ui.paragraph}>Loading Shabbat times...</Text>
+            </View>
+        );
+    }
+
+    // Show error/empty state if no data
+    if (!shabbatInfo) {
+        return (
+            <View style={ui.card}>
+                <Text style={ui.paragraph}>
+                    Unable to load Shabbat information.
+                </Text>
+            </View>
+        );
+    }
+
+    // Normal rendering with dashes for missing times
     const candleValue = shabbatInfo?.candleTime
         ? formatTime12h(shabbatInfo.candleTime)
         : dash;
@@ -42,26 +76,20 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
     return (
         <View style={ui.card}>
             {/* Friday Section */}
-            <View style={ui.shabbatSectionHeaderRow}>
-                <Text style={[ui.h5, ui.textBrand]}>Friday</Text>
-                <Text style={ui.label} numberOfLines={1}>
-                    {shabbatInfo.erevShabbatGregDate}
-                </Text>
-            </View>
-
+            <SectionHeader
+                day="Friday"
+                date={shabbatInfo.erevShabbatGregDate}
+            />
             <RowLine label="Candle lighting" value={candleValue} />
             <RowLine label="Sundown" value={friSundownValue} />
 
             <View style={ui.divider} />
 
             {/* Saturday Section */}
-            <View style={ui.shabbatSectionHeaderRow}>
-                <Text style={[ui.h5, ui.textBrand]}>Saturday</Text>
-                <Text style={ui.label} numberOfLines={1}>
-                    {shabbatInfo.yomShabbatGregDate}
-                </Text>
-            </View>
-
+            <SectionHeader
+                day="Saturday"
+                date={shabbatInfo.yomShabbatGregDate}
+            />
             <RowLine label="Sundown" value={satSundownValue} />
             <RowLine label="Shabbat ends" value={endsValue} />
 
@@ -69,23 +97,9 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
 
             {/* Parasha Section */}
             {canShowParsha ? (
-                <View
-                    style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                    }}
-                >
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            flexWrap: "wrap",
-                            flexShrink: 1,
-                        }}
-                    >
-                        <Text style={ui.paragraph}>
-                            Torah portion:{" "}
-                        </Text>
+                <View style={ui.shabbatParshaRow}>
+                    <View style={ui.shabbatParshaText}>
+                        <Text style={ui.paragraph}>Torah portion: </Text>
                         <Pressable onPress={onParshaPress} hitSlop={12}>
                             <Text style={ui.paragraph}>
                                 {shabbatInfo.parshaEnglish}
@@ -96,17 +110,17 @@ export default function ShabbatTimesCard({ shabbatInfo, onParshaPress }) {
                     <Pressable
                         onPress={onParshaPress}
                         hitSlop={12}
-                        style={{ paddingLeft: 12 }}
+                        style={ui.shabbatParshaButton}
                     >
                         <Entypo
                             name="dots-three-vertical"
-                            size={16}
-                            color={colors.muted}
+                            size={18}
+                            color="white"
                         />
                     </Pressable>
                 </View>
             ) : (
-                <Text style={[ui.textBase, ui.textWhite]}>
+                <Text style={ui.paragraph}>
                     This week's holiday Torah reading replaces the parasha.
                 </Text>
             )}

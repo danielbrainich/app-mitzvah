@@ -4,14 +4,7 @@ import { ui } from "../../constants/theme";
 
 export default function NoHolidayMessage() {
     return (
-        <View
-            style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 22,
-            }}
-        >
+        <View style={ui.centerContent}>
             <Text style={[ui.h2, ui.textWhite]}>Today is</Text>
             <Text style={[ui.h1, ui.textBrand, ui.textChutz, ui.textCenter]}>
                 not a Jewish holiday
