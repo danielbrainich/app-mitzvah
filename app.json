@@ -1,53 +1,51 @@
 {
-  "expo": {
-    "name": "appMitzvah",
-    "slug": "appmitzvah",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show you accurate Havdalah and Shabbat candle lighting times.",
-        "ITSAppUsesNonExemptEncryption": false
-      },
-      "bundleIdentifier": "com.danielbrainich.appmitzvah.dev"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
-      },
-      "package": "com.danielbrainich.appmitzvah"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-font",
-      "@react-native-community/datetimepicker",
-      "react-native-iap"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "0ef1a8ba-991b-4ae3-9e4e-fd073ac54bb0"
-      }
-    },
-    "owner": "danielbrainich",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/0ef1a8ba-991b-4ae3-9e4e-fd073ac54bb0"
+    "expo": {
+        "name": "AppMitzvah",
+        "slug": "app-mitzvah",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "userInterfaceStyle": "dark",
+        "splash": {
+            "image": "./assets/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#000000"
+        },
+        "assetBundlePatterns": ["**/*"],
+        "ios": {
+            "supportsTablet": true,
+            "infoPlist": {
+                "NSLocationWhenInUseUsageDescription": "AppMitzvah needs your location to calculate accurate Shabbat candle lighting and Havdalah times for your area.",
+                "ITSAppUsesNonExemptEncryption": false
+            },
+            "bundleIdentifier": "com.danielbrainich.appmitzvah"
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive-icon.png",
+                "backgroundColor": "#000000"
+            },
+            "package": "com.danielbrainich.appmitzvah"
+        },
+        "web": {
+            "favicon": "./assets/favicon.png"
+        },
+        "plugins": [
+            "expo-font",
+            "@react-native-community/datetimepicker",
+            "react-native-iap"
+        ],
+        "extra": {
+            "eas": {
+                "projectId": "0ef1a8ba-991b-4ae3-9e4e-fd073ac54bb0"
+            }
+        },
+        "owner": "danielbrainich",
+        "runtimeVersion": {
+            "policy": "appVersion"
+        },
+        "updates": {
+            "url": "https://u.expo.dev/0ef1a8ba-991b-4ae3-9e4e-fd073ac54bb0"
+        }
     }
-  }
 }

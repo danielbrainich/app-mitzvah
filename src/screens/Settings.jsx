@@ -150,7 +150,12 @@ export default function Settings({ navigation }) {
                         />
 
                         <TouchableOpacity
-                            style={[ui.button, ui.buttonOutline]}
+                            style={[
+                                ui.button,
+                                ui.buttonOutline,
+                                { borderColor: "#82CBFF" },
+                                { marginBottom: 8 },
+                            ]}
                             onPress={onTipPress}
                             activeOpacity={0.85}
                             disabled={iapLoading}
@@ -158,7 +163,12 @@ export default function Settings({ navigation }) {
                             {iapLoading ? (
                                 <ActivityIndicator />
                             ) : (
-                                <Text style={ui.buttonText}>
+                                <Text
+                                    style={[
+                                        ui.buttonText,
+                                        { color: "#82CBFF" },
+                                    ]}
+                                >
                                     Tip ${tipAmount}
                                 </Text>
                             )}

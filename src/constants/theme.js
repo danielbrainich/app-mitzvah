@@ -433,21 +433,6 @@ export const ui = StyleSheet.create({
         paddingLeft: spacing[3],
     },
 
-    shabbatLocationChip: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: spacing[2],
-        paddingVertical: spacing[2],
-        paddingHorizontal: spacing[4],
-        borderRadius: radii.full,
-        backgroundColor: tokenColors.background.secondary,
-    },
-
-    shabbatLocationChipText: {
-        fontSize: typography.size.sm,
-        color: tokenColors.text.primary,
-    },
-
     shabbatGreenDot: {
         width: 8,
         height: 8,
@@ -517,7 +502,6 @@ export const ui = StyleSheet.create({
     infoTiersRow: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: spacing[7],
         marginTop: spacing[1],
     },
 

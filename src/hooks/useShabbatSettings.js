@@ -42,14 +42,12 @@ export function useShabbatSettings(settings) {
         dispatch(setCandleLightingToggle(newToggleState));
 
         if (newToggleState) {
-            const v = Number.isFinite(candleLightingTime)
-                ? candleLightingTime
-                : DEFAULT_CANDLE;
-            dispatch(setCandleLightingTime(v));
+            // Always start at 0 when toggling ON
+            dispatch(setCandleLightingTime(0));
         } else {
             dispatch(setCandleLightingTime(null));
         }
-    }, [dispatch, candleLightingToggle, candleLightingTime]);
+    }, [dispatch, candleLightingToggle]);
 
     const handleHavdalahTimeToggle = useCallback(() => {
         if (Platform.OS !== "web") {
@@ -62,14 +60,12 @@ export function useShabbatSettings(settings) {
         dispatch(setHavdalahTimeToggle(newToggleState));
 
         if (newToggleState) {
-            const v = Number.isFinite(havdalahTime)
-                ? havdalahTime
-                : DEFAULT_HAVDALAH;
-            dispatch(setHavdalahTime(v));
+            // Always start at 0 when toggling ON
+            dispatch(setHavdalahTime(0));
         } else {
             dispatch(setHavdalahTime(null));
         }
-    }, [dispatch, havdalahTimeToggle, havdalahTime]);
+    }, [dispatch, havdalahTimeToggle]);
 
     const handleCandleValueChange = useCallback(
         (v) => {

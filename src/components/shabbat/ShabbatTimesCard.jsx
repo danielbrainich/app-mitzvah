@@ -1,7 +1,8 @@
-import React from "react";
-import { View, Text, Pressable } from "react-native";
+import React, { useState, useCallback } from "react";
+import { View, Text, Pressable, Platform } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import { ui } from "../../constants/theme";
+import * as Haptics from "expo-haptics";
+import { ui, colors } from "../../constants/theme";
 import { formatTime12h } from "../../utils/datetime";
 
 function RowLine({ label, value }) {
@@ -13,13 +14,29 @@ function RowLine({ label, value }) {
     );
 }
 
-function SectionHeader({ day, date }) {
+function SectionHeader({ day, gregDate, hebDate }) {
+    const [showHebrew, setShowHebrew] = useState(false);
+
+    const handleToggle = useCallback(() => {
+        if (Platform.OS === "ios" || Platform.OS === "android") {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+                () => {}
+            );
+        }
+        setShowHebrew((v) => !v);
+    }, []);
+
     return (
         <View style={ui.shabbatSectionHeader}>
             <Text style={[ui.h6, ui.textBrand]}>{day}</Text>
-            <Text style={ui.label} numberOfLines={1}>
-                {date}
-            </Text>
+            <Pressable onPress={handleToggle} hitSlop={12}>
+                <View style={ui.sheetDateToggle}>
+                    <Entypo name="cycle" size={13} color={colors.muted} />
+                    <Text style={ui.label} numberOfLines={1}>
+                        {showHebrew ? hebDate : gregDate}
+                    </Text>
+                </View>
+            </Pressable>
         </View>
     );
 }
@@ -78,7 +95,8 @@ export default function ShabbatTimesCard({
             {/* Friday Section */}
             <SectionHeader
                 day="Friday"
-                date={shabbatInfo.erevShabbatGregDate}
+                gregDate={shabbatInfo.erevShabbatGregDate || dash}
+                hebDate={shabbatInfo.erevShabbatHebrewDate || dash}
             />
             <RowLine label="Candle lighting" value={candleValue} />
             <RowLine label="Sundown" value={friSundownValue} />
@@ -88,7 +106,8 @@ export default function ShabbatTimesCard({
             {/* Saturday Section */}
             <SectionHeader
                 day="Saturday"
-                date={shabbatInfo.yomShabbatGregDate}
+                gregDate={shabbatInfo.yomShabbatGregDate || dash}
+                hebDate={shabbatInfo.yomShabbatHebrewDate || dash}
             />
             <RowLine label="Sundown" value={satSundownValue} />
             <RowLine label="Shabbat ends" value={endsValue} />
@@ -121,7 +140,9 @@ export default function ShabbatTimesCard({
                 </View>
             ) : (
                 <Text style={ui.paragraph}>
-                    This week's holiday Torah reading replaces the parasha.
+                    {shabbatInfo?.parshaReplacedByHoliday
+                        ? "This week's holiday Torah reading replaces the parasha."
+                        : "Enable location to see the Torah portion."}
                 </Text>
             )}
         </View>

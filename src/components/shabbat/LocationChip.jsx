@@ -11,7 +11,7 @@ export default function LocationChip({ hasLocation, onPress }) {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     onPress();
                 }}
-                style={[ui.shabbatLocationChip, { alignSelf: "flex-start" }]}
+                style={[ui.topBarDatePill, { alignSelf: "flex-start" }]}
                 hitSlop={12}
             >
                 <View
@@ -20,7 +20,7 @@ export default function LocationChip({ hasLocation, onPress }) {
                         !hasLocation ? { backgroundColor: "#ff3b30" } : null,
                     ]}
                 />
-                <Text style={ui.shabbatLocationChipText}>
+                <Text style={ui.topBarDateText}>
                     {hasLocation ? "Location on" : "Location off"}
                 </Text>
             </Pressable>

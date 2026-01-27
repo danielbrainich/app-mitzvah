@@ -41,7 +41,7 @@ export default function Holidays() {
                 style={ui.screen}
                 contentContainerStyle={[
                     ui.scrollContent,
-                    { flexGrow: 1, paddingBottom: tabBarHeight + 16 },
+                    { flexGrow: 1, paddingBottom: tabBarHeight },
                 ]}
             >
                 <View style={{ flex: 1 }}>

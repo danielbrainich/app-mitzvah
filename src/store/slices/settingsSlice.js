@@ -4,8 +4,8 @@ const initialState = {
     minorFasts: true,
     rosheiChodesh: true,
     modernHolidays: true,
-    candleLightingTime: null,
-    havdalahTime: null,
+    candleLightingTime: 18,
+    havdalahTime: 42,
     candleLightingToggle: true,
     havdalahTimeToggle: true,
 };
@@ -24,10 +24,10 @@ const settingsSlice = createSlice({
             state.modernHolidays = !state.modernHolidays;
         },
         setCandleLightingTime: (state, action) => {
-            state.candleLightingTime = action.payload ?? null;
+            state.candleLightingTime = action.payload;
         },
         setHavdalahTime: (state, action) => {
-            state.havdalahTime = action.payload ?? null;
+            state.havdalahTime = action.payload;
         },
         setCandleLightingToggle: (state, action) => {
             state.candleLightingToggle = action.payload;
