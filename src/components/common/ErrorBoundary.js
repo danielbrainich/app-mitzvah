@@ -1,7 +1,6 @@
 // src/components/common/ErrorBoundary.js
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { colors, typography, spacing } from "../../constants/design-tokens";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { ui } from "../../constants/theme";
 
 class ErrorBoundary extends React.Component {
@@ -15,10 +14,7 @@ class ErrorBoundary extends React.Component {
     }
 
     componentDidCatch(error, errorInfo) {
-        // Log error details for debugging
         console.error("ErrorBoundary caught an error:", error, errorInfo);
-
-        // TODO: Send to error tracking service (Sentry, etc.) when ready
     }
 
     handleReset = () => {
@@ -28,42 +24,33 @@ class ErrorBoundary extends React.Component {
     render() {
         if (this.state.hasError) {
             return (
-                <View
-                    style={[
-                        ui.container,
-                        ui.centerContent,
-                        { backgroundColor: colors.bg },
-                    ]}
-                >
+                <View style={[ui.safeArea, ui.centerContent]}>
                     <Text
                         style={[
                             ui.h2,
-                            ui.textWhite,
-                            { marginBottom: spacing.md },
+                            ui.textBrand,
+                            ui.textCenter,
+                            ui.mb3,
+                            { writingDirection: "rtl" },
                         ]}
                     >
-                        Oy vey!
-                    </Text>
+                        חבל!
+                    </Text>{" "}
                     <Text
                         style={[
                             ui.paragraph,
-                            ui.textWhite,
-                            {
-                                textAlign: "center",
-                                marginBottom: spacing.lg,
-                                paddingHorizontal: spacing.lg,
-                            },
+                            ui.textCenter,
+                            ui.mb5,
+                            styles.message,
                         ]}
                     >
-                        {this.props.fallbackMessage || "Something went wrong"}
+                        Something went wrong. Please try again.
                     </Text>
                     <TouchableOpacity
-                        style={[ui.button, { backgroundColor: colors.brand }]}
+                        style={[ui.button, ui.buttonOutline]}
                         onPress={this.handleReset}
                     >
-                        <Text style={[ui.buttonText, ui.textWhite]}>
-                            Try Again
-                        </Text>
+                        <Text style={ui.buttonText}>Try Again</Text>
                     </TouchableOpacity>
                 </View>
             );
@@ -72,5 +59,11 @@ class ErrorBoundary extends React.Component {
         return this.props.children;
     }
 }
+
+const styles = StyleSheet.create({
+    message: {
+        paddingHorizontal: 32,
+    },
+});
 
 export default ErrorBoundary;

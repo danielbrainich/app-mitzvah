@@ -64,7 +64,6 @@ export default function Holidays() {
                     </View>
                 </View>
             </ScrollView>
-
             <HolidayBottomSheet
                 visible={aboutOpen}
                 onClose={closeAbout}
