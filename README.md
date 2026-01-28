@@ -1,14 +1,14 @@
 # App Mitzvah
 
-A simple Jewish calendar app for iOS and Android that helps you keep track of Shabbat times and Jewish holidays.
+A simple Jewish calendar app for iOS that helps you keep track of Shabbat times and Jewish holidays.
 
 ## Features
 
-- **Shabbat Times**: Candle lighting, sundown, and Havdalah times based on your location
-- **Torah Portions**: Weekly parasha with descriptions
+- **Shabbat Times**: Candle lighting, sundown, and Shabbat end times based on your location
+- **Torah Portions**: Weekly Torah portion with descriptions
 - **Holiday Calendar**: Upcoming Jewish holidays with Hebrew dates
-- **Customizable Settings**: Adjust candle lighting and Havdalah times to your custom
-- **Holiday Filters**: Toggle modern holidays, minor fasts, and Rosh Chodesh
+- **Customizable Settings**: Adjust candle lighting and Shabbat end times to your custom
+- **Holiday Filters**: Toggle modern holidays, minor fasts, and Roshei Chodesh
 - **Location-based**: Automatic calculations for your area
 
 ## Built With

@@ -1,7 +1,7 @@
 {
     "expo": {
         "name": "AppMitzvah",
-        "slug": "app-mitzvah",
+        "slug": "appmitzvah",
         "version": "1.0.0",
         "orientation": "portrait",
         "icon": "./assets/icon.png",

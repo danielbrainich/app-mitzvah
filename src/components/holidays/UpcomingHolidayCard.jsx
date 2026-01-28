@@ -12,51 +12,64 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
     }, [holiday?.date]);
 
     const onPressDots = useCallback(() => {
-        if (Platform.OS === 'ios' || Platform.OS === 'android') {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+        if (Platform.OS === "ios" || Platform.OS === "android") {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+                () => {}
+            );
         }
         onAbout?.(holiday);
     }, [onAbout, holiday]);
 
     return (
         <View style={ui.card}>
-            <Text style={ui.label}>{gregLabel}</Text>
-            <Text
-                style={[ui.h6, ui.textBrand]} // Changed from h5 to h6
-                numberOfLines={1}
-                ellipsizeMode="tail"
-            >
-                {holiday?.title ?? ""}
-            </Text>
+            <View style={styles.header}>
+                <View style={styles.textContainer}>
+                    <Text style={ui.label}>{gregLabel}</Text>
 
-            {!!holiday?.hebrewTitle && (
-                <Text style={styles.hebrewText}>
-                    {holiday.hebrewTitle}
-                </Text>
-            )}
+                    <Pressable
+                        onPress={onPressDots}
+                        disabled={!onAbout}
+                        hitSlop={8}
+                    >
+                        <Text
+                            style={[ui.h6, ui.textBrand]}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                        >
+                            {holiday?.title ?? ""}
+                        </Text>
 
-            {onAbout && (
-                <Pressable
-                    onPress={onPressDots}
-                    hitSlop={12}
-                    style={[ui.iconButton, styles.moreButton]}
-                >
-                    <Entypo
-                        name="dots-three-vertical"
-                        size={18}
-                        color="white"
-                    />
-                </Pressable>
-            )}
+                        {!!holiday?.hebrewTitle && (
+                            <Text style={styles.hebrewText}>
+                                {holiday.hebrewTitle}
+                            </Text>
+                        )}
+                    </Pressable>
+                </View>
+
+                {onAbout && (
+                    <Pressable
+                        onPress={onPressDots}
+                        hitSlop={12}
+                        style={ui.iconButton}
+                    >
+                        <Entypo
+                            name="dots-three-vertical"
+                            size={18}
+                            color="white"
+                        />
+                    </Pressable>
+                )}
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    moreButton: {
-        position: "absolute",
-        top: 8,
-        right: 20,
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
     },
     hebrewText: {
         fontSize: 16,

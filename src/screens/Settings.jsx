@@ -1,12 +1,5 @@
-import React, { useState, useCallback } from "react";
-import {
-    Text,
-    View,
-    ScrollView,
-    Pressable,
-    TouchableOpacity,
-    ActivityIndicator,
-} from "react-native";
+import React from "react";
+import { Text, View, ScrollView, Pressable, Linking } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { useFonts } from "expo-font";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,13 +12,11 @@ import {
     toggleRosheiChodesh,
     toggleModernHolidays,
 } from "../store/slices/settingsSlice";
-import { useTipsIap } from "../services/iap/useTipsIap";
 import { useShabbatSettings } from "../hooks/useShabbatSettings";
 
 import SettingsCard from "../components/settings/SettingsCard";
 import SettingSwitch from "../components/settings/SettingSwitch";
 import SettingSlider from "../components/settings/SettingSlider";
-import TipSelector from "../components/settings/TipSelector";
 
 export default function Settings({ navigation }) {
     const [fontsLoaded] = useFonts({
@@ -36,9 +27,6 @@ export default function Settings({ navigation }) {
     const { minorFasts, rosheiChodesh, modernHolidays } = settings;
 
     const dispatch = useDispatch();
-    const [tipAmount, setTipAmount] = useState(5);
-
-    const { loading: iapLoading, tip } = useTipsIap();
 
     const {
         candleValue,
@@ -50,8 +38,6 @@ export default function Settings({ navigation }) {
         handleCandleValueChange,
         handleHavdalahValueChange,
     } = useShabbatSettings(settings);
-
-    const onTipPress = useCallback(() => tip(tipAmount), [tip, tipAmount]);
 
     if (!fontsLoaded) return null;
 
@@ -137,43 +123,26 @@ export default function Settings({ navigation }) {
                         )}
                     </SettingsCard>
 
-                    {/* Support */}
-                    <SettingsCard title="Support">
-                        <Text style={ui.paragraph}>
-                            If you enjoy using this app, please consider leaving
-                            a tip!
+                             {/* Footer - Fixed to bottom */}
+                <View style={{ flex: 1 }} />
+
+                <View style={{ paddingVertical: 24, alignItems: 'center' }}>
+                    <Text style={[ui.label, { textAlign: 'center', marginBottom: 4 }]}>
+                        Version 2.0.0
+                    </Text>
+
+                    <Pressable
+                        onPress={() => {
+                            Linking.openURL('https://danielbrainich.com');
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }}
+                        hitSlop={12}
+                    >
+                        <Text style={[ui.label, { textAlign: 'center', opacity: 0.6 }]}>
+                            💙 dbrainich
                         </Text>
-
-                        <TipSelector
-                            selectedAmount={tipAmount}
-                            onAmountChange={setTipAmount}
-                        />
-
-                        <TouchableOpacity
-                            style={[
-                                ui.button,
-                                ui.buttonOutline,
-                                { borderColor: "#82CBFF" },
-                                { marginBottom: 8 },
-                            ]}
-                            onPress={onTipPress}
-                            activeOpacity={0.85}
-                            disabled={iapLoading}
-                        >
-                            {iapLoading ? (
-                                <ActivityIndicator />
-                            ) : (
-                                <Text
-                                    style={[
-                                        ui.buttonText,
-                                        { color: "#82CBFF" },
-                                    ]}
-                                >
-                                    Tip ${tipAmount}
-                                </Text>
-                            )}
-                        </TouchableOpacity>
-                    </SettingsCard>
+                    </Pressable>
+                </View>
                 </ScrollView>
             </SafeAreaView>
         </View>
