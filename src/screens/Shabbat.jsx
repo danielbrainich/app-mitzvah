@@ -15,7 +15,6 @@ import ShabbatHero from "../components/shabbat/ShabbatHero";
 import ShabbatCountdown from "../components/shabbat/ShabbatCountdown";
 import ShabbatTimesCard from "../components/shabbat/ShabbatTimesCard";
 import LocationChip from "../components/shabbat/LocationChip";
-import LoadingCard from "../components/shabbat/LoadingCard";
 import LocationBottomSheet from "../components/shabbat/LocationBottomSheet";
 import ParshaBottomSheet from "../components/shabbat/ParshaBottomSheet";
 
@@ -28,7 +27,7 @@ export default function Shabbat() {
     });
 
     const [showLocationDetails, setShowLocationDetails] = useState(false);
-    const [activeParsha, setActiveParsha] = useState(null);
+    const [activeParshiot, setActiveParshiot] = useState(null);
 
     const { candleLightingTime, havdalahTime } = useSelector(
         (state) => state.settings
@@ -64,12 +63,19 @@ export default function Shabbat() {
     }, [shabbatInfo, now, isDevOverride]);
 
     const handleParshaPress = useCallback(() => {
+        console.log('1. parshaEnglish from shabbatInfo:', shabbatInfo?.parshaEnglish);
+
         if (!shabbatInfo?.parshaEnglish) return;
 
         const data = getParshaDataByName(shabbatInfo.parshaEnglish);
+        console.log('2. data returned from getParshaDataByName:', data);
+
         if (data) {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setActiveParsha(data);
+            setActiveParshiot(data);
+            console.log('3. Set activeParshiot to:', data);
+        } else {
+            console.log('3. No data returned, activeParshiot not set');
         }
     }, [shabbatInfo?.parshaEnglish]);
 
@@ -116,13 +122,12 @@ export default function Shabbat() {
                                 isDuring={vm.status.isDuring}
                                 hasLocation={hasLocation}
                                 showCountdown={vm.countdown?.show}
-                            /> 
+                            />
                             {vm.countdown?.show && !vm.status.isDuring && (
                                 <ShabbatCountdown parts={vm.countdown.parts} />
                             )}
                         </View>
 
-                        {/* Times Card and Location */}
                         {/* Times Card and Location */}
                         <View style={{ width: "100%" }}>
                             <ShabbatTimesCard
@@ -153,13 +158,10 @@ export default function Shabbat() {
             />
 
             <ParshaBottomSheet
-                visible={!!activeParsha}
-                onClose={() => setActiveParsha(null)}
-                english={activeParsha?.english}
-                hebrew={activeParsha?.hebrew}
-                verses={activeParsha?.verses}
-                blurb={activeParsha?.blurb}
-                snapPoints={["35%", "65%"]}
+                visible={!!activeParshiot}
+                onClose={() => setActiveParshiot(null)}
+                parshiot={activeParshiot}
+                snapPoints={["35%", "75%"]}
             />
         </View>
     );

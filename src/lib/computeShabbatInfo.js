@@ -1,4 +1,3 @@
-// lib/computeShabbatInfo.js
 import {
     HebrewCalendar,
     Location as HebcalLocation,
@@ -330,12 +329,12 @@ function diffPartsNoSeconds(targetDate, now) {
             mins: 0,
             daysStr: "00",
             hoursStr: "00",
-            minsStr: "00"
+            minsStr: "00",
         };
     }
 
     const ms = Math.max(0, targetDate.getTime() - now.getTime());
-    const totalMins = Math.floor(ms / 60000); 
+    const totalMins = Math.floor(ms / 60000);
 
     const days = Math.floor(totalMins / (24 * 60));
     const hours = Math.floor((totalMins % (24 * 60)) / 60);
@@ -350,7 +349,6 @@ function diffPartsNoSeconds(targetDate, now) {
         minsStr: pad2(mins),
     };
 }
-
 
 /**
  * buildShabbatViewModel(info, now, opts)

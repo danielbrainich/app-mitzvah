@@ -65,14 +65,14 @@ export const HEBCAL_PARSHA_NAMES = {
     "Ha'Azinu": "haazinu",
     "Vezot Haberakhah": "vezot_haberachah",
 
-    // Double parshiot (combined readings) - return FIRST parsha data
-    "Vayakhel-Pekudei": "vayakhel",
-    "Tazria-Metzora": "tazria",
-    "Achrei Mot-Kedoshim": "acharei_mot",
-    "Behar-Bechukotai": "behar",
-    "Chukat-Balak": "chukat",
-    "Matot-Masei": "matot",
-    "Nitzavim-Vayeilech": "nitzavim",
+    // Double parshiot (combined readings)
+    "Vayakhel-Pekudei": ["vayakhel", "pekudei"],
+    "Tazria-Metzora": ["tazria", "metzora"],
+    "Achrei Mot-Kedoshim": ["acharei_mot", "kedoshim"],
+    "Behar-Bechukotai": ["behar", "bechukotai"],
+    "Chukat-Balak": ["chukat", "balak"],
+    "Matot-Masei": ["matot", "masei"],
+    "Nitzavim-Vayeilech": ["nitzavim", "vayelech"],
 };
 
 export const PARSHIOT = {
@@ -464,18 +464,27 @@ export const PARSHIOT = {
  * Look up parsha data by name (handles "Parashat X" format from Hebcal).
  * Returns null if not found.
  */
-export function getParshaDataByName(parshaName) {
-    if (!parshaName || typeof parshaName !== "string") return null;
+export function getParshaDataByName(hebcalName) {
+    if (!hebcalName) return null;
 
-    // Remove "Parashat " prefix if present
-    const cleanName = parshaName.replace(/^Parashat\s+/i, "").trim();
+    // Strip "Parashat " or "Parasha " prefix
+    const cleanName = hebcalName
+        .replace(/^Parashat\s+/i, "")
+        .replace(/^Parasha\s+/i, "")
+        .trim();
 
-    // Look up the key
     const key = HEBCAL_PARSHA_NAMES[cleanName];
-
-    if (key && PARSHIOT[key]) {
-        return PARSHIOT[key];
+    if (!key) {
+        console.log("Could not find key for:", cleanName);
+        return null;
     }
 
-    return null;
+    // Handle double parshiot
+    if (Array.isArray(key)) {
+        return key.map((k) => PARSHIOT[k]).filter(Boolean);
+    }
+
+    // Single parsha
+    const parsha = PARSHIOT[key];
+    return parsha ? [parsha] : null;
 }

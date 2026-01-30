@@ -1,36 +1,15 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import BottomSheetDrawerBase from "../common/BottomSheetDrawerBase";
 import { ui } from "../../constants/theme";
 
-function stripParshaEnglish(name) {
-    if (!name) return "";
-    return String(name)
-        .replace(/^\s*parash(at|a|ah)?\s+/i, "")
-        .replace(/^\s*parsha\s+/i, "")
-        .trim();
-}
-
-function stripParshaHebrew(name) {
-    if (!name) return "";
-    return String(name)
-        .replace(/^\s*פרשת\s+/, "")
-        .trim();
-}
-
 export default function ParshaBottomSheet({
     visible,
     onClose,
-    english,
-    hebrew,
-    verses,
-    blurb,
-    snapPoints = ["45%", "80%"],
+    parshiot,
+    snapPoints = ["35%", "75%"],
 }) {
-    const nameLeft = useMemo(() => stripParshaEnglish(english), [english]);
-    const nameRight = useMemo(() => stripParshaHebrew(hebrew), [hebrew]);
-
-    const hasHeader = !!(nameLeft || nameRight);
+    if (!parshiot || parshiot.length === 0) return null;
 
     return (
         <BottomSheetDrawerBase
@@ -40,29 +19,28 @@ export default function ParshaBottomSheet({
             defaultIndex={0}
             contentContainerStyle={ui.sheetBody}
         >
-            {hasHeader && (
-                <>
-                    <View style={ui.sheetHeader}>
-                        {!!nameLeft && (
-                            <Text style={[ui.h6, ui.textBrand]}>
-                                {`Parashat ${nameLeft}`}
-                            </Text>
-                        )}
+            {parshiot.map((parsha, index) => (
+                <View key={parsha.key}>
+                    {index > 0 && <View style={[ui.divider, { marginVertical: 24 }]} />}
 
-                        {!!nameRight && (
-                            <Text style={styles.hebrewText}>
-                                {`פרשת ${nameRight}`}
-                            </Text>
-                        )}
+                    <View style={ui.sheetHeader}>
+                        <Text style={[ui.h6, ui.textBrand]}>
+                            {parsha.english}
+                        </Text>
+                        <Text style={styles.hebrewText}>
+                            {parsha.hebrew}
+                        </Text>
+                    <Text style={ui.label}>
+                        {parsha.verses}
+                    </Text>
                     </View>
 
                     <View style={ui.divider} />
-                </>
-            )}
 
-            {!!verses && <Text style={ui.label}>{verses}</Text>}
+                    <Text style={ui.paragraph}>{parsha.blurb}</Text>
 
-            {!!blurb && <Text style={ui.paragraph}>{blurb}</Text>}
+                </View>
+            ))}
         </BottomSheetDrawerBase>
     );
 }
