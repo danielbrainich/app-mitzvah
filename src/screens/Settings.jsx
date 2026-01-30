@@ -123,26 +123,38 @@ export default function Settings({ navigation }) {
                         )}
                     </SettingsCard>
 
-                             {/* Footer - Fixed to bottom */}
-                <View style={{ flex: 1 }} />
+                    {/* Footer - Fixed to bottom */}
+                    <View style={{ flex: 1 }} />
 
-                <View style={{ paddingVertical: 24, alignItems: 'center' }}>
-                    <Text style={[ui.label, { textAlign: 'center', marginBottom: 4 }]}>
-                        Version 2.0.0
-                    </Text>
-
-                    <Pressable
-                        onPress={() => {
-                            Linking.openURL('https://danielbrainich.com');
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        }}
-                        hitSlop={12}
-                    >
-                        <Text style={[ui.label, { textAlign: 'center', opacity: 0.6 }]}>
-                            💙 dbrainich
+                    <View style={{ paddingVertical: 24, alignItems: "center" }}>
+                        <Text
+                            style={[
+                                ui.label,
+                                { textAlign: "center", marginBottom: 4 },
+                            ]}
+                        >
+                            Version 2.0.0
                         </Text>
-                    </Pressable>
-                </View>
+
+                        <Pressable
+                            onPress={() => {
+                                Linking.openURL("https://danielbrainich.com");
+                                Haptics.impactAsync(
+                                    Haptics.ImpactFeedbackStyle.Light
+                                );
+                            }}
+                            hitSlop={12}
+                        >
+                            <Text
+                                style={[
+                                    ui.label,
+                                    { textAlign: "center", opacity: 0.6 },
+                                ]}
+                            >
+                                💙 dbrainy
+                            </Text>
+                        </Pressable>
+                    </View>
                 </ScrollView>
             </SafeAreaView>
         </View>

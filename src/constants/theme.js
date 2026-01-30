@@ -379,13 +379,13 @@ export const ui = StyleSheet.create({
 
     shabbatCountdownCard: {
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "center",
+        gap: spacing[3],
         marginVertical: spacing[5],
-        marginHorizontal: 80,
     },
 
     shabbatCountdownItem: {
-        width: "33.33%",
+        minWidth: 72,
         alignItems: "center",
     },
 

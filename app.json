@@ -2,7 +2,7 @@
     "expo": {
         "name": "AppMitzvah",
         "slug": "appmitzvah",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "orientation": "portrait",
         "icon": "./assets/icon.png",
         "userInterfaceStyle": "dark",
@@ -15,7 +15,7 @@
         "ios": {
             "supportsTablet": true,
             "infoPlist": {
-                "NSLocationWhenInUseUsageDescription": "AppMitzvah needs your location to calculate accurate Shabbat candle lighting and Havdalah times for your area.",
+                "NSLocationWhenInUseUsageDescription": "AppMitzvah needs your location to calculate accurate Shabbat candle lighting and end times for your area.",
                 "ITSAppUsesNonExemptEncryption": false
             },
             "bundleIdentifier": "com.danielbrainich.appmitzvah"

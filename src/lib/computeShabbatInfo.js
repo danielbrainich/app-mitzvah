@@ -324,22 +324,33 @@ function pad2(n) {
 
 function diffPartsNoSeconds(targetDate, now) {
     if (!(targetDate instanceof Date) || !(now instanceof Date)) {
-        return { days: "00", hours: "00", mins: "00" };
+        return {
+            days: 0,
+            hours: 0,
+            mins: 0,
+            daysStr: "00",
+            hoursStr: "00",
+            minsStr: "00"
+        };
     }
 
     const ms = Math.max(0, targetDate.getTime() - now.getTime());
-    const totalMins = Math.ceil(ms / 60000);
+    const totalMins = Math.floor(ms / 60000); 
 
     const days = Math.floor(totalMins / (24 * 60));
     const hours = Math.floor((totalMins % (24 * 60)) / 60);
     const mins = totalMins % 60;
 
     return {
-        days: pad2(days),
-        hours: pad2(hours),
-        mins: pad2(mins),
+        days,
+        hours,
+        mins,
+        daysStr: pad2(days),
+        hoursStr: pad2(hours),
+        minsStr: pad2(mins),
     };
 }
+
 
 /**
  * buildShabbatViewModel(info, now, opts)
