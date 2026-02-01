@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Pressable, Linking, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
+import { Entypo } from "@expo/vector-icons";
 import { ui } from "../../constants/theme";
 
 export default function ShabbatHero({
@@ -10,6 +11,7 @@ export default function ShabbatHero({
     candleMins,
     havdalahMins,
     now,
+    onShowDetails,
 }) {
     const handleEnableLocation = () => {
         if (Platform.OS === "ios" || Platform.OS === "android") {
@@ -18,6 +20,15 @@ export default function ShabbatHero({
             );
         }
         Linking.openSettings();
+    };
+
+    const handleShowDetails = () => {
+        if (Platform.OS === "ios" || Platform.OS === "android") {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+                () => {}
+            );
+        }
+        onShowDetails?.();
     };
 
     // Format time nicely (e.g., "7:23 PM")
@@ -29,24 +40,34 @@ export default function ShabbatHero({
         }).format(date);
     };
 
+    // Format date without day of week (e.g., "February 6th")
+    const formatDateShort = (dateString) => {
+        if (!dateString) return "";
+        const parts = dateString.split(", ");
+        if (parts.length < 2) return dateString;
+
+        const monthDay = parts[1];
+        const [month, day] = monthDay.split(" ");
+        const dayNum = parseInt(day);
+
+        const suffix =
+            dayNum % 10 === 1 && dayNum !== 11
+                ? "st"
+                : dayNum % 10 === 2 && dayNum !== 12
+                ? "nd"
+                : dayNum % 10 === 3 && dayNum !== 13
+                ? "rd"
+                : "th";
+
+        return `${month} ${dayNum}${suffix}`;
+    };
+
     const isFridayNow = now.getDay() === 5;
     const isSaturdayNow = now.getDay() === 6;
 
     return (
         <View style={ui.shabbatHeroWrap}>
-            {!hasLocation ? (
-                <>
-                    <Text style={[ui.paragraph, ui.textCenter]}>
-                        Enable Location Services{"\n"}for detailed Shabbat times
-                    </Text>
-                    <Pressable
-                        onPress={handleEnableLocation}
-                        style={[ui.button, ui.buttonOutline]}
-                    >
-                        <Text style={ui.buttonText}>Enable location</Text>
-                    </Pressable>
-                </>
-            ) : isDuring ? (
+            {isDuring ? (
                 <>
                     <Text
                         style={[
@@ -58,34 +79,51 @@ export default function ShabbatHero({
                     >
                         Shabbat Shalom
                     </Text>
-                    {shabbatInfo?.shabbatEnds && (
-                        <>
-                            <Text
-                                style={[
-                                    ui.h5,
-                                    ui.textWhite,
-                                    ui.textCenter,
-                                    ui.mt3,
-                                ]}
+                    {hasLocation && shabbatInfo?.shabbatEnds ? (
+                        <View style={{ marginTop: 12 }}>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: 6,
+                                }}
                             >
-                                Shabbat ends{" "}
-                                {isSaturdayNow ? "today" : "Saturday"} at
+                                <Text
+                                    style={[ui.h5, ui.textWhite, ui.textCenter]}
+                                >
+                                    Shabbat ends{" "}
+                                    {isSaturdayNow ? "today" : "Saturday"} at{" "}
+                                    {formatTime(shabbatInfo.shabbatEnds)}
+                                </Text>
+                                <Pressable
+                                    onPress={handleShowDetails}
+                                    hitSlop={12}
+                                    style={ui.iconButtonSmall}
+                                >
+                                    <Entypo
+                                        name="dots-three-vertical"
+                                        size={16}
+                                        color="white"
+                                    />
+                                </Pressable>
+                            </View>
+                        </View>
+                    ) : (
+                        <View style={{ marginTop: 24 }}>
+                            <Text style={[ui.paragraph, ui.textCenter]}>
+                                Enable Location Services{"\n"}for Shabbat end
+                                time
                             </Text>
-                            <Text
-                                style={[
-                                    ui.h3,
-                                    ui.textWhite,
-                                    ui.textCenter,
-                                    ui.mt1,
-                                ]}
+                            <Pressable
+                                onPress={handleEnableLocation}
+                                style={[ui.button, ui.buttonOutline]}
                             >
-                                {formatTime(shabbatInfo.shabbatEnds)}
-                            </Text>
-                            <Text style={[ui.label, ui.textCenter]}>
-                                {havdalahMins} minutes after{" "}
-                                {formatTime(shabbatInfo.saturdaySunset)} sundown
-                            </Text>
-                        </>
+                                <Text style={ui.buttonText}>
+                                    Enable location
+                                </Text>
+                            </Pressable>
+                        </View>
                     )}
                 </>
             ) : (
@@ -97,13 +135,15 @@ export default function ShabbatHero({
                             </Text>
                             <Text
                                 style={[
-                                    ui.h1,
+                                    ui.h3,
                                     ui.textBrand,
                                     ui.textChutz,
                                     ui.textCenter,
+                                    ui.mt2,
+                                    ui.mb2,
                                 ]}
                             >
-                                Today
+                                this evening
                             </Text>
                         </>
                     ) : (
@@ -113,34 +153,61 @@ export default function ShabbatHero({
                             </Text>
                             <Text
                                 style={[
-                                    ui.h1,
+                                    ui.h3,
                                     ui.textBrand,
                                     ui.textChutz,
                                     ui.textCenter,
                                     ui.mt2,
                                 ]}
                             >
-                                {shabbatInfo?.erevShabbatShort}
+                                {formatDateShort(shabbatInfo?.erevShabbatShort)}
                             </Text>
                         </>
                     )}
-                    {shabbatInfo?.candleTime && (
-                        <>
-                            <Text
-                                style={[
-                                    ui.h3,
-                                    ui.textWhite,
-                                    ui.textCenter,
-                                    ui.mt2,
-                                ]}
+
+                    {hasLocation && shabbatInfo?.candleTime ? (
+                        <View style={{ marginTop: 8 }}>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: 6,
+                                }}
                             >
-                                {formatTime(shabbatInfo.candleTime)}
+                                <Text
+                                    style={[ui.h5, ui.textWhite, ui.textCenter]}
+                                >
+                                    Candle lighting at{" "}
+                                    {formatTime(shabbatInfo.candleTime)}
+                                </Text>
+                                <Pressable
+                                    onPress={handleShowDetails}
+                                    hitSlop={12}
+                                    style={ui.iconButtonSmall}
+                                >
+                                    <Entypo
+                                        name="dots-three-vertical"
+                                        size={16}
+                                        color="white"
+                                    />
+                                </Pressable>
+                            </View>
+                        </View>
+                    ) : (
+                        <View style={{ marginTop: 16 }}>
+                            <Text style={[ui.paragraph, ui.textCenter]}>
+                                Share your location for{"\n"}Shabbat times
                             </Text>
-                            <Text style={[ui.label, ui.textCenter]}>
-                                {candleMins} minutes before{" "}
-                                {formatTime(shabbatInfo.fridaySunset)} sundown
-                            </Text>
-                        </>
+                            <Pressable
+                                onPress={handleEnableLocation}
+                                style={[ui.button, ui.buttonOutline]}
+                            >
+                                <Text style={ui.buttonText}>
+                                    Enable location
+                                </Text>
+                            </Pressable>
+                        </View>
                     )}
                 </>
             )}

@@ -124,12 +124,12 @@ export const ui = StyleSheet.create({
     },
 
     h2: {
-        fontSize: typography.size["5xl"],
+        fontSize: typography.size["4xl"],
         marginBottom: spacing[2],
     },
 
     h3: {
-        fontSize: typography.size["4xl"],
+        fontSize: 45,
         fontWeight: typography.weight.bold,
     },
 
@@ -139,7 +139,7 @@ export const ui = StyleSheet.create({
     },
 
     h5: {
-        fontSize: typography.size.xl,
+        fontSize: typography.size.lg,
         marginBottom: spacing[2],
     },
 

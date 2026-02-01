@@ -11,6 +11,7 @@ import { useShabbatData } from "../hooks/useShabbatData";
 import { useShabbatCountdown } from "../hooks/useShabbatCountdown.js";
 import { ui } from "../constants/theme";
 
+import ShabbatTimesBottomSheet from "../components/shabbat/ShabbatTimesBottomSheet";
 import ShabbatHero from "../components/shabbat/ShabbatHero";
 import LocationChip from "../components/shabbat/LocationChip";
 import LocationBottomSheet from "../components/shabbat/LocationBottomSheet";
@@ -81,6 +82,8 @@ export default function Shabbat() {
 
     const tabBarHeight = useBottomTabBarHeight();
 
+    const [showShabbatTimes, setShowShabbatTimes] = useState(false);
+
     if (!fontsLoaded) return null;
 
     return (
@@ -110,6 +113,7 @@ export default function Shabbat() {
                             candleMins={candleMins}
                             havdalahMins={havdalahMins}
                             now={now}
+                            onShowDetails={() => setShowShabbatTimes(true)}
                         />
                     </View>
                 </View>
@@ -153,6 +157,14 @@ export default function Shabbat() {
                 onClose={() => setActiveParshiot(null)}
                 parshiot={activeParshiot}
                 snapPoints={["35%", "75%"]}
+            />
+
+            <ShabbatTimesBottomSheet
+                visible={showShabbatTimes}
+                onClose={() => setShowShabbatTimes(false)}
+                shabbatInfo={shabbatInfo}
+                candleMins={candleMins}
+                havdalahMins={havdalahMins}
             />
         </View>
     );

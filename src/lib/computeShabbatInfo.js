@@ -326,11 +326,20 @@ export function buildShabbatViewModel(
     const candleTime = shabbatInfo?.candleTime ?? null;
     const shabbatEnds = shabbatInfo?.shabbatEnds ?? null;
 
-    const isDuring =
-        candleTime instanceof Date &&
-        shabbatEnds instanceof Date &&
-        now >= candleTime &&
-        now < shabbatEnds;
+    let isDuring;
+    if (candleTime instanceof Date && shabbatEnds instanceof Date) {
+        // With location: use precise times
+        isDuring = now >= candleTime && now < shabbatEnds;
+    } else {
+        // Without location: use day-based fallback
+        // Shabbat is from Friday evening through Saturday evening
+        const dayOfWeek = now.getDay();
+        const hourOfDay = now.getHours();
+
+        isDuring =
+            dayOfWeek === 6 || // All of Saturday
+            (dayOfWeek === 5 && hourOfDay >= 18); // Friday after 6 PM
+    }
 
     const isBefore = candleTime instanceof Date && now < candleTime;
 
