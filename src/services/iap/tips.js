@@ -1,13 +1,12 @@
 import * as RNIap from "react-native-iap";
 
 export const TIP_PRODUCT_IDS = [
-    "appmitzvah.tip_1",
-    "appmitzvah.tip_2",
-    "appmitzvah.tip_3",
-    "appmitzvah.tip_4",
-    "appmitzvah.tip_5",
-];
-
+    "appmitzvah.tip.c1",
+    "appmitzvah.tip.c2",
+    "appmitzvah.tip.c3",
+    "appmitzvah.tip.c4",
+    "appmitzvah.tip.c5",
+  ];
 export async function initIap() {
     try {
         await RNIap.initConnection();
@@ -63,7 +62,7 @@ export async function buyTip(amount) {
         throw new Error("Invalid tip amount");
     }
 
-    const productId = `appmitzvah.tip_${amount}`;
+    const productId = `appmitzvah.tip.c${amount}`;
 
     // Verify this product ID exists in our list
     if (!TIP_PRODUCT_IDS.includes(productId)) {
