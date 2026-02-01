@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const STORAGE_KEY = "DEV_OVERRIDE_ISO_DATE";
+const TIME_STORAGE_KEY = "DEV_OVERRIDE_TIME";
 
 // simple in-memory pubsub so hooks update immediately
 const listeners = new Set();
@@ -46,6 +47,36 @@ export async function setDevOverrideIsoDate(isoOrNull) {
         console.error("Error setting dev override date:", err);
     } finally {
         emit(); // important: makes the app re-render immediately
+    }
+}
+
+/**
+ * Get the persisted dev override time (timestamp) or null
+ */
+export async function getDevOverrideTime() {
+    try {
+        const v = await AsyncStorage.getItem(TIME_STORAGE_KEY);
+        return v ? parseInt(v, 10) : null;
+    } catch (err) {
+        console.error("Error reading dev override time:", err);
+        return null;
+    }
+}
+
+/**
+ * Set dev override time (timestamp) or clear with null
+ */
+export async function setDevOverrideTime(timestampOrNull) {
+    try {
+        if (timestampOrNull === null || timestampOrNull === undefined) {
+            await AsyncStorage.removeItem(TIME_STORAGE_KEY);
+        } else {
+            await AsyncStorage.setItem(TIME_STORAGE_KEY, String(timestampOrNull));
+        }
+    } catch (err) {
+        console.error("Error setting dev override time:", err);
+    } finally {
+        emit();
     }
 }
 

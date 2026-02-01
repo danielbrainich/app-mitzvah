@@ -9,7 +9,7 @@ export default function ShabbatTimesBottomSheet({
     shabbatInfo,
     candleMins,
     havdalahMins,
-    snapPoints = ["35%", "55%"],
+    snapPoints = ["40%", "60%"],
 }) {
     // Format time nicely (e.g., "7:23 PM")
     const formatTime = (date) => {
@@ -36,53 +36,61 @@ export default function ShabbatTimesBottomSheet({
 
             <View style={ui.divider} />
 
-            {/* Friday Times */}
-            <View style={ui.mb5}>
-                <Text style={[ui.label, ui.mb2]}>
+            {/* Erev Shabbat (Friday) */}
+            <View style={{ marginBottom: 24 }}>
+                <Text style={[ui.label, { marginBottom: 8 }]}>
+                    Erev Shabbat
+                </Text>
+
+                <Text style={[ui.h6, ui.textWhite, { marginBottom: 12 }]}>
                     {shabbatInfo.erevShabbatShort}
                 </Text>
 
                 {shabbatInfo.candleTime && (
-                    <View style={[ui.row, ui.mb2]}>
-                        <Text style={ui.textWhite}>Candle lighting</Text>
-                        <Text style={ui.textWhite}>
-                            {formatTime(shabbatInfo.candleTime)}
-                        </Text>
-                    </View>
-                )}
+                    <>
+                        <View style={[ui.row, { marginBottom: 8 }]}>
+                            <Text style={ui.textWhite}>Candle lighting</Text>
+                            <Text style={[ui.textWhite, { fontWeight: "600" }]}>
+                                {formatTime(shabbatInfo.candleTime)}
+                            </Text>
+                        </View>
 
-                {shabbatInfo.fridaySunset && (
-                    <View style={[ui.row, ui.mb1]}>
-                        <Text style={ui.label}>Sundown</Text>
-                        <Text style={ui.label}>
-                            {formatTime(shabbatInfo.fridaySunset)}
-                        </Text>
-                    </View>
+                        {shabbatInfo.fridaySunset && (
+                            <Text style={[ui.label, { fontSize: 13 }]}>
+                                {candleMins} minutes before{" "}
+                                {formatTime(shabbatInfo.fridaySunset)} sundown
+                            </Text>
+                        )}
+                    </>
                 )}
             </View>
 
-            {/* Saturday Times */}
-            <View>
-                <Text style={[ui.label, ui.mb2]}>
+            <View style={ui.divider} />
+
+            {/* Yom Shabbat (Saturday) */}
+            <View style={{ marginTop: 24 }}>
+                <Text style={[ui.label, { marginBottom: 8 }]}>Yom Shabbat</Text>
+
+                <Text style={[ui.h6, ui.textWhite, { marginBottom: 12 }]}>
                     {shabbatInfo.yomShabbatShort}
                 </Text>
 
                 {shabbatInfo.shabbatEnds && (
-                    <View style={[ui.row, ui.mb2]}>
-                        <Text style={ui.textWhite}>Shabbat ends</Text>
-                        <Text style={ui.textWhite}>
-                            {formatTime(shabbatInfo.shabbatEnds)}
-                        </Text>
-                    </View>
-                )}
+                    <>
+                        <View style={[ui.row, { marginBottom: 8 }]}>
+                            <Text style={ui.textWhite}>Shabbat ends</Text>
+                            <Text style={[ui.textWhite, { fontWeight: "600" }]}>
+                                {formatTime(shabbatInfo.shabbatEnds)}
+                            </Text>
+                        </View>
 
-                {shabbatInfo.saturdaySunset && (
-                    <View style={[ui.row, ui.mb1]}>
-                        <Text style={ui.label}>Sundown</Text>
-                        <Text style={ui.label}>
-                            {formatTime(shabbatInfo.saturdaySunset)}
-                        </Text>
-                    </View>
+                        {shabbatInfo.saturdaySunset && (
+                            <Text style={[ui.label, { fontSize: 13 }]}>
+                                {havdalahMins} minutes after{" "}
+                                {formatTime(shabbatInfo.saturdaySunset)} sundown
+                            </Text>
+                        )}
+                    </>
                 )}
             </View>
         </BottomSheetDrawerBase>

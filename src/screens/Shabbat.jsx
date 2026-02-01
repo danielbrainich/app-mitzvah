@@ -8,7 +8,7 @@ import * as Haptics from "expo-haptics";
 import useAppLocation from "../hooks/useAppLocation";
 import useTodayIsoDay from "../hooks/useTodayIsoDay";
 import { useShabbatData } from "../hooks/useShabbatData";
-import { useShabbatCountdown } from "../hooks/useShabbatCountdown.js";
+import { useCurrentTime } from "../hooks/useCurrentTime.js";
 import { ui } from "../constants/theme";
 
 import ShabbatTimesBottomSheet from "../components/shabbat/ShabbatTimesBottomSheet";
@@ -46,7 +46,7 @@ export default function Shabbat() {
         : 18;
     const havdalahMins = Number.isFinite(havdalahTime) ? havdalahTime : 42;
 
-    const { now, isDevOverride } = useShabbatCountdown(todayIso);
+    const { now, isDevOverride } = useCurrentTime(todayIso);
 
     const { shabbatInfo, loading, timezone } = useShabbatData({
         location: hasLocation ? location : null,
@@ -131,7 +131,7 @@ export default function Shabbat() {
                         }
                         onPress={handleParshaPress}
                     />
-                    <View style={ui.mt3}>
+                    <View style={ui.mb3}>
                         <LocationChip
                             hasLocation={hasLocation}
                             onPress={() => setShowLocationDetails(true)}

@@ -331,14 +331,13 @@ export function buildShabbatViewModel(
         // With location: use precise times
         isDuring = now >= candleTime && now < shabbatEnds;
     } else {
-        // Without location: use day-based fallback
-        // Shabbat is from Friday evening through Saturday evening
+        // Without location: use approximate day/hour-based fallback
         const dayOfWeek = now.getDay();
         const hourOfDay = now.getHours();
 
         isDuring =
-            dayOfWeek === 6 || // All of Saturday
-            (dayOfWeek === 5 && hourOfDay >= 18); // Friday after 6 PM
+            (dayOfWeek === 5 && hourOfDay >= 18) || // Friday 6 PM onwards
+            (dayOfWeek === 6 && hourOfDay < 20); // Saturday before 8 PM
     }
 
     const isBefore = candleTime instanceof Date && now < candleTime;

@@ -14,9 +14,11 @@ import { Entypo } from "@expo/vector-icons";
 import {
     setDevOverrideIsoDate,
     getDevOverrideIsoDate,
+    setDevOverrideTime,
+    getDevOverrideTime,
 } from "../../hooks/useTodayIsoDay";
 
-// Local helpers (small + only used here)
+// Local helpers
 function parseIsoToDate(iso) {
     const [y, m, d] = iso.split("-").map(Number);
     return new Date(y, m - 1, d, 12, 0, 0, 0);
@@ -38,12 +40,18 @@ export function TopBar({ todayIso }) {
     const [pickerDate, setPickerDate] = useState(() =>
         parseIsoToDate(todayIso)
     );
+    const [pickerTime, setPickerTime] = useState(() => new Date());
     const [devOverrideIso, setDevOverrideIso] = useState(null);
 
     useEffect(() => {
         if (!__DEV__) return;
         getDevOverrideIsoDate()
             .then(setDevOverrideIso)
+            .catch(() => {});
+        getDevOverrideTime()
+            .then((time) => {
+                if (time) setPickerTime(new Date(time));
+            })
             .catch(() => {});
     }, []);
 
@@ -59,10 +67,15 @@ export function TopBar({ todayIso }) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
         const current = await getDevOverrideIsoDate();
+        const currentTime = await getDevOverrideTime();
         setDevOverrideIso(current);
 
         const baseIso = current || todayIso;
         setPickerDate(parseIsoToDate(baseIso));
+
+        if (currentTime) {
+            setPickerTime(new Date(currentTime));
+        }
 
         setDevOpen(true);
     }, [todayIso]);
@@ -72,13 +85,15 @@ export function TopBar({ todayIso }) {
     const saveDev = useCallback(async () => {
         const iso = dateToIsoLocal(pickerDate);
         await setDevOverrideIsoDate(iso);
+        await setDevOverrideTime(pickerTime.getTime());
         setDevOverrideIso(iso);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         setDevOpen(false);
-    }, [pickerDate]);
+    }, [pickerDate, pickerTime]);
 
     const resetDev = useCallback(async () => {
         await setDevOverrideIsoDate(null);
+        await setDevOverrideTime(null);
         setDevOverrideIso(null);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         setDevOpen(false);
@@ -135,7 +150,9 @@ export function TopBar({ todayIso }) {
                     <Pressable onPress={closeDev} style={ui.devModalBackdrop} />
 
                     <View style={ui.devModalCard}>
-                        <Text style={ui.devModalTitle}>Set Debug Date</Text>
+                        <Text style={ui.devModalTitle}>
+                            Set Debug Date & Time
+                        </Text>
 
                         <View style={{ height: 10 }} />
 
@@ -148,17 +165,31 @@ export function TopBar({ todayIso }) {
                             themeVariant="dark"
                             onChange={(event, selectedDate) => {
                                 if (!selectedDate) return;
-                                // selectedDate comes from picker, make sure we extract just the date part
                                 const localDate = new Date(
                                     selectedDate.getFullYear(),
                                     selectedDate.getMonth(),
                                     selectedDate.getDate(),
-                                    12,
-                                    0,
+                                    pickerTime.getHours(),
+                                    pickerTime.getMinutes(),
                                     0,
                                     0
                                 );
                                 setPickerDate(localDate);
+                            }}
+                        />
+
+                        <View style={{ height: 10 }} />
+
+                        <DateTimePicker
+                            value={pickerTime}
+                            mode="time"
+                            display={
+                                Platform.OS === "ios" ? "spinner" : "default"
+                            }
+                            themeVariant="dark"
+                            onChange={(event, selectedTime) => {
+                                if (!selectedTime) return;
+                                setPickerTime(selectedTime);
                             }}
                         />
 
@@ -176,14 +207,14 @@ export function TopBar({ todayIso }) {
                                 style={[ui.devModalBtn, ui.devModalBtnPrimary]}
                             >
                                 <Text style={ui.devModalBtnText}>
-                                    Use this date
+                                    Use this date & time
                                 </Text>
                             </Pressable>
                         </View>
 
                         <Text style={ui.devModalHelper}>
                             {devOverrideIso
-                                ? `Current override: ${devOverrideIso}`
+                                ? `Current override: ${devOverrideIso} at ${pickerTime.toLocaleTimeString()}`
                                 : "No override set (using real today)"}
                         </Text>
                     </View>

@@ -99,7 +99,7 @@ export default function ShabbatHero({
                                 <Pressable
                                     onPress={handleShowDetails}
                                     hitSlop={12}
-                                    style={ui.iconButtonSmall}
+                                    style={{ paddingBottom: 6 }}
                                 >
                                     <Entypo
                                         name="dots-three-vertical"
@@ -112,8 +112,7 @@ export default function ShabbatHero({
                     ) : (
                         <View style={{ marginTop: 24 }}>
                             <Text style={[ui.paragraph, ui.textCenter]}>
-                                Enable Location Services{"\n"}for Shabbat end
-                                time
+                                Share your location for{"\n"}detailed Shabbat times
                             </Text>
                             <Pressable
                                 onPress={handleEnableLocation}
@@ -184,7 +183,8 @@ export default function ShabbatHero({
                                 <Pressable
                                     onPress={handleShowDetails}
                                     hitSlop={12}
-                                    style={ui.iconButtonSmall}
+                                    style={{ paddingBottom: 6 }}
+
                                 >
                                     <Entypo
                                         name="dots-three-vertical"
@@ -197,7 +197,7 @@ export default function ShabbatHero({
                     ) : (
                         <View style={{ marginTop: 16 }}>
                             <Text style={[ui.paragraph, ui.textCenter]}>
-                                Share your location for{"\n"}Shabbat times
+                                Share your location for{"\n"}detailed Shabbat times
                             </Text>
                             <Pressable
                                 onPress={handleEnableLocation}
