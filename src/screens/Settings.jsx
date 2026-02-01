@@ -28,6 +28,7 @@ import TipSelector from "../components/settings/TipSelector";
 import SettingsCard from "../components/settings/SettingsCard";
 import SettingSwitch from "../components/settings/SettingSwitch";
 import SettingSlider from "../components/settings/SettingSlider";
+import PopupModal from "../components/common/PopupModal";
 
 export default function Settings({ navigation }) {
     const [fontsLoaded] = useFonts({
@@ -53,7 +54,42 @@ export default function Settings({ navigation }) {
 
     const [tipAmount, setTipAmount] = useState(5);
     const { loading: iapLoading, tip } = useTipsIap();
-    const onTipPress = useCallback(() => tip(tipAmount), [tip, tipAmount]);
+
+    const [tipPopup, setTipPopup] = useState(null);
+
+    const handleTipAttempt = useCallback(
+        async (amount) => {
+            try {
+                await tip(amount);
+
+                setTipPopup({
+                    title: "Thank you!",
+                    message: "Your tip means a lot. 💙",
+                    primaryLabel: "Done",
+                    onPrimary: () => setTipPopup(null),
+                });
+            } catch (e) {
+                if (e?.code === "TIP_CANCELLED") {
+                    // User hit cancel — do nothing
+                    return;
+                }
+
+                setTipPopup({
+                    title: "Tips not working",
+                    message:
+                        "In-app purchases aren’t working right now. Please try again later.",
+                    primaryLabel: "OK",
+                    onPrimary: () => setTipPopup(null),
+                });
+            }
+        },
+        [tip]
+    );
+
+    const onTipPress = useCallback(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+        handleTipAttempt(tipAmount);
+    }, [handleTipAttempt, tipAmount]);
 
     if (!fontsLoaded) return null;
 
@@ -67,7 +103,7 @@ export default function Settings({ navigation }) {
                             navigation.goBack();
                             Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
-                            );
+                            ).catch(() => {});
                         }}
                         hitSlop={12}
                         style={ui.iconButtonSmall}
@@ -85,7 +121,7 @@ export default function Settings({ navigation }) {
                     ]}
                 >
                     {/* Holiday Options */}
-                    <SettingsCard title="Holiday Options">
+                    <SettingsCard title="Holiday Options" variant="flat">
                         <SettingSwitch
                             label="Include modern holidays"
                             value={modernHolidays}
@@ -114,8 +150,20 @@ export default function Settings({ navigation }) {
                         />
                     </SettingsCard>
 
+                    <View
+                        style={[
+                            ui.divider,
+                            {
+                                height: 1,
+                                backgroundColor: "rgba(255,255,255,0.25)",
+                                marginTop: 8,
+                                marginBottom: 12,
+                            },
+                        ]}
+                    />
+
                     {/* Shabbat Options */}
-                    <SettingsCard title="Shabbat Options">
+                    <SettingsCard title="Shabbat Options" variant="flat">
                         <SettingSwitch
                             label="Custom candle lighting"
                             sublabel={`Minutes before sundown: ${candleDisplayValue}`}
@@ -127,7 +175,6 @@ export default function Settings({ navigation }) {
                             <SettingSlider
                                 value={candleValue}
                                 onValueChange={handleCandleValueChange}
-                                showDivider
                             />
                         )}
 
@@ -147,39 +194,48 @@ export default function Settings({ navigation }) {
                     </SettingsCard>
 
                     {/* Support Section */}
-                    <SettingsCard title="Support">
-                        <View style={{ paddingBottom: 6 }}>
-                            <Text style={ui.paragraph}>
-                                If you enjoy using this app, please consider
-                                leaving a tip!
-                            </Text>
+                    <View style={{ marginTop: 16 }}>
+                        <SettingsCard title="" variant="card">
+                            <View style={{ paddingBottom: 10 }}>
+                                <Text style={ui.paragraph}>
+                                    If you enjoy using this app, please consider
+                                    leaving a tip!
+                                </Text>
 
-                            <TipSelector
-                                selectedAmount={tipAmount}
-                                onAmountChange={setTipAmount}
-                            />
+                                <TipSelector
+                                    selectedAmount={tipAmount}
+                                    onAmountChange={setTipAmount}
+                                />
 
-                            <Pressable
-                                style={[
-                                    ui.button,
-                                    ui.buttonOutline,
-                                    { borderColor: colors.accent },
-                                ]}
-                                onPress={onTipPress}
-                                disabled={iapLoading}
-                            >
-                                {iapLoading ? (
-                                    <ActivityIndicator color={colors.accent} />
-                                ) : (
-                                    <Text style={[ui.buttonText, ui.textBrand]}>
-                                        Tip ${tipAmount}
-                                    </Text>
-                                )}
-                            </Pressable>
-                        </View>
-                    </SettingsCard>
+                                <Pressable
+                                    style={[
+                                        ui.button,
+                                        ui.buttonOutline,
+                                        { borderColor: colors.accent },
+                                    ]}
+                                    onPress={onTipPress}
+                                    disabled={iapLoading}
+                                >
+                                    {iapLoading ? (
+                                        <ActivityIndicator
+                                            color={colors.accent}
+                                        />
+                                    ) : (
+                                        <Text
+                                            style={[
+                                                ui.buttonText,
+                                                ui.textBrand,
+                                            ]}
+                                        >
+                                            Tip ${tipAmount}
+                                        </Text>
+                                    )}
+                                </Pressable>
+                            </View>
+                        </SettingsCard>
+                    </View>
 
-                    {/* Footer - Fixed to bottom */}
+                    {/* Footer */}
                     <View style={{ flex: 1 }} />
 
                     <View style={{ paddingVertical: 24, alignItems: "center" }}>
@@ -197,7 +253,7 @@ export default function Settings({ navigation }) {
                                 Linking.openURL("https://danielbrainich.com");
                                 Haptics.impactAsync(
                                     Haptics.ImpactFeedbackStyle.Light
-                                );
+                                ).catch(() => {});
                             }}
                             hitSlop={12}
                         >
@@ -212,6 +268,18 @@ export default function Settings({ navigation }) {
                         </Pressable>
                     </View>
                 </ScrollView>
+
+                {/* Overlay modal OUTSIDE ScrollView */}
+                <PopupModal
+                    visible={!!tipPopup}
+                    title={tipPopup?.title}
+                    message={tipPopup?.message}
+                    primaryLabel={tipPopup?.primaryLabel}
+                    secondaryLabel={tipPopup?.secondaryLabel}
+                    onPrimary={tipPopup?.onPrimary}
+                    onSecondary={tipPopup?.onSecondary}
+                    onClose={() => setTipPopup(null)}
+                />
             </SafeAreaView>
         </View>
     );

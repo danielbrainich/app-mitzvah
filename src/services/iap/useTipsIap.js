@@ -1,8 +1,15 @@
 import { useEffect, useState, useCallback } from "react";
-import { Alert, Platform } from "react-native";
+import { Platform } from "react-native";
 import * as Haptics from "expo-haptics";
-import * as RNIap from "react-native-iap"; // Add this import
+import * as RNIap from "react-native-iap";
+
 import { initIap, endIap, fetchTipProducts, buyTip } from "./tips";
+
+function makeIapError(code, message) {
+    const err = new Error(message || code);
+    err.code = code;
+    return err;
+}
 
 export function useTipsIap() {
     const [tipProducts, setTipProducts] = useState([]);
@@ -17,10 +24,10 @@ export function useTipsIap() {
             try {
                 setError(null);
 
-                // Check if IAP is available
-                if (!RNIap.initConnection) {
+                // In dev / unsupported environments, react-native-iap may not work
+                if (!RNIap?.initConnection) {
                     console.warn("IAP not available in this environment");
-                    setReady(false);
+                    if (alive) setReady(false);
                     return;
                 }
 
@@ -35,14 +42,16 @@ export function useTipsIap() {
                     setReady(true);
                 } else {
                     console.warn("No tip products available");
+                    setTipProducts([]);
                     setReady(false);
                 }
             } catch (err) {
                 console.warn(
                     "IAP initialization failed (expected in dev):",
-                    err.message
+                    err
                 );
                 if (alive) {
+                    setTipProducts([]);
                     setReady(false);
                 }
             }
@@ -60,61 +69,55 @@ export function useTipsIap() {
 
     const tip = useCallback(
         async (amount) => {
+            // Let the UI decide how to message "not ready"
             if (!ready) {
-                Alert.alert(
-                    "Tips unavailable",
-                    "In-app purchases aren't ready yet."
+                throw makeIapError(
+                    "IAP_NOT_READY",
+                    "In-app purchases aren’t available right now."
                 );
-                return;
             }
 
             if (!amount || typeof amount !== "number" || amount <= 0) {
-                Alert.alert(
-                    "Invalid amount",
+                throw makeIapError(
+                    "INVALID_AMOUNT",
                     "Please select a valid tip amount."
                 );
-                return;
             }
 
             try {
                 setLoading(true);
                 setError(null);
 
-                // Haptics with platform check
-                if (Platform.OS === "ios" || Platform.OS === "android") {
-                    await Haptics.impactAsync(
-                        Haptics.ImpactFeedbackStyle.Light
-                    ).catch(() => {}); // Silent fail for haptics
+                // Optional haptic on start of purchase
+                if (Platform.OS === "ios") {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }
 
                 await buyTip(amount);
 
-                Alert.alert("Thank you!", "Your tip means a lot! 💙");
+                // Success: just return. UI will show your PopupModal.
+                return true;
             } catch (e) {
-                console.error("Tip purchase error:", e);
-
                 const msg = String(e?.message || "");
-                const code = e?.code || "";
+                const code = e?.code || "TIP_FAILED";
 
                 const cancelled =
                     code === "E_USER_CANCELLED" ||
                     msg.toLowerCase().includes("cancel");
 
                 if (cancelled) {
-                    Alert.alert(
-                        "Tip cancelled",
-                        "No worries — thanks for considering it!"
-                    );
-                } else {
-                    // Log the actual error for debugging
-                    console.error("IAP Error details:", { code, msg });
-                    setError(msg || "Purchase failed");
-
-                    Alert.alert(
-                        "Tip failed",
-                        "Something went wrong. Please try again or contact support."
+                    // If you don't want a "cancelled" popup, let UI treat it
+                    // as a non-error by throwing a specific code it can ignore
+                    throw makeIapError(
+                        "TIP_CANCELLED",
+                        msg || "User cancelled"
                     );
                 }
+
+                console.error("Tip purchase error:", e);
+                setError(msg || "Purchase failed");
+
+                throw makeIapError(code, msg || "Purchase failed");
             } finally {
                 setLoading(false);
             }

@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { View, Platform, useWindowDimensions } from "react-native";
+import React from "react";
+import { View } from "react-native";
 import { Slider } from "@miblanchard/react-native-slider";
 import * as Haptics from "expo-haptics";
 import { ui } from "../../constants/theme";
@@ -11,19 +11,13 @@ export default function SettingSlider({
     onValueChange,
     showDivider = false,
 }) {
-    const lastHapticValue = useRef(value);
-
     const handleValueChange = (values) => {
         const newValue = Array.isArray(values) ? values[0] : values;
-
-        if (newValue !== lastHapticValue.current) {
-            if (Platform.OS === 'ios' || Platform.OS === 'android') {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-            }
-            lastHapticValue.current = newValue;
-        }
-
         onValueChange(newValue);
+    };
+
+    const handleSlidingComplete = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     };
 
     return (
@@ -31,6 +25,7 @@ export default function SettingSlider({
             <Slider
                 value={value}
                 onValueChange={handleValueChange}
+                onSlidingComplete={handleSlidingComplete}
                 minimumValue={minimumValue}
                 maximumValue={maximumValue}
                 step={1}

@@ -119,8 +119,8 @@ export const ui = StyleSheet.create({
     // ==========================================
     h1: {
         fontSize: typography.size.hero,
-        lineHeight: 70,
         fontWeight: typography.weight.bold,
+        lineHeight: 68,
     },
 
     h2: {
@@ -140,7 +140,7 @@ export const ui = StyleSheet.create({
 
     h5: {
         fontSize: typography.size.lg,
-        marginBottom: spacing[2],
+        marginVertical: spacing[2],
     },
 
     h6: {
@@ -266,6 +266,10 @@ export const ui = StyleSheet.create({
         writingDirection: "rtl",
         textAlign: "left",
         marginTop: 3,
+    },
+
+    cardFlat: {
+        backgroundColor: "transparent",
     },
 
     // ==========================================
@@ -437,6 +441,10 @@ export const ui = StyleSheet.create({
         backgroundColor: tokenColors.semantic.success,
     },
 
+    shabbatTimeBlock: {
+        marginVertical: spacing[2], // same space above & below
+    },
+
     // ==========================================
     // HOLIDAYS SCREEN
     // ==========================================
@@ -499,28 +507,32 @@ export const ui = StyleSheet.create({
     infoTiersRow: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: spacing[1],
+        marginTop: spacing[4],
+        marginHorizontal: 36,
     },
 
     infoTierPill: {
-        width: 56,
+        width: 40,
+        height: 36,
+        borderRadius: 14,
         alignItems: "center",
+        justifyContent: "center",
         borderWidth: 1,
-        borderColor: tokenColors.border.light,
-        borderRadius: radii.full,
-        paddingVertical: spacing[3],
+        borderColor: "rgba(255,255,255,0.25)",
         backgroundColor: "transparent",
     },
 
     infoTierPillSelected: {
-        borderColor: tokenColors.brand.light,
-        backgroundColor: tokenColors.brand.bg,
+        borderColor: tokenColors.brand.primary,
+        backgroundColor: "rgba(130,203,255,0.15)",
     },
 
     infoTierText: {
-        color: tokenColors.text.muted,
         fontSize: typography.size.sm,
-        fontWeight: typography.weight.bold,
+        fontWeight: typography.weight.semibold,
+        color: "rgba(255,255,255,0.85)",
+        lineHeight: typography.size.sm + 2,
+        includeFontPadding: false,
     },
 
     infoTierTextSelected: {
@@ -682,5 +694,25 @@ export const ui = StyleSheet.create({
         color: tokenColors.text.muted,
         marginTop: spacing[4],
         textAlign: "center",
+    },
+
+    // ==========================================
+    // POPUUP
+    // ==========================================
+    popupBackdrop: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.55)",
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: 24,
+    },
+
+    popupCard: {
+        width: "100%",
+        maxWidth: 420,
+        backgroundColor: colors.card,
+        borderRadius: 16,
+        padding: 18,
+        paddingBottom: 8,
     },
 });

@@ -261,7 +261,6 @@ function computeForAnchor({
  * Primary computation:
  * - uses "today" (which comes from useTodayIsoDay, and may be overridden)
  * - normalizes to local noon
- * - special-case: Saturday AFTER Shabbat ends => compute NEXT Shabbat week
  */
 export function computeShabbatInfo({
     today,
@@ -286,30 +285,6 @@ export function computeShabbatInfo({
         havdalahMins,
     });
 
-    // Only do Saturday night logic if we have shabbatEnds time (requires location)
-    if (location) {
-        const isSaturday = anchor.getDay() === 6;
-        const ended =
-            info.shabbatEnds instanceof Date &&
-            now instanceof Date &&
-            now.getTime() >= info.shabbatEnds.getTime();
-
-        if (isSaturday && ended) {
-            const nextDay = new Date(anchor);
-            nextDay.setDate(nextDay.getDate() + 1);
-            const nextAnchor = normalizeToLocalNoon(nextDay);
-
-            info = computeForAnchor({
-                anchor: nextAnchor,
-                todayIso,
-                timezone,
-                location,
-                candleMins,
-                havdalahMins,
-            });
-        }
-    }
-
     return info;
 }
 
@@ -326,26 +301,26 @@ export function buildShabbatViewModel(
     const candleTime = shabbatInfo?.candleTime ?? null;
     const shabbatEnds = shabbatInfo?.shabbatEnds ?? null;
 
-    let isDuring;
-    if (candleTime instanceof Date && shabbatEnds instanceof Date) {
-        // With location: use precise times
-        isDuring = now >= candleTime && now < shabbatEnds;
-    } else {
-        // Without location: use approximate day/hour-based fallback
-        const dayOfWeek = now.getDay();
-        const hourOfDay = now.getHours();
+    let isBefore = false;
+    let isDuring = false;
+    let isAfter = false;
 
-        isDuring =
-            (dayOfWeek === 5 && hourOfDay >= 18) || // Friday 6 PM onwards
-            (dayOfWeek === 6 && hourOfDay < 20); // Saturday before 8 PM
+    if (candleTime instanceof Date && shabbatEnds instanceof Date) {
+        isBefore = now < candleTime;
+        isDuring = now >= candleTime && now < shabbatEnds;
+        isAfter = now >= shabbatEnds;
+    } else {
+        // Without location: approximate
+        const day = now.getDay();
+        const hour = now.getHours();
+
+        isBefore = day < 5 || (day === 5 && hour < 18);
+        isDuring = (day === 5 && hour >= 18) || (day === 6 && hour < 20);
+        isAfter = day === 6 && hour >= 20;
     }
 
-    const isBefore = candleTime instanceof Date && now < candleTime;
-
     return {
-        status: { isBefore, isDuring },
-        meta: {
-            isDevOverride,
-        },
+        status: { isBefore, isDuring, isAfter },
+        meta: { isDevOverride },
     };
 }

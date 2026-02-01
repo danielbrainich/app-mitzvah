@@ -107,7 +107,7 @@ export default function Shabbat() {
                         }}
                     >
                         <ShabbatHero
-                            isDuring={vm.status.isDuring}
+                            status={vm.status}
                             hasLocation={hasLocation}
                             shabbatInfo={shabbatInfo}
                             candleMins={candleMins}
@@ -121,17 +121,23 @@ export default function Shabbat() {
                 {/* Parsha Card Section */}
                 <View style={ui.holidaysComingUpSection}>
                     <Text style={[ui.h5, ui.textWhite]}>
-                        Torah Portion this week
+                        Torah Portion{" "}
+                        {now.getDay() === 6 && !vm.status.isDuring
+                            ? "this past week"
+                            : "this week"}
                     </Text>
                     <ParshaCard
                         parshaEnglish={shabbatInfo?.parshaEnglish}
-                        parshaHebrew={shabbatInfo?.parshaHebrew}
+                        parshaHebrew={shabbatInfo?.parshaHebrew?.replace(
+                            /^פרשת\s*/,
+                            ""
+                        )}
                         parshaReplacedByHoliday={
                             shabbatInfo?.parshaReplacedByHoliday
                         }
                         onPress={handleParshaPress}
                     />
-                    <View style={ui.mb3}>
+                    <View style={{ marginBottom: 10 }}>
                         <LocationChip
                             hasLocation={hasLocation}
                             onPress={() => setShowLocationDetails(true)}
