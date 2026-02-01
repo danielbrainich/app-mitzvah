@@ -32,7 +32,7 @@ export function useShabbatCountdown(todayIso) {
         }
 
         setNow(new Date());
-        const interval = setInterval(() => setNow(new Date()), 60000);
+        const interval = setInterval(() => setNow(new Date()), 1000);
         return () => clearInterval(interval);
     }, [isDevOverride, todayIso]);
 

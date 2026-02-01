@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import * as Haptics from "expo-haptics";
-import { ui } from "../../../constants/theme";
+import { ui } from "../../constants/theme";
 
-const TIP_AMOUNTS = [1, 2, 5, 10, 18];
+const TIP_AMOUNTS = [1, 2, 3, 4, 5];
 
 export default function TipSelector({ selectedAmount, onAmountChange }) {
     return (

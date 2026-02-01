@@ -318,7 +318,7 @@ export function computeShabbatInfo({
  * Countdown: minutes-only (no seconds), ceil to avoid early minute drop.
  */
 function pad2(n) {
-    return String(Math.max(0, n)).padStart(2, "0");
+    return String(Math.max(0, n));
 }
 
 function diffPartsNoSeconds(targetDate, now) {

@@ -3,9 +3,9 @@ import * as RNIap from "react-native-iap";
 export const TIP_PRODUCT_IDS = [
     "appmitzvah.tip_1",
     "appmitzvah.tip_2",
+    "appmitzvah.tip_3",
+    "appmitzvah.tip_4",
     "appmitzvah.tip_5",
-    "appmitzvah.tip_10",
-    "appmitzvah.tip_18",
 ];
 
 export async function initIap() {

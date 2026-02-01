@@ -1,12 +1,19 @@
-import React from "react";
-import { Text, View, ScrollView, Pressable, Linking } from "react-native";
+import React, { useState, useCallback } from "react";
+import {
+    Text,
+    View,
+    ScrollView,
+    Pressable,
+    Linking,
+    ActivityIndicator,
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { useFonts } from "expo-font";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Entypo } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 
-import { ui } from "../constants/theme";
+import { ui, colors } from "../constants/theme";
 import {
     toggleMinorFasts,
     toggleRosheiChodesh,
@@ -14,6 +21,9 @@ import {
     toggleSpecialShabbatot,
 } from "../store/slices/settingsSlice";
 import { useShabbatSettings } from "../hooks/useShabbatSettings";
+
+import { useTipsIap } from "../services/iap/useTipsIap";
+import TipSelector from "../components/settings/TipSelector";
 
 import SettingsCard from "../components/settings/SettingsCard";
 import SettingSwitch from "../components/settings/SettingSwitch";
@@ -40,6 +50,10 @@ export default function Settings({ navigation }) {
         handleCandleValueChange,
         handleHavdalahValueChange,
     } = useShabbatSettings(settings);
+
+    const [tipAmount, setTipAmount] = useState(5);
+    const { loading: iapLoading, tip } = useTipsIap();
+    const onTipPress = useCallback(() => tip(tipAmount), [tip, tipAmount]);
 
     if (!fontsLoaded) return null;
 
@@ -92,7 +106,7 @@ export default function Settings({ navigation }) {
                             }
                         />
                         <SettingSwitch
-                            label="Special Shabbatot"
+                            label="Include special shabbatot"
                             value={specialShabbatot}
                             onValueChange={() =>
                                 dispatch(toggleSpecialShabbatot())
@@ -132,6 +146,39 @@ export default function Settings({ navigation }) {
                         )}
                     </SettingsCard>
 
+                    {/* Support Section */}
+                    <SettingsCard title="Support">
+                        <View style={{ paddingBottom: 6 }}>
+                            <Text style={ui.paragraph}>
+                                If you enjoy using this app, please consider
+                                leaving a tip!
+                            </Text>
+
+                            <TipSelector
+                                selectedAmount={tipAmount}
+                                onAmountChange={setTipAmount}
+                            />
+
+                            <Pressable
+                                style={[
+                                    ui.button,
+                                    ui.buttonOutline,
+                                    { borderColor: colors.accent },
+                                ]}
+                                onPress={onTipPress}
+                                disabled={iapLoading}
+                            >
+                                {iapLoading ? (
+                                    <ActivityIndicator color={colors.accent} />
+                                ) : (
+                                    <Text style={[ui.buttonText, ui.textBrand]}>
+                                        Tip ${tipAmount}
+                                    </Text>
+                                )}
+                            </Pressable>
+                        </View>
+                    </SettingsCard>
+
                     {/* Footer - Fixed to bottom */}
                     <View style={{ flex: 1 }} />
 
@@ -160,7 +207,7 @@ export default function Settings({ navigation }) {
                                     { textAlign: "center", opacity: 0.6 },
                                 ]}
                             >
-                                💙 dbrainy
+                                🩶 dbrainy
                             </Text>
                         </Pressable>
                     </View>

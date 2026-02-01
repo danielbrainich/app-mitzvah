@@ -29,7 +29,7 @@ export default function ShabbatHero({ isDuring, hasLocation }) {
                     ) : (
                         <>
                             <Text style={[ui.paragraph, ui.textCenter]}>
-                                Turn on location for{"\n"}detailed Shabbat times
+                                Enable Location Services{"\n"}for detailed Shabbat times
                             </Text>
                             <Pressable
                                 onPress={handleEnableLocation}
