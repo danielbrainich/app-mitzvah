@@ -121,7 +121,7 @@ export default function ShabbatTimesCard({
                         <Text style={ui.paragraph}>Torah portion: </Text>
                         <Pressable onPress={onParshaPress} hitSlop={12}>
                             <Text style={ui.paragraph}>
-                                {shabbatInfo.parshaEnglish}
+                            {shabbatInfo.parshaEnglish?.replace(/^Parashat\s+/i, "")}
                             </Text>
                         </Pressable>
                     </View>
@@ -138,12 +138,12 @@ export default function ShabbatTimesCard({
                         />
                     </Pressable>
                 </View>
-            ) : (
+            ) : shabbatInfo?.parshaReplacedByHoliday ? (
                 <Text style={ui.paragraph}>
-                    {shabbatInfo?.parshaReplacedByHoliday
-                        ? "This week's holiday Torah reading replaces the parasha."
-                        : "Enable location to see the Torah portion."}
+                    This week's holiday Torah reading replaces the parasha.
                 </Text>
+            ) : (
+                <Text style={ui.paragraph}>Torah portion unavailable.</Text>
             )}
         </View>
     );

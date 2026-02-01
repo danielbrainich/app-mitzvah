@@ -1,12 +1,23 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Pressable, Linking, Platform } from "react-native";
+import * as Haptics from "expo-haptics";
 import { ui } from "../../constants/theme";
 
 export default function ShabbatHero({ isDuring, hasLocation }) {
+    const handleEnableLocation = () => {
+        if (Platform.OS === "ios" || Platform.OS === "android") {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+                () => {}
+            );
+        }
+        Linking.openSettings();
+    };
     return (
         <View style={ui.shabbatHeroWrap}>
             {isDuring ? (
-                <Text style={[ui.h1, ui.textBrand, ui.textChutz, ui.textCenter]}>
+                <Text
+                    style={[ui.h1, ui.textBrand, ui.textChutz, ui.textCenter]}
+                >
                     Shabbat Shalom
                 </Text>
             ) : (
@@ -16,11 +27,19 @@ export default function ShabbatHero({ isDuring, hasLocation }) {
                             Shabbat begins in
                         </Text>
                     ) : (
-                        <View style={ui.card}>
+                        <>
                             <Text style={[ui.paragraph, ui.textCenter]}>
-                                Enable location for detailed Shabbat times
+                                Turn on location for{"\n"}detailed Shabbat times
                             </Text>
-                        </View>
+                            <Pressable
+                                onPress={handleEnableLocation}
+                                style={[ui.button, ui.buttonOutline]}
+                            >
+                                <Text style={ui.buttonText}>
+                                    Enable location
+                                </Text>
+                            </Pressable>
+                        </>
                     )}
                 </>
             )}
