@@ -253,6 +253,21 @@ export const ui = StyleSheet.create({
         padding: spacing[5],
         marginBottom: spacing[4],
     },
+
+    cardHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+    },
+
+    hebrewCardText: {
+        fontSize: 16,
+        color: "#82CBFF",
+        writingDirection: "rtl",
+        textAlign: "left",
+        marginTop: 3,
+    },
+
     // ==========================================
     // BUTTONS
     // ==========================================
@@ -375,24 +390,6 @@ export const ui = StyleSheet.create({
         alignItems: "center",
         paddingTop: spacing[3],
         paddingBottom: spacing[4],
-    },
-
-    shabbatCountdownCard: {
-        flexDirection: "row",
-        justifyContent: "center",
-        gap: spacing[3],
-        marginVertical: spacing[5],
-    },
-
-    shabbatCountdownItem: {
-        minWidth: 72,
-        alignItems: "center",
-    },
-
-    shabbatCountdownNumber: {
-        fontSize: 44,
-        color: tokenColors.brand.primary,
-        fontFamily: "ChutzBold",
     },
 
     shabbatSectionHeader: {

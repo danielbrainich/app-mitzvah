@@ -20,7 +20,14 @@ function localNoonFromIso(iso) {
 export function useShabbatCountdown(todayIso) {
     const realIso = useMemo(() => formatIsoLocal(new Date()), []);
     const isDevOverride = todayIso && todayIso !== realIso;
-    const [now, setNow] = useState(() => new Date());
+
+    const [now, setNow] = useState(() => {
+        if (isDevOverride) {
+            const frozen = localNoonFromIso(todayIso);
+            return frozen || new Date();
+        }
+        return new Date();
+    });
 
     useEffect(() => {
         if (isDevOverride) {
@@ -28,12 +35,9 @@ export function useShabbatCountdown(todayIso) {
             if (frozen) {
                 setNow(frozen);
             }
-            return;
+        } else {
+            setNow(new Date());
         }
-
-        setNow(new Date());
-        const interval = setInterval(() => setNow(new Date()), 1000);
-        return () => clearInterval(interval);
     }, [isDevOverride, todayIso]);
 
     return { now, isDevOverride };

@@ -314,56 +314,7 @@ export function computeShabbatInfo({
 }
 
 /**
- * ---------- UI view-model helpers ----------
- * Countdown: minutes-only (no seconds), ceil to avoid early minute drop.
- */
-function pad2(n) {
-    return String(Math.max(0, n));
-}
-
-function diffPartsNoSeconds(targetDate, now) {
-    if (!(targetDate instanceof Date) || !(now instanceof Date)) {
-        return {
-            days: 0,
-            hours: 0,
-            mins: 0,
-            daysStr: "00",
-            hoursStr: "00",
-            minsStr: "00",
-        };
-    }
-
-    // Floor both times to the minute for consistency
-    const targetMs = new Date(targetDate).setSeconds(0, 0);
-    const nowMs = new Date(now).setSeconds(0, 0);
-
-    const ms = Math.max(0, targetMs - nowMs);
-    const totalMins = Math.floor(ms / 60000);
-
-    const days = Math.floor(totalMins / (24 * 60));
-    const hours = Math.floor((totalMins % (24 * 60)) / 60);
-    const mins = totalMins % 60;
-
-    return {
-        days,
-        hours,
-        mins,
-        daysStr: pad2(days),
-        hoursStr: pad2(hours),
-        minsStr: pad2(mins),
-    };
-}
-
-/**
- * buildShabbatViewModel(info, now, opts)
- * - countdown logic:
- *   - before: countdown to candleTime
- *   - during: hidden (top shows "Shabbat Shalom")
- *   - after: countdown to next candleTime (info will already be next if Sat night ended)
- *
- * Override behavior:
- * - freeze in the screen (you freeze `now` there)
- * - keep countdown visible (but it won’t tick)
+ * Build view model for UI
  */
 export function buildShabbatViewModel(
     shabbatInfo,
@@ -383,27 +334,8 @@ export function buildShabbatViewModel(
 
     const isBefore = candleTime instanceof Date && now < candleTime;
 
-    // Determine countdown target (same for normal + override)
-    let countdownTarget = null;
-    if (!isDuring) {
-        countdownTarget = candleTime instanceof Date ? candleTime : null;
-    }
-
-    // In your UI: when isDuring, you show "Shabbat Shalom" and hide countdown.
-    // In override mode, you freeze `now` in the screen, so parts won't tick.
     return {
         status: { isBefore, isDuring },
-        hero: {
-            title: isDuring ? "Shabbat Shalom" : "Shabbat begins in",
-            dateLine: isDuring ? "" : shabbatInfo?.erevShabbatShort ?? "",
-        },
-        countdown: {
-            show: !!countdownTarget && !isDuring, // override still shows (target exists)
-            target: countdownTarget,
-            parts: countdownTarget
-                ? diffPartsNoSeconds(countdownTarget, now)
-                : { days: "00", hours: "00", mins: "00" },
-        },
         meta: {
             isDevOverride,
         },

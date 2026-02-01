@@ -111,40 +111,6 @@ export default function ShabbatTimesCard({
             />
             <RowLine label="Sundown" value={satSundownValue} />
             <RowLine label="Shabbat ends" value={endsValue} />
-
-            <View style={ui.divider} />
-
-            {/* Parasha Section */}
-            {canShowParsha ? (
-                <View style={ui.shabbatParshaRow}>
-                    <View style={ui.shabbatParshaText}>
-                        <Text style={ui.paragraph}>Torah portion: </Text>
-                        <Pressable onPress={onParshaPress} hitSlop={12}>
-                            <Text style={ui.paragraph}>
-                            {shabbatInfo.parshaEnglish?.replace(/^Parashat\s+/i, "")}
-                            </Text>
-                        </Pressable>
-                    </View>
-
-                    <Pressable
-                        onPress={onParshaPress}
-                        hitSlop={12}
-                        style={ui.shabbatParshaButton}
-                    >
-                        <Entypo
-                            name="dots-three-vertical"
-                            size={18}
-                            color="white"
-                        />
-                    </Pressable>
-                </View>
-            ) : shabbatInfo?.parshaReplacedByHoliday ? (
-                <Text style={ui.paragraph}>
-                    This week's holiday Torah reading replaces the parasha.
-                </Text>
-            ) : (
-                <Text style={ui.paragraph}>Torah portion unavailable.</Text>
-            )}
         </View>
     );
 }

@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useMemo } from "react";
-import { View, ScrollView, Linking } from "react-native";
+import { View, ScrollView, Linking, Text } from "react-native";
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -8,16 +8,14 @@ import * as Haptics from "expo-haptics";
 import useAppLocation from "../hooks/useAppLocation";
 import useTodayIsoDay from "../hooks/useTodayIsoDay";
 import { useShabbatData } from "../hooks/useShabbatData";
-import { useShabbatCountdown } from "../hooks/useShabbatCountdown";
+import { useShabbatCountdown } from "../hooks/useShabbatCountdown.js";
 import { ui } from "../constants/theme";
 
 import ShabbatHero from "../components/shabbat/ShabbatHero";
-import ShabbatCountdown from "../components/shabbat/ShabbatCountdown";
-import ShabbatTimesCard from "../components/shabbat/ShabbatTimesCard";
 import LocationChip from "../components/shabbat/LocationChip";
 import LocationBottomSheet from "../components/shabbat/LocationBottomSheet";
 import ParshaBottomSheet from "../components/shabbat/ParshaBottomSheet";
-
+import ParshaCard from "../components/shabbat/ParshaCard";
 import { buildShabbatViewModel } from "../lib/computeShabbatInfo";
 import { getParshaDataByName } from "../data/parshiot";
 
@@ -49,7 +47,6 @@ export default function Shabbat() {
 
     const { now, isDevOverride } = useShabbatCountdown(todayIso);
 
-    // Custom hooks handle all the complex logic
     const { shabbatInfo, loading, timezone } = useShabbatData({
         location: hasLocation ? location : null,
         candleMins,
@@ -57,25 +54,18 @@ export default function Shabbat() {
         now,
     });
 
-    // Build view model for UI
     const vm = useMemo(() => {
         return buildShabbatViewModel(shabbatInfo, now, { isDevOverride });
     }, [shabbatInfo, now, isDevOverride]);
 
     const handleParshaPress = useCallback(() => {
-        console.log('1. parshaEnglish from shabbatInfo:', shabbatInfo?.parshaEnglish);
-
         if (!shabbatInfo?.parshaEnglish) return;
 
         const data = getParshaDataByName(shabbatInfo.parshaEnglish);
-        console.log('2. data returned from getParshaDataByName:', data);
 
         if (data) {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setActiveParshiot(data);
-            console.log('3. Set activeParshiot to:', data);
-        } else {
-            console.log('3. No data returned, activeParshiot not set');
         }
     }, [shabbatInfo?.parshaEnglish]);
 
@@ -90,7 +80,6 @@ export default function Shabbat() {
     }, [requestPermission]);
 
     const tabBarHeight = useBottomTabBarHeight();
-    const MAX_WIDTH = 520;
 
     if (!fontsLoaded) return null;
 
@@ -98,49 +87,51 @@ export default function Shabbat() {
         <View style={ui.safeArea}>
             <ScrollView
                 style={ui.screen}
-                contentContainerStyle={{
-                    flexGrow: 1,
-                    paddingBottom: tabBarHeight + 10,
-                }}
+                contentContainerStyle={[
+                    ui.scrollContent,
+                    { flexGrow: 1, paddingBottom: tabBarHeight },
+                ]}
                 showsVerticalScrollIndicator={false}
                 bounces
                 alwaysBounceVertical
             >
-                <View style={{ flex: 1, width: "100%", alignItems: "center" }}>
+                {/* Hero Section */}
+                <View style={{ flex: 1 }}>
                     <View
-                        style={{ flex: 1, width: "100%", maxWidth: MAX_WIDTH }}
+                        style={{
+                            flex: 1,
+                            justifyContent: "center",
+                        }}
                     >
-                        {/* Hero and Countdown Section */}
-                        <View
-                            style={{
-                                flex: 1,
-                                justifyContent: "center",
-                                paddingTop: 8,
-                            }}
-                        >
-                            <ShabbatHero
-                                isDuring={vm.status.isDuring}
-                                hasLocation={hasLocation}
-                                showCountdown={vm.countdown?.show}
-                            />
-                            {vm.countdown?.show && !vm.status.isDuring && (
-                                <ShabbatCountdown parts={vm.countdown.parts} />
-                            )}
-                        </View>
+                        <ShabbatHero
+                            isDuring={vm.status.isDuring}
+                            hasLocation={hasLocation}
+                            shabbatInfo={shabbatInfo}
+                            candleMins={candleMins}
+                            havdalahMins={havdalahMins}
+                            now={now}
+                        />
+                    </View>
+                </View>
 
-                        {/* Times Card and Location */}
-                        <View style={{ width: "100%" }}>
-                            <ShabbatTimesCard
-                                shabbatInfo={shabbatInfo}
-                                onParshaPress={handleParshaPress}
-                                loading={loading}
-                            />
-
-                            <LocationChip
-                                hasLocation={hasLocation}
-                                onPress={() => setShowLocationDetails(true)}
-                            />
-                        </View>
+                {/* Parsha Card Section */}
+                <View style={ui.holidaysComingUpSection}>
+                    <Text style={[ui.h5, ui.textWhite]}>
+                        Torah Portion this week
+                    </Text>
+                    <ParshaCard
+                        parshaEnglish={shabbatInfo?.parshaEnglish}
+                        parshaHebrew={shabbatInfo?.parshaHebrew}
+                        parshaReplacedByHoliday={
+                            shabbatInfo?.parshaReplacedByHoliday
+                        }
+                        onPress={handleParshaPress}
+                    />
+                    <View style={ui.mt3}>
+                        <LocationChip
+                            hasLocation={hasLocation}
+                            onPress={() => setShowLocationDetails(true)}
+                        />
                     </View>
                 </View>
             </ScrollView>

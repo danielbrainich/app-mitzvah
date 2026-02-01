@@ -27,7 +27,7 @@ export default function ParshaBottomSheet({
                         <Text style={[ui.h6, ui.textBrand]}>
                             {parsha.english}
                         </Text>
-                        <Text style={styles.hebrewText}>
+                        <Text style={ui.hebrewCardText}>
                             {parsha.hebrew}
                         </Text>
                     <Text style={ui.label}>
@@ -44,13 +44,3 @@ export default function ParshaBottomSheet({
         </BottomSheetDrawerBase>
     );
 }
-
-const styles = StyleSheet.create({
-    hebrewText: {
-        fontSize: 16,
-        color: "#82CBFF",
-        writingDirection: "rtl",
-        textAlign: "left",
-        marginTop: 3,
-    },
-});
