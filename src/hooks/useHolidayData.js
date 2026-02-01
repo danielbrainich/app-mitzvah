@@ -4,7 +4,7 @@ import { computeHolidaysInfo } from "../lib/computeHolidaysinfo";
 import useTodayIsoDay from "./useTodayIsoDay";
 
 export function useHolidayData() {
-    const { minorFasts, rosheiChodesh, modernHolidays } = useSelector(
+    const { minorFasts, rosheiChodesh, modernHolidays, specialShabbatot } = useSelector(
         (state) => state.settings
     );
 
@@ -22,7 +22,7 @@ export function useHolidayData() {
             setError(null);
             const result = computeHolidaysInfo({
                 todayIso,
-                settings: { minorFasts, rosheiChodesh, modernHolidays },
+                settings: { minorFasts, rosheiChodesh, modernHolidays, specialShabbatot },
             });
 
             setHolidays(result.holidays || []);
@@ -33,7 +33,7 @@ export function useHolidayData() {
             setError(err.message || "Failed to compute holidays");
             // Keep existing data on error rather than clearing it
         }
-    }, [todayIso, minorFasts, rosheiChodesh, modernHolidays]);
+    }, [todayIso, minorFasts, rosheiChodesh, modernHolidays, specialShabbatot]);
 
     useEffect(() => {
         fetchHolidays();

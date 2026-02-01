@@ -11,6 +11,7 @@ import {
     toggleMinorFasts,
     toggleRosheiChodesh,
     toggleModernHolidays,
+    toggleSpecialShabbatot,
 } from "../store/slices/settingsSlice";
 import { useShabbatSettings } from "../hooks/useShabbatSettings";
 
@@ -24,7 +25,8 @@ export default function Settings({ navigation }) {
     });
 
     const settings = useSelector((state) => state.settings);
-    const { minorFasts, rosheiChodesh, modernHolidays } = settings;
+    const { minorFasts, rosheiChodesh, modernHolidays, specialShabbatot } =
+        settings;
 
     const dispatch = useDispatch();
 
@@ -87,6 +89,13 @@ export default function Settings({ navigation }) {
                             value={rosheiChodesh}
                             onValueChange={() =>
                                 dispatch(toggleRosheiChodesh())
+                            }
+                        />
+                        <SettingSwitch
+                            label="Special Shabbatot"
+                            value={specialShabbatot}
+                            onValueChange={() =>
+                                dispatch(toggleSpecialShabbatot())
                             }
                         />
                     </SettingsCard>

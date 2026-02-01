@@ -20,7 +20,7 @@ export default function TodayHolidayHero({ holiday, onAbout }) {
             <Text style={[ui.h2, ui.textWhite]}>Today is</Text>
 
             <Text style={[ui.h1, ui.textBrand, ui.textChutz, ui.textCenter]}>
-                {holiday.title ?? ""}
+                {holiday.displayTitle ?? ""}
             </Text>
 
             {holiday.hebrewTitle ? (

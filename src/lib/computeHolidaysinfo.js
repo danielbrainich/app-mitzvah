@@ -1,6 +1,10 @@
 import { HebrewCalendar, HDate, Event } from "@hebcal/core";
 import { parseLocalIso } from "../utils/datetime";
-import { normalizeHolidayTitle } from "../utils/normalizeHolidayTitle";
+import {
+    normalizeHolidayName,
+    transformHolidayTitle,
+    transformHebrewTitle,
+} from "../utils/getHolidayDetails";
 
 /**
  * Date -> local YYYY-MM-DD (stable in local time; avoids UTC shifting).
@@ -43,8 +47,11 @@ export function formatHebcalEventsToHolidays(events) {
             const gregIso = toLocalIsoDate(ev.getDate().greg());
             return {
                 id: `${ev.getDesc()}-${gregIso}`,
-                title: normalizeHolidayTitle(ev.getDesc()),
-                hebrewTitle: ev.renderBrief("he-x-NoNikud"),
+                title: normalizeHolidayName(ev.getDesc()),
+                displayTitle: transformHolidayTitle(ev.getDesc()),
+                hebrewTitle: transformHebrewTitle(
+                    ev.renderBrief("he-x-NoNikud")
+                ), // ← Apply transform here
                 date: gregIso,
                 hebrewDate: ev.getDate().toString(),
                 categories: ev.getCategories(),
@@ -54,13 +61,13 @@ export function formatHebcalEventsToHolidays(events) {
 
 /**
  * Main compute function: returns { holidays, todayHolidays, upcoming }
- * Keeps behavior identical to your current Holidays.js.
  */
 export function computeHolidaysInfo({ todayIso, settings = {} }) {
     const {
         minorFasts = true,
         rosheiChodesh = true,
         modernHolidays = true,
+        specialShabbatot = true,
     } = settings;
 
     const start = parseLocalIso(todayIso);
@@ -73,7 +80,7 @@ export function computeHolidaysInfo({ todayIso, settings = {} }) {
         candlelighting: false,
 
         noMinorFast: !minorFasts,
-        noSpecialShabbat: true,
+        noSpecialShabbat: !specialShabbatot,
         noModern: !modernHolidays,
         noRoshChodesh: !rosheiChodesh,
 
@@ -85,6 +92,27 @@ export function computeHolidaysInfo({ todayIso, settings = {} }) {
 
         locale: "he",
     });
+
+    // 🔍 DEBUG: Holiday coverage (development only)
+    // To verify leap year coverage, set dev date to February 15, 2027
+    // Expected: Display: 81, Normalized: 51
+    // Regular year: Display: 78, Normalized: 49
+    if (__DEV__) {
+        const uniqueNormalized = new Set();
+        const uniqueDisplay = new Set();
+        events.forEach((ev) => {
+            if (ev instanceof Event) {
+                uniqueNormalized.add(normalizeHolidayName(ev.getDesc()));
+                uniqueDisplay.add(transformHolidayTitle(ev.getDesc()));
+            }
+        });
+        console.log("=== NORMALIZED (for matching) ===");
+        console.log(Array.from(uniqueNormalized).sort());
+        console.log("Total:", uniqueNormalized.size);
+        console.log("\n=== DISPLAY TITLES (what users see) ===");
+        console.log(Array.from(uniqueDisplay).sort());
+        console.log("Total:", uniqueDisplay.size);
+    }
 
     const holidays = formatHebcalEventsToHolidays(events);
     const todayHolidays = holidays.filter((h) => h.date === todayIso);

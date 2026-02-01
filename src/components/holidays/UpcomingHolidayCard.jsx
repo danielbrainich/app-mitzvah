@@ -36,7 +36,7 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
                             numberOfLines={1}
                             ellipsizeMode="tail"
                         >
-                            {holiday?.title ?? ""}
+                            {holiday?.displayTitle ?? ""}
                         </Text>
 
                         {!!holiday?.hebrewTitle && (

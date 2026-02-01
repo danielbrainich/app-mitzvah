@@ -333,7 +333,11 @@ function diffPartsNoSeconds(targetDate, now) {
         };
     }
 
-    const ms = Math.max(0, targetDate.getTime() - now.getTime());
+    // Floor both times to the minute for consistency
+    const targetMs = new Date(targetDate).setSeconds(0, 0);
+    const nowMs = new Date(now).setSeconds(0, 0);
+
+    const ms = Math.max(0, targetMs - nowMs);
     const totalMins = Math.floor(ms / 60000);
 
     const days = Math.floor(totalMins / (24 * 60));

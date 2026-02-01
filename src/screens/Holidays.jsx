@@ -68,11 +68,11 @@ export default function Holidays() {
                 visible={aboutOpen}
                 onClose={closeAbout}
                 isoDate={aboutHoliday?.date ?? ""}
-                nameLeft={aboutHoliday?.title ?? ""}
+                nameLeft={aboutHoliday?.displayTitle ?? ""} // ← Display the full title
                 nameRight={aboutHoliday?.hebrewTitle ?? ""}
                 description={
                     aboutHoliday
-                        ? getHolidayDetailsByName(aboutHoliday.title)
+                        ? getHolidayDetailsByName(aboutHoliday.title) // ← Use normalized title for matching
                               ?.description ?? "No description available."
                         : ""
                 }

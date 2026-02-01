@@ -23,6 +23,9 @@ const settingsSlice = createSlice({
         toggleModernHolidays: (state) => {
             state.modernHolidays = !state.modernHolidays;
         },
+        toggleSpecialShabbatot: (state) => {
+            state.specialShabbatot = !state.specialShabbatot;
+        },
         setCandleLightingTime: (state, action) => {
             state.candleLightingTime = action.payload;
         },
@@ -42,6 +45,7 @@ export const {
     toggleMinorFasts,
     toggleRosheiChodesh,
     toggleModernHolidays,
+    toggleSpecialShabbatot,
     setCandleLightingTime,
     setHavdalahTime,
     setCandleLightingToggle,
