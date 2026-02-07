@@ -310,13 +310,12 @@ export function buildShabbatViewModel(
         isDuring = now >= candleTime && now < shabbatEnds;
         isAfter = now >= shabbatEnds;
     } else {
-        // Without location: approximate
+        // Without location: approximate BUT be conservative
         const day = now.getDay();
-        const hour = now.getHours();
 
-        isBefore = day < 5 || (day === 5 && hour < 18);
-        isDuring = (day === 5 && hour >= 18) || (day === 6 && hour < 20);
-        isAfter = day === 6 && hour >= 20;
+        isBefore = day < 6; // Before Saturday
+        isDuring = day === 6; // All of Saturday
+        isAfter = false; // Never show Shavua Tov without location
     }
 
     return {

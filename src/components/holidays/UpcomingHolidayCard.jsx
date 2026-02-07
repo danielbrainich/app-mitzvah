@@ -24,13 +24,12 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
         <View style={ui.card}>
             <View style={styles.header}>
                 <View style={styles.textContainer}>
-                    <Text style={ui.label}>{gregLabel}</Text>
-
                     <Pressable
                         onPress={onPressDots}
                         disabled={!onAbout}
                         hitSlop={8}
                     >
+                        <Text style={ui.label}>{gregLabel}</Text>
                         <Text
                             style={[ui.h6, ui.textBrand]}
                             numberOfLines={1}
@@ -51,11 +50,11 @@ export default function UpcomingHolidayCard({ holiday, onAbout }) {
                     <Pressable
                         onPress={onPressDots}
                         hitSlop={12}
-                        style={ui.iconButton}
-                    >
+                        style={[ui.iconButton, { marginTop: -4 }]}
+                        >
                         <Entypo
                             name="dots-three-vertical"
-                            size={18}
+                            size={20}
                             color="white"
                         />
                     </Pressable>

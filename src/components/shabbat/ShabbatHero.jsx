@@ -1,15 +1,14 @@
 import React from "react";
 import { View, Text, Pressable, Linking, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
-import { Entypo } from "@expo/vector-icons";
 import { ui } from "../../constants/theme";
 
 export default function ShabbatHero({
     status,
     hasLocation,
     shabbatInfo,
-    candleMins, // unused here, but OK to keep for future
-    havdalahMins, // unused here, but OK to keep for future
+    candleMins,
+    havdalahMins,
     now,
     onShowDetails,
 }) {
@@ -19,7 +18,7 @@ export default function ShabbatHero({
         isAfter = false,
     } = status ?? {};
 
-    // ✅ one knob for vertical symmetry around the big blue line
+    // Vertical spacing constant
     const GAP = 12;
     const Spacer = () => <View style={{ height: GAP }} />;
 
@@ -73,12 +72,15 @@ export default function ShabbatHero({
     const isFridayNow = now.getDay() === 5;
     const isSaturdayNow = now.getDay() === 6;
 
-    // Shavua Tov only after Shabbat ends, and only on Saturday (until midnight)
+    // Show "Shavua Tov" only after Shabbat ends on Saturday (until midnight)
     const showShavuaTov = isAfter && isSaturdayNow;
 
     return (
         <View style={ui.shabbatHeroWrap}>
-            {/* DURING SHABBAT */}
+            {/* ========================================
+                STATE 1: DURING SHABBAT
+                Friday after candle lighting through Saturday before havdalah
+                ======================================== */}
             {isDuring ? (
                 <>
                     <Text
@@ -92,44 +94,43 @@ export default function ShabbatHero({
                         Shabbat Shalom
                     </Text>
 
+                    <Spacer />
+
                     {hasLocation && shabbatInfo?.shabbatEnds ? (
-                        <View style={{ marginTop: 12 }}>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    gap: 6,
-                                }}
+                        <>
+                            <Text
+                                style={[
+                                    ui.h5,
+                                    ui.textWhite,
+                                    ui.textCenter,
+                                    { marginTop: 0, marginBottom: 12 },
+                                ]}
                             >
-                                <Text
-                                    style={[
-                                        ui.h5,
-                                        ui.textWhite,
-                                        ui.textCenter,
-                                        { marginBottom: 0 },
-                                    ]}
-                                >
-                                    Shabbat ends{" "}
-                                    {isSaturdayNow ? "today" : "Saturday"} at{" "}
-                                    {formatTime(shabbatInfo.shabbatEnds)}
-                                </Text>
-                                <Pressable
-                                    onPress={handleShowDetails}
-                                    hitSlop={12}
-                                    style={[{ paddingTop: 4 }, { paddingLeft: 2}]}
-                                >
-                                    <Entypo
-                                        name="dots-three-vertical"
-                                        size={16}
-                                        color="white"
-                                    />
-                                </Pressable>
-                            </View>
-                        </View>
+                                {isSaturdayNow
+                                    ? `Shabbat ends at ${formatTime(
+                                          shabbatInfo.shabbatEnds
+                                      )}`
+                                    : `Candle lighting was at ${formatTime(
+                                          shabbatInfo.candleTime
+                                      )}`}
+                            </Text>
+
+                            <Pressable
+                                onPress={handleShowDetails}
+                                style={[ui.button, ui.buttonOutline]}
+                            >
+                                <Text style={ui.buttonText}>Shabbat times</Text>
+                            </Pressable>
+                        </>
                     ) : (
-                        <View>
-                            <Text style={[ui.paragraph, ui.textCenter]}>
+                        <>
+                            <Text
+                                style={[
+                                    ui.paragraph,
+                                    ui.textCenter,
+                                    { marginBottom: 12 },
+                                ]}
+                            >
                                 Share your location for{"\n"}detailed Shabbat
                                 times
                             </Text>
@@ -141,11 +142,14 @@ export default function ShabbatHero({
                                     Enable location
                                 </Text>
                             </Pressable>
-                        </View>
+                        </>
                     )}
                 </>
             ) : showShavuaTov ? (
-                /* SATURDAY AFTER SHABBAT: Show Shavua Tov until midnight */
+                /* ========================================
+                   STATE 2: SHAVUA TOV
+                   Saturday after Shabbat ends (until midnight)
+                   ======================================== */
                 <>
                     <Text
                         style={[
@@ -158,156 +162,38 @@ export default function ShabbatHero({
                         Shavua Tov
                     </Text>
 
+                    <Spacer />
+
                     {hasLocation && shabbatInfo?.shabbatEnds ? (
-                        <View style={{ marginTop: 12 }}>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    gap: 6,
-                                }}
-                            >
-                                <Text
-                                    style={[
-                                        ui.h5,
-                                        ui.textWhite,
-                                        ui.textCenter,
-                                        { marginBottom: 0 },
-                                    ]}
-                                >
-                                    Shabbat ended today at{" "}
-                                    {formatTime(shabbatInfo.shabbatEnds)}
-                                </Text>
-                                <Pressable
-                                    onPress={handleShowDetails}
-                                    hitSlop={12}
-                                    style={[{ paddingTop: 4 }, { paddingLeft: 2}]}
-                                >
-                                    <Entypo
-                                        name="dots-three-vertical"
-                                        size={16}
-                                        color="white"
-                                    />
-                                </Pressable>
-                            </View>
-                        </View>
-                    ) : (
-                        <Text
-                            style={[
-                                ui.h5,
-                                ui.textWhite,
-                                ui.textCenter,
-                                { marginTop: 12, marginBottom: 0 },
-                            ]}
-                        >
-                            Have a good week
-                        </Text>
-                    )}
-                </>
-            ) : (
-                /* BEFORE SHABBAT (or after Shabbat on non-Saturday) */
-                <>
-                    {/* Friday: Show "this evening" */}
-                    {isFridayNow ? (
                         <>
                             <Text
                                 style={[
-                                    ui.h2,
+                                    ui.h5,
                                     ui.textWhite,
                                     ui.textCenter,
-                                    { marginBottom: 0 },
+                                    { marginTop: 0, marginBottom: 12 },
                                 ]}
                             >
-                                Shabbat begins
+                                Shabbat ended at{" "}
+                                {formatTime(shabbatInfo.shabbatEnds)}
                             </Text>
 
-                            {/* ✅ symmetric spacing around the big blue line */}
-                            <Spacer />
-
-                            <Text
-                                style={[
-                                    ui.h3,
-                                    ui.textBrand,
-                                    ui.textChutz,
-                                    ui.textCenter,
-                                    { marginTop: 0, marginBottom: 0 },
-                                ]}
+                            <Pressable
+                                onPress={handleShowDetails}
+                                style={[ui.button, ui.buttonOutline]}
                             >
-                                this evening
-                            </Text>
-
-                            <Spacer />
+                                <Text style={ui.buttonText}>Shabbat times</Text>
+                            </Pressable>
                         </>
                     ) : (
                         <>
                             <Text
                                 style={[
-                                    ui.h2,
-                                    ui.textWhite,
+                                    ui.paragraph,
                                     ui.textCenter,
-                                    { marginBottom: 0 },
+                                    { marginBottom: 12 },
                                 ]}
                             >
-                                Next Shabbat begins
-                            </Text>
-
-                            {/* ✅ symmetric spacing around the big blue line */}
-                            <Spacer />
-
-                            <Text
-                                style={[
-                                    ui.h3,
-                                    ui.textBrand,
-                                    ui.textChutz,
-                                    ui.textCenter,
-                                    { marginTop: 0, marginBottom: 0 },
-                                ]}
-                            >
-                                {formatDateShort(shabbatInfo?.erevShabbatShort)}
-                            </Text>
-
-                            <Spacer />
-                        </>
-                    )}
-
-                    {hasLocation && shabbatInfo?.candleTime ? (
-                        <View>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    gap: 6,
-                                }}
-                            >
-                                <Text
-                                    style={[
-                                        ui.h5,
-                                        ui.textWhite,
-                                        ui.textCenter,
-                                        { marginBottom: 0 },
-                                    ]}
-                                >
-                                    Candle lighting at{" "}
-                                    {formatTime(shabbatInfo.candleTime)}
-                                </Text>
-                                <Pressable
-                                    onPress={handleShowDetails}
-                                    hitSlop={12}
-                                    style={[{ paddingTop: 4 }, { paddingLeft: 2}]}
-                                >
-                                    <Entypo
-                                        name="dots-three-vertical"
-                                        size={16}
-                                        color="white"
-                                    />
-                                </Pressable>
-                            </View>
-                        </View>
-                    ) : (
-                        <View>
-                            <Text style={[ui.paragraph, ui.textCenter]}>
                                 Share your location for{"\n"}detailed Shabbat
                                 times
                             </Text>
@@ -319,7 +205,95 @@ export default function ShabbatHero({
                                     Enable location
                                 </Text>
                             </Pressable>
-                        </View>
+                        </>
+                    )}
+                </>
+            ) : (
+                /* ========================================
+                   STATE 3: BEFORE SHABBAT
+                   Sunday through Friday before candle lighting
+                   ======================================== */
+                <>
+                    {/* Show "Erev Shabbat" on Friday, "not Shabbat" on other days */}
+                    <Text
+                        style={[
+                            ui.h2,
+                            ui.textWhite,
+                            ui.textCenter,
+                            { marginBottom: 0 },
+                        ]}
+                    >
+                        Today is
+                    </Text>
+
+                    <Spacer />
+
+                    <Text
+                        style={[
+                            ui.textBrand,
+                            ui.textChutz,
+                            ui.textCenter,
+                            {
+                                fontSize: 60,
+                                marginTop: 0,
+                                marginBottom: 0,
+                            },
+                        ]}
+                    >
+                        {isFridayNow ? "Erev Shabbat" : "not Shabbat"}
+                    </Text>
+
+                    <Spacer />
+
+                    {hasLocation && shabbatInfo?.candleTime ? (
+                        /* User has shared location - show times and button */
+                        <>
+                            <Text
+                                style={[
+                                    ui.h5,
+                                    ui.textWhite,
+                                    ui.textCenter,
+                                    { marginTop: 0, marginBottom: 12 },
+                                ]}
+                            >
+                                {isFridayNow
+                                    ? `Candle lighting is at ${formatTime(
+                                          shabbatInfo.candleTime
+                                      )}`
+                                    : `Shabbat begins ${formatDateShort(
+                                          shabbatInfo?.erevShabbatShort
+                                      )}`}
+                            </Text>
+
+                            <Pressable
+                                onPress={handleShowDetails}
+                                style={[ui.button, ui.buttonOutline]}
+                            >
+                                <Text style={ui.buttonText}>Shabbat times</Text>
+                            </Pressable>
+                        </>
+                    ) : (
+                        /* User has not shared location - show enable prompt */
+                        <>
+                            <Text
+                                style={[
+                                    ui.paragraph,
+                                    ui.textCenter,
+                                    { marginBottom: 12 },
+                                ]}
+                            >
+                                Share your location for{"\n"}detailed Shabbat
+                                times
+                            </Text>
+                            <Pressable
+                                onPress={handleEnableLocation}
+                                style={[ui.button, ui.buttonOutline]}
+                            >
+                                <Text style={ui.buttonText}>
+                                    Enable location
+                                </Text>
+                            </Pressable>
+                        </>
                     )}
                 </>
             )}

@@ -64,11 +64,11 @@ export default function ParshaCard({
                         <Pressable
                             onPress={onPressDots}
                             hitSlop={12}
-                            style={ui.iconButton}
-                        >
+                            style={[ui.iconButton, { marginTop: -4 }]}
+                            >
                             <Entypo
                                 name="dots-three-vertical"
-                                size={18}
+                                size={20}
                                 color="white"
                             />
                         </Pressable>
