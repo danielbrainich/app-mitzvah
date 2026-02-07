@@ -1,13 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+    // Holiday toggles - all start ON
     minorFasts: true,
     rosheiChodesh: true,
     modernHolidays: true,
+    specialShabbatot: true,
+
+    // Shabbat time values (used when toggles are ON)
     candleLightingTime: 18,
     havdalahTime: 42,
-    candleLightingToggle: true,
-    havdalahTimeToggle: true,
+
+    // Shabbat toggles - both start OFF (use default times)
+    candleLightingToggle: false,
+    havdalahTimeToggle: false,
 };
 
 const settingsSlice = createSlice({

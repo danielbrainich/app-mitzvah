@@ -24,11 +24,11 @@ import { useShabbatSettings } from "../hooks/useShabbatSettings";
 
 import { useTipsIap } from "../services/iap/useTipsIap";
 import TipSelector from "../components/settings/TipSelector";
+import PopupModal from "../components/common/PopupModal";
 
 import SettingsCard from "../components/settings/SettingsCard";
 import SettingSwitch from "../components/settings/SettingSwitch";
 import SettingSlider from "../components/settings/SettingSlider";
-import PopupModal from "../components/common/PopupModal";
 
 export default function Settings({ navigation }) {
     const [fontsLoaded] = useFonts({
@@ -54,7 +54,6 @@ export default function Settings({ navigation }) {
 
     const [tipAmount, setTipAmount] = useState(5);
     const { loading: iapLoading, tip } = useTipsIap();
-
     const [tipPopup, setTipPopup] = useState(null);
 
     const handleTipAttempt = useCallback(
@@ -70,14 +69,13 @@ export default function Settings({ navigation }) {
                 });
             } catch (e) {
                 if (e?.code === "TIP_CANCELLED") {
-                    // User hit cancel — do nothing
                     return;
                 }
 
                 setTipPopup({
                     title: "Tips not working",
                     message:
-                        "In-app purchases aren’t working right now. Please try again later.",
+                        "In-app purchases aren't working right now. Please try again later.",
                     primaryLabel: "OK",
                     onPrimary: () => setTipPopup(null),
                 });
@@ -193,7 +191,7 @@ export default function Settings({ navigation }) {
                         )}
                     </SettingsCard>
 
-                    {/* Support Section */}
+                    {/* DISABLED: Tips/IAP - uncomment when re-enabled
                     <View style={{ marginTop: 16 }}>
                         <SettingsCard title="" variant="card">
                             <View style={{ paddingBottom: 10 }}>
@@ -234,6 +232,7 @@ export default function Settings({ navigation }) {
                             </View>
                         </SettingsCard>
                     </View>
+                    */}
 
                     {/* Footer */}
                     <View style={{ flex: 1 }} />
@@ -269,7 +268,7 @@ export default function Settings({ navigation }) {
                     </View>
                 </ScrollView>
 
-                {/* Overlay modal OUTSIDE ScrollView */}
+                {/* DISABLED: IAP popup
                 <PopupModal
                     visible={!!tipPopup}
                     title={tipPopup?.title}
@@ -280,6 +279,7 @@ export default function Settings({ navigation }) {
                     onSecondary={tipPopup?.onSecondary}
                     onClose={() => setTipPopup(null)}
                 />
+                */}
             </SafeAreaView>
         </View>
     );

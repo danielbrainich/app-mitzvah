@@ -1,3 +1,9 @@
+// ===================================================================
+// DISABLED: IAP TIPS LOGIC
+// To re-enable: uncomment the code below and reinstall react-native-iap
+// ===================================================================
+
+/*
 import { useEffect, useState, useCallback } from "react";
 import { Platform } from "react-native";
 import * as Haptics from "expo-haptics";
@@ -73,7 +79,7 @@ export function useTipsIap() {
             if (!ready) {
                 throw makeIapError(
                     "IAP_NOT_READY",
-                    "In-app purchases aren’t available right now."
+                    "In-app purchases aren't available right now."
                 );
             }
 
@@ -126,4 +132,21 @@ export function useTipsIap() {
     );
 
     return { tipProducts, ready, loading, error, tip };
+}
+*/
+
+// ===================================================================
+// STUB: Returns disabled state so Settings screen doesn't break
+// ===================================================================
+
+export function useTipsIap() {
+    return {
+        tipProducts: [],
+        ready: false,
+        loading: false,
+        error: null,
+        tip: async () => {
+            throw new Error("IAP is currently disabled");
+        },
+    };
 }
