@@ -9,7 +9,7 @@ export default function ShabbatTimesBottomSheet({
     shabbatInfo,
     candleMins,
     havdalahMins,
-    snapPoints = ["40%", "60%"],
+    snapPoints = ["35%", "65%"],
 }) {
     const formatTime = (date) => {
         if (!(date instanceof Date)) return "";
@@ -21,7 +21,6 @@ export default function ShabbatTimesBottomSheet({
 
     if (!shabbatInfo) return null;
 
-    // Equal space above + below each primary time row
     const timeBlockStyle = ui.shabbatTimeBlock ?? ui.mt2;
 
     return (
@@ -30,28 +29,32 @@ export default function ShabbatTimesBottomSheet({
             onClose={onClose}
             snapPoints={snapPoints}
             defaultIndex={0}
+            enablePanDownToClose={false}
             contentContainerStyle={ui.sheetBody}
         >
             {/* Header */}
-            <View style={ui.mb3}>
+            <View style={ui.sheetHeader}>
                 <Text style={[ui.h6, ui.textBrand]}>Shabbat times</Text>
             </View>
 
-            <View style={[ui.divider, ui.mb4]} />
+            <View style={ui.divider} />
 
             {/* Friday */}
-            <View style={ui.mb4}>
-                {/* Smaller + tighter “blue date” (match left label size) */}
+            <View style={ui.mt4}>
                 <View style={ui.mb2}>
-                    <Text style={[ui.textBody, ui.textBrand ]}>
+                    <Text style={[ui.textBody, ui.textBrand]}>
                         {shabbatInfo.erevShabbatShort}
                     </Text>
                 </View>
 
                 {!!shabbatInfo.candleTime && (
                     <View style={timeBlockStyle}>
-                        <View style={[ui.shabbatTimeRow, { alignItems: "baseline" }]}>
-                            {/* Remove ui.paragraph's default marginTop so baseline aligns */}
+                        <View
+                            style={[
+                                ui.shabbatTimeRow,
+                                { alignItems: "baseline" },
+                            ]}
+                        >
                             <Text style={[ui.textBody, ui.textWhite]}>
                                 Shabbat begins / Candle lighting
                             </Text>
@@ -71,19 +74,29 @@ export default function ShabbatTimesBottomSheet({
                 )}
             </View>
 
-            <View style={[ui.divider, { opacity: 0.6 }]} />
+            <View
+                style={[
+                    ui.divider,
+                    { marginTop: 12, marginBottom: 12 },
+                ]}
+            />
 
             {/* Saturday */}
-            <View style={ui.mt4}>
+            <View>
                 <View style={ui.mb2}>
-                    <Text style={[ui.textBody, ui.textBrand ]}>
+                    <Text style={[ui.textBody, ui.textBrand]}>
                         {shabbatInfo.yomShabbatShort}
                     </Text>
                 </View>
 
                 {!!shabbatInfo.shabbatEnds && (
                     <View style={timeBlockStyle}>
-                        <View style={[ui.shabbatTimeRow, { alignItems: "baseline" }]}>
+                        <View
+                            style={[
+                                ui.shabbatTimeRow,
+                                { alignItems: "baseline" },
+                            ]}
+                        >
                             <Text style={[ui.textBody, ui.textWhite]}>
                                 Shabbat ends / Havdalah
                             </Text>

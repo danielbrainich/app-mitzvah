@@ -7,7 +7,7 @@ export default function ParshaBottomSheet({
     visible,
     onClose,
     parshiot,
-    snapPoints = ["35%", "75%"],
+    snapPoints = ["35%", "65%"],
 }) {
     if (!parshiot || parshiot.length === 0) return null;
 
@@ -21,24 +21,29 @@ export default function ParshaBottomSheet({
         >
             {parshiot.map((parsha, index) => (
                 <View key={parsha.key}>
-                    {index > 0 && <View style={[ui.divider, { marginVertical: 24 }]} />}
+                    {index > 0 && (
+                        <View style={[
+                            ui.divider,
+                            {
+                                height: 1,
+                                backgroundColor: "rgba(255,255,255,0.25)",
+                                marginTop: 24,
+                                marginBottom: 24,
+                            },
+                        ]} />
+                    )}
 
                     <View style={ui.sheetHeader}>
                         <Text style={[ui.h6, ui.textBrand]}>
                             {parsha.english}
                         </Text>
-                        <Text style={ui.hebrewCardText}>
-                            {parsha.hebrew}
-                        </Text>
-                    <Text style={ui.label}>
-                        {parsha.verses}
-                    </Text>
+                        <Text style={ui.hebrewCardText}>{parsha.hebrew}</Text>
+                        <Text style={ui.label}>{parsha.verses}</Text>
                     </View>
 
                     <View style={ui.divider} />
 
                     <Text style={ui.paragraph}>{parsha.blurb}</Text>
-
                 </View>
             ))}
         </BottomSheetDrawerBase>

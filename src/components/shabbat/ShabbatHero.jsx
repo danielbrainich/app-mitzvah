@@ -18,10 +18,6 @@ export default function ShabbatHero({
         isAfter = false,
     } = status ?? {};
 
-    // Vertical spacing constant
-    const GAP = 12;
-    const Spacer = () => <View style={{ height: GAP }} />;
-
     const handleEnableLocation = () => {
         if (Platform.OS === "ios" || Platform.OS === "android") {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
@@ -94,18 +90,9 @@ export default function ShabbatHero({
                         Shabbat Shalom
                     </Text>
 
-                    <Spacer />
-
                     {hasLocation && shabbatInfo?.shabbatEnds ? (
                         <>
-                            <Text
-                                style={[
-                                    ui.h5,
-                                    ui.textWhite,
-                                    ui.textCenter,
-                                    { marginTop: 0, marginBottom: 12 },
-                                ]}
-                            >
+                            <Text style={[ui.h5, ui.textWhite, ui.textCenter]}>
                                 {isSaturdayNow
                                     ? `Shabbat ends at ${formatTime(
                                           shabbatInfo.shabbatEnds
@@ -124,13 +111,7 @@ export default function ShabbatHero({
                         </>
                     ) : (
                         <>
-                            <Text
-                                style={[
-                                    ui.paragraph,
-                                    ui.textCenter,
-                                    { marginBottom: 12 },
-                                ]}
-                            >
+                            <Text style={[ui.label, ui.textCenter]}>
                                 Share your location for{"\n"}detailed Shabbat
                                 times
                             </Text>
@@ -162,18 +143,9 @@ export default function ShabbatHero({
                         Shavua Tov
                     </Text>
 
-                    <Spacer />
-
                     {hasLocation && shabbatInfo?.shabbatEnds ? (
                         <>
-                            <Text
-                                style={[
-                                    ui.h5,
-                                    ui.textWhite,
-                                    ui.textCenter,
-                                    { marginTop: 0, marginBottom: 12 },
-                                ]}
-                            >
+                            <Text style={[ui.h5, ui.textWhite, ui.textCenter]}>
                                 Shabbat ended at{" "}
                                 {formatTime(shabbatInfo.shabbatEnds)}
                             </Text>
@@ -187,13 +159,7 @@ export default function ShabbatHero({
                         </>
                     ) : (
                         <>
-                            <Text
-                                style={[
-                                    ui.paragraph,
-                                    ui.textCenter,
-                                    { marginBottom: 12 },
-                                ]}
-                            >
+                            <Text style={[ui.label, ui.textCenter]}>
                                 Share your location for{"\n"}detailed Shabbat
                                 times
                             </Text>
@@ -215,18 +181,9 @@ export default function ShabbatHero({
                    ======================================== */
                 <>
                     {/* Show "Erev Shabbat" on Friday, "not Shabbat" on other days */}
-                    <Text
-                        style={[
-                            ui.h2,
-                            ui.textWhite,
-                            ui.textCenter,
-                            { marginBottom: 0 },
-                        ]}
-                    >
+                    <Text style={[ui.h2, ui.textWhite, ui.textCenter]}>
                         Today is
                     </Text>
-
-                    <Spacer />
 
                     <Text
                         style={[
@@ -235,27 +192,16 @@ export default function ShabbatHero({
                             ui.textCenter,
                             {
                                 fontSize: 60,
-                                marginTop: 0,
-                                marginBottom: 0,
                             },
                         ]}
                     >
                         {isFridayNow ? "Erev Shabbat" : "not Shabbat"}
                     </Text>
 
-                    <Spacer />
-
                     {hasLocation && shabbatInfo?.candleTime ? (
                         /* User has shared location - show times and button */
                         <>
-                            <Text
-                                style={[
-                                    ui.h5,
-                                    ui.textWhite,
-                                    ui.textCenter,
-                                    { marginTop: 0, marginBottom: 12 },
-                                ]}
-                            >
+                            <Text style={[ui.h5, ui.textWhite, ui.textCenter]}>
                                 {isFridayNow
                                     ? `Candle lighting is at ${formatTime(
                                           shabbatInfo.candleTime
@@ -273,15 +219,20 @@ export default function ShabbatHero({
                             </Pressable>
                         </>
                     ) : (
-                        /* User has not shared location - show enable prompt */
+                        /* User has not shared location - show date and enable prompt */
                         <>
-                            <Text
-                                style={[
-                                    ui.paragraph,
-                                    ui.textCenter,
-                                    { marginBottom: 12 },
-                                ]}
-                            >
+                            {!isFridayNow && shabbatInfo?.erevShabbatShort && (
+                                <Text
+                                    style={[ui.h5, ui.textWhite, ui.textCenter]}
+                                >
+                                    Shabbat begins{" "}
+                                    {formatDateShort(
+                                        shabbatInfo?.erevShabbatShort
+                                    )}
+                                </Text>
+                            )}
+
+                            <Text style={[ui.label, ui.textCenter]}>
                                 Share your location for{"\n"}detailed Shabbat
                                 times
                             </Text>

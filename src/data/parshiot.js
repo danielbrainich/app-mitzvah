@@ -475,7 +475,9 @@ export function getParshaDataByName(hebcalName) {
 
     const key = HEBCAL_PARSHA_NAMES[cleanName];
     if (!key) {
-        console.log("Could not find key for:", cleanName);
+        if (__DEV__) {
+            console.log("Could not find key for:", cleanName);
+        }
         return null;
     }
 

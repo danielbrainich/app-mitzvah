@@ -14,7 +14,7 @@
         "assetBundlePatterns": ["**/*"],
         "ios": {
             "supportsTablet": true,
-            "buildNumber": "3",
+            "buildNumber": "4",
             "infoPlist": {
                 "NSLocationWhenInUseUsageDescription": "AppMitzvah needs your location to calculate accurate Shabbat candle lighting and end times for your area.",
                 "ITSAppUsesNonExemptEncryption": false

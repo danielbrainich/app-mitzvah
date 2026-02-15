@@ -66,13 +66,16 @@ export default function Shabbat() {
 
         if (data) {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setActiveParshiot(data);
+            // Close other sheets first
+            setShowShabbatTimes(false);
+            setShowLocationDetails(false);
+            // Then open this one
+            setTimeout(() => setActiveParshiot(data), 100);
         }
     }, [shabbatInfo?.parshaEnglish]);
 
     const handleEnableLocation = useCallback(async () => {
         const status = await requestPermission();
-
         if (status === "granted") {
             setShowLocationDetails(false);
         } else {
@@ -85,14 +88,6 @@ export default function Shabbat() {
     const [showShabbatTimes, setShowShabbatTimes] = useState(false);
 
     if (!fontsLoaded) return null;
-
-    console.log("Debug Saturday evening:", {
-        now: now.toLocaleString(),
-        day: now.getDay(),
-        shabbatEnds: shabbatInfo?.shabbatEnds?.toLocaleString(),
-        isAfter: vm.status.isAfter,
-        isDuring: vm.status.isDuring,
-    });
 
     return (
         <View style={ui.safeArea}>
@@ -156,7 +151,7 @@ export default function Shabbat() {
                 visible={showLocationDetails}
                 onClose={() => setShowLocationDetails(false)}
                 title="Location"
-                snapPoints={["25%", "55%"]}
+                snapPoints={["35%", "65%"]}
                 hasLocation={hasLocation}
                 location={location}
                 timezone={timezone}
@@ -167,7 +162,7 @@ export default function Shabbat() {
                 visible={!!activeParshiot}
                 onClose={() => setActiveParshiot(null)}
                 parshiot={activeParshiot}
-                snapPoints={["35%", "75%"]}
+                snapPoints={["35%", "65%"]}
             />
 
             <ShabbatTimesBottomSheet
