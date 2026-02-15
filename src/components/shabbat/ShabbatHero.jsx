@@ -195,7 +195,7 @@ export default function ShabbatHero({
                             },
                         ]}
                     >
-                        {isFridayNow ? "Erev Shabbat" : "not Shabbat"}
+                        {isFridayNow ? "Erev Shabbat" : "not Shabbat "}
                     </Text>
 
                     {hasLocation && shabbatInfo?.candleTime ? (
