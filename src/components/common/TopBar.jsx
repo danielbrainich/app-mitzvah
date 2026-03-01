@@ -2,7 +2,6 @@ import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { View, Text, Pressable, Modal, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import {
     formatGregorianLongFromIso,
     formatHebrewLongFromIso,
@@ -17,6 +16,12 @@ import {
     setDevOverrideTime,
     getDevOverrideTime,
 } from "../../hooks/useTodayIsoDay";
+
+// DateTimePicker is native-only
+const DateTimePicker =
+    Platform.OS !== "web"
+        ? require("@react-native-community/datetimepicker").default
+        : null;
 
 // Local helpers
 function parseIsoToDate(iso) {
@@ -121,7 +126,6 @@ export function TopBar({ todayIso }) {
                         <Text style={ui.topBarDateText} numberOfLines={1}>
                             {label}
                         </Text>
-
                         {showDevBadge ? <View style={ui.topBarDevDot} /> : null}
                     </View>
                 </Pressable>
@@ -156,42 +160,54 @@ export function TopBar({ todayIso }) {
 
                         <View style={{ height: 10 }} />
 
-                        <DateTimePicker
-                            value={pickerDate}
-                            mode="date"
-                            display={
-                                Platform.OS === "ios" ? "inline" : "default"
-                            }
-                            themeVariant="dark"
-                            onChange={(event, selectedDate) => {
-                                if (!selectedDate) return;
-                                const localDate = new Date(
-                                    selectedDate.getFullYear(),
-                                    selectedDate.getMonth(),
-                                    selectedDate.getDate(),
-                                    pickerTime.getHours(),
-                                    pickerTime.getMinutes(),
-                                    0,
-                                    0
-                                );
-                                setPickerDate(localDate);
-                            }}
-                        />
+                        {Platform.OS !== "web" && DateTimePicker ? (
+                            <>
+                                <DateTimePicker
+                                    value={pickerDate}
+                                    mode="date"
+                                    display={
+                                        Platform.OS === "ios"
+                                            ? "inline"
+                                            : "default"
+                                    }
+                                    themeVariant="dark"
+                                    onChange={(event, selectedDate) => {
+                                        if (!selectedDate) return;
+                                        const localDate = new Date(
+                                            selectedDate.getFullYear(),
+                                            selectedDate.getMonth(),
+                                            selectedDate.getDate(),
+                                            pickerTime.getHours(),
+                                            pickerTime.getMinutes(),
+                                            0,
+                                            0
+                                        );
+                                        setPickerDate(localDate);
+                                    }}
+                                />
 
-                        <View style={{ height: 10 }} />
+                                <View style={{ height: 10 }} />
 
-                        <DateTimePicker
-                            value={pickerTime}
-                            mode="time"
-                            display={
-                                Platform.OS === "ios" ? "spinner" : "default"
-                            }
-                            themeVariant="dark"
-                            onChange={(event, selectedTime) => {
-                                if (!selectedTime) return;
-                                setPickerTime(selectedTime);
-                            }}
-                        />
+                                <DateTimePicker
+                                    value={pickerTime}
+                                    mode="time"
+                                    display={
+                                        Platform.OS === "ios"
+                                            ? "spinner"
+                                            : "default"
+                                    }
+                                    themeVariant="dark"
+                                    onChange={(event, selectedTime) => {
+                                        if (!selectedTime) return;
+                                        setPickerTime(selectedTime);
+                                    }}
+                                />
+                            </>
+                        ) : (
+                            <Text style={ui.devModalHelper}>
+                                Date picker not available on web
+                            </Text>
+                        )}
 
                         <View style={{ height: 12 }} />
                         <View style={ui.devModalBtnRow}>

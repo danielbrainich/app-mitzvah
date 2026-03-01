@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import {
     colors as tokenColors,
     spacing,
@@ -118,7 +118,7 @@ export const ui = StyleSheet.create({
     // TYPOGRAPHY - Headings
     // ==========================================
     h1: {
-        fontSize: typography.size.hero,
+        fontSize: Platform.OS === "web" ? 36 : typography.size.hero,
         fontWeight: typography.weight.bold,
         lineHeight: 68,
     },

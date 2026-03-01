@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from "react";
 import { Text, View, ScrollView } from "react-native";
-import { useFonts } from "expo-font";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 import { ui } from "../constants/theme";
@@ -14,10 +13,6 @@ import HolidayBottomSheet from "../components/holidays/HolidayBottomSheet";
 const UPCOMING_HEIGHT = 120;
 
 export default function Holidays() {
-    const [fontsLoaded] = useFonts({
-        ChutzBold: require("../../assets/fonts/Chutz-Bold.otf"),
-    });
-
     const { todayHolidays, upcoming } = useHolidayData();
 
     const [aboutOpen, setAboutOpen] = useState(false);
@@ -32,8 +27,6 @@ export default function Holidays() {
     const closeAbout = useCallback(() => setAboutOpen(false), []);
 
     const tabBarHeight = useBottomTabBarHeight();
-
-    if (!fontsLoaded) return null;
 
     return (
         <View style={ui.safeArea}>

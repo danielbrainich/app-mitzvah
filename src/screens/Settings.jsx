@@ -8,7 +8,6 @@ import {
     ActivityIndicator,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { useFonts } from "expo-font";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Entypo } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -31,10 +30,6 @@ import SettingSwitch from "../components/settings/SettingSwitch";
 import SettingSlider from "../components/settings/SettingSlider";
 
 export default function Settings({ navigation }) {
-    const [fontsLoaded] = useFonts({
-        ChutzBold: require("../../assets/fonts/Chutz-Bold.otf"),
-    });
-
     const settings = useSelector((state) => state.settings);
     const { minorFasts, rosheiChodesh, modernHolidays, specialShabbatot } =
         settings;
@@ -88,8 +83,6 @@ export default function Settings({ navigation }) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
         handleTipAttempt(tipAmount);
     }, [handleTipAttempt, tipAmount]);
-
-    if (!fontsLoaded) return null;
 
     return (
         <View style={ui.safeArea}>

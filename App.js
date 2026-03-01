@@ -7,7 +7,6 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { NavigationContainer } from "@react-navigation/native";
 import RootNavigator from "./src/navigation/RootNavigator";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { store, persistor } from "./src/store/store";
@@ -17,14 +16,6 @@ import ErrorBoundary from "./src/components/common/ErrorBoundary";
 
 // Keep splash screen visible while loading
 SplashScreen.preventAutoHideAsync();
-
-const Stack = createNativeStackNavigator();
-
-const screenOptions = {
-    headerStyle: { backgroundColor: colors.bg },
-    headerTintColor: colors.bg,
-    title: "",
-};
 
 export default function App() {
     const [appIsReady, setAppIsReady] = useState(false);
@@ -74,7 +65,7 @@ export default function App() {
                 style={{
                     flex: 1,
                     opacity: fadeAnim,
-                    backgroundColor: "#000000",
+                    backgroundColor: "colors.bg",
                 }}
                 onLayout={onLayoutRootView}
             >

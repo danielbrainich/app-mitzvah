@@ -1,6 +1,5 @@
 import React, { useCallback, useState, useMemo } from "react";
 import { View, ScrollView, Linking, Text } from "react-native";
-import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
@@ -21,12 +20,9 @@ import { buildShabbatViewModel } from "../lib/computeShabbatInfo";
 import { getParshaDataByName } from "../data/parshiot";
 
 export default function Shabbat() {
-    const [fontsLoaded] = useFonts({
-        ChutzBold: require("../../assets/fonts/Chutz-Bold.otf"),
-    });
-
     const [showLocationDetails, setShowLocationDetails] = useState(false);
     const [activeParshiot, setActiveParshiot] = useState(null);
+    const [showShabbatTimes, setShowShabbatTimes] = useState(false);
 
     const { candleLightingTime, havdalahTime } = useSelector(
         (state) => state.settings
@@ -84,10 +80,6 @@ export default function Shabbat() {
     }, [requestPermission]);
 
     const tabBarHeight = useBottomTabBarHeight();
-
-    const [showShabbatTimes, setShowShabbatTimes] = useState(false);
-
-    if (!fontsLoaded) return null;
 
     return (
         <View style={ui.safeArea}>
