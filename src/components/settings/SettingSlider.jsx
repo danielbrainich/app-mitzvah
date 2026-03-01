@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { View, Platform } from "react-native";
 import { Slider } from "@miblanchard/react-native-slider";
 import * as Haptics from "expo-haptics";
 import { ui } from "../../constants/theme";
@@ -11,6 +11,8 @@ export default function SettingSlider({
     onValueChange,
     showDivider = false,
 }) {
+    const isWeb = Platform.OS === "web";
+
     const handleValueChange = (values) => {
         const newValue = Array.isArray(values) ? values[0] : values;
         onValueChange(newValue);
@@ -21,7 +23,7 @@ export default function SettingSlider({
     };
 
     return (
-        <View style={{ paddingHorizontal: 8 }}>
+        <View style={{ paddingHorizontal: isWeb ? 4 : 8 }}>
             <Slider
                 value={value}
                 onValueChange={handleValueChange}
@@ -32,14 +34,20 @@ export default function SettingSlider({
                 minimumTrackTintColor="#82CBFF"
                 maximumTrackTintColor="#3e3e3e"
                 thumbTintColor="#ffffff"
-                trackStyle={{ height: 4, borderRadius: 2 }}
+
+                trackStyle={{
+                    height: isWeb ? 3 : 4,
+                    borderRadius: 2,
+                }}
+
                 thumbStyle={{
-                    height: 26,
-                    width: 26,
-                    borderRadius: 13,
+                    height: isWeb ? 18 : 26,
+                    width: isWeb ? 18 : 26,
+                    borderRadius: isWeb ? 9 : 13,
                     backgroundColor: "#ffffff",
                 }}
             />
+
             {showDivider && <View style={ui.divider} />}
         </View>
     );

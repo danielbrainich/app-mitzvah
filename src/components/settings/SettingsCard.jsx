@@ -1,21 +1,37 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Platform } from "react-native";
 import { ui } from "../../constants/theme";
 
 export default function SettingsCard({
     title,
     children,
-    variant = "card", // "flat" | "card"
+    variant = "card",
 }) {
     const hasTitle = typeof title === "string" && title.trim().length > 0;
+    const isWeb = Platform.OS === "web";
 
     return (
         <View style={[ui.card, variant === "flat" && ui.cardFlat]}>
             {hasTitle && (
-                <Text style={[ui.h6, ui.textBrand, ui.mb2]}>{title}</Text>
+                <Text
+                    style={[
+                        ui.h6,
+                        ui.textBrand,
+                        ui.mb2,
+                        isWeb && { marginBottom: 6 }
+                    ]}
+                >
+                    {title}
+                </Text>
             )}
 
-            <View style={{ gap: 12 }}>{children}</View>
+            <View
+                style={{
+                    gap: isWeb ? 6 : 12
+                }}
+            >
+                {children}
+            </View>
         </View>
     );
 }

@@ -13,23 +13,33 @@ import { store, persistor } from "./src/store/store";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { colors } from "./src/constants/theme";
 import ErrorBoundary from "./src/components/common/ErrorBoundary";
+import {
+    PlayfairDisplay_700Bold,
+    PlayfairDisplay_700Bold_Italic,
+} from "@expo-google-fonts/playfair-display";
+import {
+    DMSans_400Regular,
+    DMSans_500Medium,
+} from "@expo-google-fonts/dm-sans";
 
 // Keep splash screen visible while loading
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
     const [appIsReady, setAppIsReady] = useState(false);
-    const fadeAnim = useRef(new Animated.Value(0)).current; // Start at 0 (invisible)
+    const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         async function prepare() {
             try {
-                // Load fonts
                 await Font.loadAsync({
                     ChutzBold: require("./assets/fonts/Chutz-Bold.otf"),
+                    PlayfairDisplay_700Bold,
+                    PlayfairDisplay_700Bold_Italic,
+                    DMSans_400Regular,
+                    DMSans_500Medium,
                 });
 
-                // Small delay to ensure everything is ready
                 await new Promise((resolve) => setTimeout(resolve, 100));
             } catch (err) {
                 console.warn("Failed to load resources:", err);
@@ -43,10 +53,8 @@ export default function App() {
 
     const onLayoutRootView = useCallback(async () => {
         if (appIsReady) {
-            // Hide splash immediately
             await SplashScreen.hideAsync();
 
-            // Then fade in the app
             Animated.timing(fadeAnim, {
                 toValue: 1,
                 duration: 1000,

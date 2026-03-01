@@ -53,6 +53,10 @@ const CARD_WIDTH = 460;
 const CARD_HEIGHT = 640;
 const BOTTOM_INSET = 56;
 
+const BACKGROUNDS = [
+    require("../../assets/backgrounds/bg1.jpg")
+];
+
 // ─── Icon Button with hover ───────────────────────────────────────────────────
 
 function IconBtn({ onPress, hitSlop, style, children }) {
@@ -148,8 +152,6 @@ const m = StyleSheet.create({
         backgroundColor: "#1e1e1e",
         borderRadius: 16,
         padding: spacing[7],
-        borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.08)",
         overflow: "hidden",
     },
     closeBtn: {
@@ -158,8 +160,6 @@ const m = StyleSheet.create({
         right: spacing[4],
         width: 28,
         height: 28,
-        borderRadius: radii.full,
-        backgroundColor: "rgba(255,255,255,0.08)",
         alignItems: "center",
         justifyContent: "center",
         zIndex: 10,
@@ -469,29 +469,35 @@ function SettingsPanel() {
 // ─── Info Panel ───────────────────────────────────────────────────────────────
 
 function InfoContent() {
+    const [hovered, setHovered] = useState(false);
+
     return (
         <View style={s.infoContent}>
-            <Text style={s.infoTitle}>AppMitzvah</Text>
-            <Text style={s.infoBody}>
-                A Jewish calendar for Shabbat times and holiday tracking.
-            </Text>
-            <Pressable
-                onPress={() => Linking.openURL("https://danielbrainich.com")}
-            >
+            {/* Centered text */}
+            <View style={s.infoCenter}>
+                <Text style={s.infoTitle}>AppMitzvah</Text>
+                <Text style={s.infoBody}>
+                    Tune in to the Hebrew calendar and Jewish life.
+                </Text>
+            </View>
+
+            {/* Bottom credit */}
+            <Text style={[s.infoBody, s.infoBottom]}>
+                Built by{" "}
                 <Text
+                    onPress={() => Linking.openURL("https://danielbrainich.com")}
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
                     style={[
                         s.infoBody,
-                        {
-                            color: tokenColors.brand.primary,
-                            marginTop: spacing[4],
-                        },
+                        { cursor: "pointer" },
+                        hovered
+                            ? { color: tokenColors.text.primary }
+                            : { color: tokenColors.text.muted },
                     ]}
                 >
-                    Built by dbrainy 🩶
+                    dbrainy
                 </Text>
-            </Pressable>
-            <Text style={[s.infoBody, { marginTop: spacing[6], opacity: 0.3 }]}>
-                v2.0.0
             </Text>
         </View>
     );
@@ -517,6 +523,30 @@ export default function AppNavigatorWeb() {
     const flipAnim = useRef(new Animated.Value(0)).current;
     const tabAnim = useRef(new Animated.Value(1)).current;
 
+    // Background image state
+    const [bgOn, setBgOn] = useState(false);
+    const [bgIndex, setBgIndex] = useState(0);
+    const bgAnim = useRef(new Animated.Value(0)).current;
+
+    const toggleBg = useCallback(() => {
+        if (bgOn) {
+            Animated.timing(bgAnim, {
+                toValue: 0,
+                duration: 400,
+                useNativeDriver: true,
+            }).start();
+            setBgOn(false);
+        } else {
+            setBgIndex((i) => (i + 1) % BACKGROUNDS.length);
+            Animated.timing(bgAnim, {
+                toValue: 1,
+                duration: 400,
+                useNativeDriver: true,
+            }).start();
+            setBgOn(true);
+        }
+    }, [bgOn, bgAnim]);
+
     // Per-tab scale animations — Holidays starts active (1.08)
     const tabScales = useRef(
         TABS.reduce((acc, tab) => {
@@ -527,7 +557,6 @@ export default function AppNavigatorWeb() {
 
     const switchTab = useCallback(
         (tab) => {
-            // Animate tab label scales with bounce
             TABS.forEach((t) => {
                 Animated.spring(tabScales[t], {
                     toValue: t === tab ? 1.08 : 1,
@@ -537,7 +566,6 @@ export default function AppNavigatorWeb() {
                 }).start();
             });
 
-            // Fade content out, swap, fade in
             Animated.timing(tabAnim, {
                 toValue: 0,
                 duration: 120,
@@ -579,6 +607,34 @@ export default function AppNavigatorWeb() {
 
     return (
         <View style={s.page}>
+            {/* ── Background image layer ── */}
+            <Animated.Image
+                source={BACKGROUNDS[bgIndex]}
+                style={[
+                    StyleSheet.absoluteFill,
+                    {
+                        opacity: bgAnim,
+                        width: "100%",
+                        height: "100%",
+                        resizeMode: "cover",
+                    },
+                ]}
+                blurRadius={0}
+            />
+            {/* Dark overlay so card stays readable */}
+            <Animated.View
+                style={[
+                    StyleSheet.absoluteFill,
+                    {
+                        backgroundColor: "#000",
+                        opacity: bgAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0, 0.35],
+                        }),
+                    },
+                ]}
+            />
+
             <View style={s.cardContainer}>
                 {/* ── Front face ── */}
                 <Animated.View
@@ -609,6 +665,21 @@ export default function AppNavigatorWeb() {
                                 name="cog"
                                 size={20}
                                 color={tokenColors.text.primary}
+                            />
+                        </IconBtn>
+                        <IconBtn
+                            onPress={toggleBg}
+                            hitSlop={8}
+                            style={s.topIconBtn}
+                        >
+                            <Feather
+                                name="image"
+                                size={18}
+                                color={
+                                    bgOn
+                                        ? tokenColors.brand.primary
+                                        : tokenColors.text.primary
+                                }
                             />
                         </IconBtn>
                     </View>
@@ -754,7 +825,7 @@ const s = StyleSheet.create({
         backfaceVisibility: "hidden",
     },
 
-    // Top-left icon cluster (info + cog on front, arrow on back)
+    // Top-left icon cluster (info + cog + image on front, arrow on back)
     topLeft: {
         position: "absolute",
         top: spacing[3],
@@ -818,8 +889,6 @@ const s = StyleSheet.create({
         paddingHorizontal: spacing[2],
         paddingVertical: spacing[2],
         gap: 2,
-        borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.07)",
     },
     tab: {
         paddingVertical: 5,
@@ -901,22 +970,27 @@ const s = StyleSheet.create({
     // Info face
     infoContent: {
         flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
         paddingHorizontal: spacing[8],
         paddingTop: spacing[6],
     },
+    infoCenter: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+    },
     infoTitle: {
-        fontSize: typography.size["2xl"],
-        fontWeight: "700",
+        fontSize: typography.size["md"],
         color: tokenColors.text.primary,
         marginBottom: spacing[3],
-        fontFamily: "ChutzBold",
     },
     infoBody: {
         fontSize: typography.size.sm,
         color: tokenColors.text.muted,
         textAlign: "center",
         lineHeight: 20,
+    },
+    infoBottom: {
+        textAlign: "center",
+        paddingBottom: spacing[6],
     },
 });

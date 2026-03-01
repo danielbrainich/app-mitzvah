@@ -189,6 +189,13 @@ export const ui = StyleSheet.create({
         fontFamily: "ChutzBold",
     },
 
+    textPlayfair: {
+        fontFamily: "PlayfairDisplay_700Bold_Italic",
+    },
+    textDMSans: {
+        fontFamily: "DMSans_500Medium",
+    },
+
     textHebrew: {
         writingDirection: "rtl",
         textAlign: "right",

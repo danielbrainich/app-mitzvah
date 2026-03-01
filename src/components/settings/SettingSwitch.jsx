@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Platform } from "react-native";
+import { View, Text, Platform, Pressable } from "react-native";
 import { Switch } from "react-native-switch";
 import * as Haptics from "expo-haptics";
 import { ui } from "../../constants/theme";
@@ -19,19 +19,35 @@ export default function SettingSwitch({
         onValueChange(newValue);
     };
 
+    const isWeb = Platform.OS === "web";
+
     return (
-        <View style={ui.row}>
+        <Pressable
+            onPress={() => handleChange(!value)}
+            style={[
+                ui.row,
+                isWeb && {
+                    cursor: "pointer",
+                },
+            ]}
+        >
             <View style={ui.rowLeft}>
-                <Text style={ui.paragraph}>{label}</Text>
-                {sublabel && <Text style={ui.label}>{sublabel}</Text>}
+                <Text style={[ui.paragraph, isWeb && { fontSize: 13 }]}>
+                    {label}
+                </Text>
+                {sublabel && (
+                    <Text style={[ui.label, isWeb && { fontSize: 11 }]}>
+                        {sublabel}
+                    </Text>
+                )}
             </View>
 
             <Switch
                 value={value}
                 onValueChange={handleChange}
                 disabled={false}
-                circleSize={26}
-                barHeight={32}
+                circleSize={isWeb ? 18 : 26}
+                barHeight={isWeb ? 22 : 32}
                 circleBorderWidth={0}
                 backgroundActive="#82CBFF"
                 backgroundInactive="#3e3e3e"
@@ -41,8 +57,9 @@ export default function SettingSwitch({
                 renderActiveText={false}
                 renderInActiveText={false}
                 switchWidthMultiplier={2.2}
-                switchBorderRadius={16}
+                switchBorderRadius={isWeb ? 11 : 16}
+                style
             />
-        </View>
+        </Pressable>
     );
 }
